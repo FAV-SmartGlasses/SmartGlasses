@@ -3,7 +3,7 @@ import board
 import busio
 import adafruit_bno055
 import socket
-import struct
+import json
 
 i2c = busio.I2C(board.SCL, board.SDA)
 sensor = adafruit_bno055.BNO055_I2C(i2c)
@@ -19,8 +19,17 @@ def send_bno055_data():
 
     yaw, roll, pitch = euler
 
-    message = struct.pack("fff", yaw, roll, pitch)
-    sock.sendto(message, (IP, PORT))
+    imu_data = {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "yaw": yaw,
+        "pitch": pitch,
+        "roll": roll
+    }
+
+    message = json.dumps(imu_data)
+    sock.sendto(message.encode(), (IP, PORT))
 
 try:
     while True:
