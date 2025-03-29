@@ -1,7 +1,12 @@
 from ultralytics import YOLO
 import cv2
+from picamera2 import Picamera2
 import math 
+
 # start webcam
+picam2 = Picamera2()
+picam2.start()
+
 cap = cv2.VideoCapture(0)
 cap.set(3, 640)
 cap.set(4, 480)
@@ -23,8 +28,12 @@ classNames = ["Clovek", "Kolo", "Auto", "Motorka", "Letadlo", "Autobus", "Vlak",
 
 
 while True:
-    success, img = cap.read()
-    results = model(img, stream=True)
+    frame = picam2.capture_array()
+
+    # Convert to RGB (sRGB) if necessary
+    frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    
+    results = model(frame_rgb, stream=True)
 
     # coordinates
     for r in results:
@@ -41,7 +50,7 @@ while True:
                 x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2) # convert to int values
 
                 # put box in cam
-                cv2.rectangle(img, (x1, y1), (x2, y2), (255, 0, 255), 3)
+                cv2.rectangle(frame_rgb, (x1, y1), (x2, y2), (255, 0, 255), 3)
 
                 # class name
                 cls = int(box.cls[0])
@@ -54,9 +63,9 @@ while True:
                 color = (255, 0, 0)
                 thickness = 2
 
-                cv2.putText(img, classNames[cls], org, font, fontScale, color, thickness)
+                cv2.putText(frame_rgb, classNames[cls], org, font, fontScale, color, thickness)
 
-    cv2.imshow('Webcam', img)
+    cv2.imshow('Webcam', frame_rgb)
     if cv2.waitKey(1) == ord('q'):
         break
 
