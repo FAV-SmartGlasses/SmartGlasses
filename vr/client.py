@@ -15,9 +15,9 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 while True:
     quat = sensor.quaternion
     if quat is not None:
-        w, x, y, z = quat
+        qw, qx, qy, qz = quat
 
-        packet = struct.pack("<Bffff", 1, x, y, z, w)
+        packet = struct.pack("<BBffff", 1, 0, qx, qy, qz, qw)  # <BB = header, ID | ffff = 4 floats
 
         sock.sendto(packet, (IP, PORT))
 
