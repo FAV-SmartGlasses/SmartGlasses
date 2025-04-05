@@ -10,7 +10,7 @@ class HandDetection:
     def __init__(self):
         self.mp_hands = mp.solutions.hands
         self.mp_drawing = mp.solutions.drawing_utils
-        self.hands = self.mp_hands.Hands(max_num_hands=1    , min_detection_confidence=0.7)
+        self.hands = self.mp_hands.Hands(static_image_mode=False, max_num_hands=1, min_detection_confidence=0.7)
         self.hand_state_history = deque(maxlen=20)  # ukládá poslední stavy ('open'/'closed')
         self.gesture_detected = False
         self.last_wrist_x = None
@@ -91,7 +91,7 @@ class HandDetection:
             if item_y <= middle_point_y <= item_y + item_height:
                 self.current_selection = i  # označ aktuálně vybrané tlačítko
                 # volitelně: zvýraznění nebo výpis
-                print(f"Zelená čára ukazuje na: {Menu.items[i]}")
+                print(f"Zelená čára ukazuje na: {Menu.items[i].get_name()}")
 
     def CheckClickGestureForOpeningApp(self, hand_state, menu_visible):
         """if hand_state == 'closed':
@@ -104,7 +104,7 @@ class HandDetection:
         if hand_state == 'closed':
             menu_visible = False
             if self.current_selection != len(Menu.items) - 1:  #kdyč to není poslední položka menu
-                print(f"Spuštěná aplikace: {Menu.items[self.current_selection]}")
+                print(f"Spuštěná aplikace: {Menu.items[self.current_selection].get_name()}")
         return menu_visible
             
     

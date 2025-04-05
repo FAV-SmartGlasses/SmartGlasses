@@ -3,12 +3,13 @@ from hand_detection import HandDetection
 from menu import Menu
 
 # Kamera
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 
 menu_visible = False
 current_selection = 0
 
 hand_detection = HandDetection()
+menu = Menu()
 
 while cap.isOpened():
     success, image = cap.read()
@@ -21,7 +22,7 @@ while cap.isOpened():
 
     image, menu_visible, current_selection = hand_detection.process_image(image, w, h, menu_visible, current_selection)
 
-    image = Menu.display_menu(image, current_selection, menu_visible, w, h)
+    image = menu.display_menu(image, current_selection, menu_visible, h)
 
     # Zobrazení obrazu
     cv2.imshow('VR Menu', image)
@@ -30,8 +31,6 @@ while cap.isOpened():
     key = cv2.waitKey(1) & 0xFF
     if key == 27:  # ESC pro ukončení
         break
-    """if key == ord('m'):  # Stisknutím 'M' otevřeme/zavřeme menu
-        menu_visible = not menu_visible"""
 
 cap.release()
 cv2.destroyAllWindows()
