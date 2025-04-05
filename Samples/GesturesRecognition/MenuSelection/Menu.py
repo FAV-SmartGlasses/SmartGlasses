@@ -8,8 +8,95 @@ mp_hands = mp.solutions.hands
 mp_drawing = mp.solutions.drawing_utils
 hands = mp_hands.Hands(max_num_hands=1, min_detection_confidence=0.7)
 
+class MenuItem:
+    def __init__(self, name, display_name, iconPath):
+        self._name = name
+        self._display_name = display_name
+        self._selected = False
+        self._icon_path = iconPath
+
+    def select(self):
+        print(f"Vybrána položka: {self.name}")
+        self._selected = True
+
+    def unselect(self):
+        print(f"Zrušena volba položky: {self.name}")
+        self.selected = False
+
+    def clicked(self):
+        print(f"Položka '{self.name}' byla kliknuta.")
+
+    def setDisplayName(self, display_name):
+        self._display_name = display_name
+
+    def getDisplayName(self):
+        return self._display_name
+    
+    def getName(self):
+        return self._name
+    
+    def getIconPath(self):
+        return self.icon_path
+
+class App(MenuItem):
+    def __init__(self, name, display_name, icon_path):
+        super().__init__(name, display_name, icon_path)
+        self.opened = False
+
+
+    def launch(self):
+        print(f"Spuštění aplikace {self.app_name}")
+        #TODO: implementace spuštění aplikace
+        self.opened = True
+
+
+class LockMenu(MenuItem):
+    def __init__(self, icons_path):
+        super().__init__("MenuLock", "Pin Menu", icons_path[0])
+        self.menu_pined = False
+        self._iconPaths = icons_path
+
+    def pin_menu(self):
+        print(f"Menu '{self.name}' is pined")
+        self._icon = self._iconPaths[0]
+        self.menu_pined = True
+        #TODO: implementace připnutí menu
+
+    def unpin_menu(self):
+        print(f"Menu '{self.name}' is unpined.")
+        self._icon = self._iconPaths[1]
+        self.menu_pined = False
+
+    def clicked(self):
+        print(f"Menu '{self.name}' was clicked.")
+        if self.menu_pined:
+            self.unpin_menu()
+        else:
+            self.pin_menu()
+
+
+class CloseMenu(MenuItem):
+    def __init__(self, icon_path):
+        super().__init__("CloseMenu", "Close Menu", icon_path)
+
+    def close(self):
+        print(f"Menu '{self.name}' bylo zavřeno.")
+        #TODO: implementace zavření menu"""
+
+
 # Nastavení menu a aplikací
-menu_items = ["Aplikace 1", "Aplikace 2", "Aplikace 3", "Aplikace 4", "Zavřít menu"]
+#menu_items = ["Aplikace 1", "Aplikace 2", "Aplikace 3", "Aplikace 4", "Zavřít menu"]
+menu_items = [
+        App("Home", "Home", "Home.png"),
+        App("Settings", "Settings", "Settings.png"),
+        App("ToDo", "To DO", "Done.png"),
+        App("Calculator", "Calculator", "Plus.png"),
+        App("Browser", "Browser", "Search.png"),
+        App("Music", "Music", "Music.png"),
+        App("Notes", "Notes", "Edit.png"),
+        LockMenu(("Lock.png", "Padlock.png")),
+        CloseMenu("Close.png")
+    ]
 current_selection = 0
 menu_visible = False
 DIST_THRESHOLD = 40  # prahová hodnota pro "spojení prstů"
@@ -100,7 +187,7 @@ while cap.isOpened():
                     if item_y <= middle_point_y <= item_y + item_height:
                         current_selection = i  # označ aktuálně vybrané tlačítko
                         # volitelně: zvýraznění nebo výpis
-                        print(f"Zelená čára ukazuje na: {menu_items[i]}")
+                        print(f"Zelená čára ukazuje na: {menu_items[i].getName()}")
       
                 # Zjištění pohybu nahoru/dolů
                 """if wrist[1] < h // 3:  # pokud je ruka nahoře
@@ -116,7 +203,7 @@ while cap.isOpened():
                     if current_selection == len(menu_items) - 1:  # Poslední položka = zavření menu
                         menu_visible = False  # zavření menu
                     else:
-                        print(f"Spuštěná aplikace: {menu_items[current_selection]}")
+                        print(f"Spuštěná aplikace: {menu_items[current_selection].getName()}")
 
             # Vytvoření bodu mezi palcem a ukazováčkem (polovina mezi těmito dvěma body)
             middle_point_x = (thumb_tip[0] + index_tip[0]) // 2
@@ -153,7 +240,7 @@ while cap.isOpened():
 
             # Kreslení zaoblených čtverců
             draw_rounded_rectangle(image, (item_x, item_y), (item_x + menu_width - 2 * padding, item_y + 40), 20, color, -1)
-            cv2.putText(image, item, (item_x + 20, item_y + 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
+            cv2.putText(image, item.getDisplayName(), (item_x + 20, item_y + 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
 
     # Zobrazení obrazu
     cv2.imshow('VR Menu', image)
