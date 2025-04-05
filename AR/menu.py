@@ -126,8 +126,10 @@ class Menu:
 
             # Poloprůhledné pozadí menu
             overlay = image.copy()
-            cv2.rectangle(overlay, (menu_x, menu_y), (menu_x + menu_width + padding, menu_y + menu_height + padding), (0, 0, 0), -1)
-            cv2.addWeighted(overlay, 0.4, image, 1 - 0.4, 0, image)
+
+            if(False): #konstanta zda vykrelit pozadí pro menu
+                Menu.draw_rounded_rectangle(overlay, (menu_x, menu_y), (menu_x + menu_width + padding, menu_y + menu_height + padding), 40, (0, 0, 0), -1)
+                cv2.addWeighted(overlay, 0.4, image, 1 - 0.4, 0, image)
 
             # Zaoblené čtverce pro ikony
             for i, item in enumerate(Menu.items):
