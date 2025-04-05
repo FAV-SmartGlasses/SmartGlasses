@@ -1,5 +1,6 @@
 import cv2
 import math
+import numpy as np
 from collections import deque
 import os
 
@@ -140,17 +141,25 @@ class Menu:
 
             # Zaoblené čtverce pro ikony
             for i, item in enumerate(Menu.items):
-                color = (0, 255, 255) if i == current_selection else (255, 255, 255)
+                #color = (0, 255, 255) if i == current_selection else (255, 255, 255)
+                color = (255, 255, 255)
                 item_x = menu_x + padding
                 item_y = menu_y + padding + i * (item_height + padding) #(menu_height // len(Menu.items))
 
                 # Kreslení zaoblených čtverců pro ikony
-                Menu.draw_rounded_rectangle(image, 
+                """Menu.draw_rounded_rectangle(image, 
                                             (item_x, item_y), 
                                             (item_x + item_height, item_y + item_height), 
                                             20, 
                                             color, 
-                                            -1)
+                                            -1)"""
+                radius = item_height // 2 if i != current_selection else math.ceil(item_height // 2 * 1.5)
+                cv2.circle(image, 
+                            (menu_x + (menu_width // 2 ), 
+                             item_y + (item_height // 2 )), 
+                            radius, 
+                            color, 
+                            -1)
                 #Menu.draw_rounded_rectangle(image, (item_x, item_y), (item_x + item_height, item_y + item_height), 20, color, -1)
 
 
@@ -159,19 +168,30 @@ class Menu:
                 if icon_path:
                     icon = cv2.imread(icon_path, cv2.IMREAD_UNCHANGED)
                     if icon is not None:
-                        icon = cv2.resize(icon, (item_height, item_height))  # Přizpůsobení velikosti ikony
+                        icon_size = int(item_height / 5 * (3 if i != current_selection else 5))  # Velikost ikony
+                        icon = cv2.resize(icon, (icon_size, icon_size))  # Přizpůsobení velikosti ikony
+
+                        padded_icon = np.zeros((item_height, item_height, 4), dtype=np.uint8)  # Vytvoření prázdného pozadí pro ikonu
+
+                        # Výpočet pozice pro umístění ikony do středu
+                        y_offset = (item_height - icon_size) // 2
+                        x_offset = (item_height - icon_size) // 2
+
+                        # Vložení ikony do středu matice
+                        padded_icon[y_offset:y_offset + icon_size, x_offset:x_offset + icon_size] = icon
+
                         icon_y = item_y
                         icon_x = item_x
                         # Přidání ikony do menu
                         if icon.shape[2] == 4:  # Pokud má ikona alfa kanál
                             alpha_channel = icon[:, :, 3] / 255.0
                             for c in range(3):  # Pro RGB kanály
-                                image[icon_y:icon_y + item_height, icon_x:icon_x + item_height, c] = (
+                                image[icon_y + y_offset:icon_y + y_offset + icon_size, icon_x + x_offset:icon_x + x_offset + icon_size, c] = (
                                     alpha_channel * icon[:, :, c] +
-                                    (1 - alpha_channel) * image[icon_y:icon_y + item_height, icon_x:icon_x + item_height, c]
+                                    (1 - alpha_channel) * image[icon_y + y_offset:icon_y + y_offset + icon_size, icon_x + x_offset:icon_x + x_offset + icon_size, c]
                                 )
                         else:
-                            image[icon_y:icon_y + item_height, icon_x:icon_x + item_height] = icon
+                            image[icon_y + y_offset:icon_y + y_offset + icon_size, icon_x + x_offset:icon_x + x_offset + icon_size] = icon
                 #cv2.putText(image, item.get_display_name(), (item_x + 20, item_y + item_height // 2 + 10), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
 
         return image
