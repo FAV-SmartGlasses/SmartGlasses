@@ -31,8 +31,6 @@ while cap.isOpened():
     key = cv2.waitKey(1) & 0xFF
     if key == 27:  # ESC pro ukončení
         break
-    """if key == ord('m'):  # Stisknutím 'M' otevřeme/zavřeme menu
-        menu_visible = not menu_visible"""
 
 cap.release()
 cv2.destroyAllWindows()

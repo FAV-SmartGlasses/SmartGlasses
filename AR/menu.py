@@ -168,7 +168,7 @@ class Menu:
                 if icon_path:
                     icon = cv2.imread(icon_path, cv2.IMREAD_UNCHANGED)
                     if icon is not None:
-                        icon_size = int(item_height / 5 * (3 if i != current_selection else 5))  # Velikost ikony
+                        icon_size = int(item_height / 5 * (3 if i != current_selection else 5))
                         icon = cv2.resize(icon, (icon_size, icon_size))  # Přizpůsobení velikosti ikony
 
                         padded_icon = np.zeros((item_height, item_height, 4), dtype=np.uint8)  # Vytvoření prázdného pozadí pro ikonu
