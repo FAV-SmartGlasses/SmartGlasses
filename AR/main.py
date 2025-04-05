@@ -3,7 +3,7 @@ from hand_detection import HandDetection
 from menu import Menu
 
 # Kamera
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 
 menu_visible = False
 current_selection = 0

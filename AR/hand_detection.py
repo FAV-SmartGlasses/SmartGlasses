@@ -91,7 +91,7 @@ class HandDetection:
             if item_y <= middle_point_y <= item_y + item_height:
                 self.current_selection = i  # označ aktuálně vybrané tlačítko
                 # volitelně: zvýraznění nebo výpis
-                print(f"Zelená čára ukazuje na: {Menu.items[i].getName()}")
+                print(f"Zelená čára ukazuje na: {Menu.items[i].get_name()}")
 
     def CheckClickGestureForOpeningApp(self, hand_state, menu_visible):
         """if hand_state == 'closed':
@@ -104,7 +104,7 @@ class HandDetection:
         if hand_state == 'closed':
             menu_visible = False
             if self.current_selection != len(Menu.items) - 1:  #kdyč to není poslední položka menu
-                print(f"Spuštěná aplikace: {Menu.items[self.current_selection].getName()}")
+                print(f"Spuštěná aplikace: {Menu.items[self.current_selection].get_name()}")
         return menu_visible
             
     
