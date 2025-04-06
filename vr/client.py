@@ -14,6 +14,7 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 while True:
     quat = sensor.quaternion
+    quat = [quat[1], quat[0], quat[2], quat[3]]
     if quat is not None:
         # Just pack the 4 floats: qw, qx, qy, qz (or whatever order you prefer)
         packet = array.array('f', quat).tobytes()
