@@ -1,5 +1,4 @@
 import cv2
-from hand_detection import HandDetection
 from UI_manager import UImanager
 #from menu import Menu
 
@@ -9,7 +8,7 @@ cap = cv2.VideoCapture(1)
 menu_visible = False
 current_selection = 0
 
-hand_detection = HandDetection()
+ui_manager = UImanager()
 
 while cap.isOpened():
     success, image = cap.read()
@@ -18,18 +17,15 @@ while cap.isOpened():
 
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-    h, w, _ = image.shape
-
-    image, menu_visible, current_selection = hand_detection.process_image(image, w, h, menu_visible, current_selection)
-
-    image = UImanager().display_UI(image, current_selection, menu_visible, h, w)
+    image = ui_manager.display_UI(image)
 
     # Zobrazení obrazu
-    cv2.imshow('VR Menu', image)
+    cv2.imshow('AR Menu', image)
 
-    # Detekce stisknutí klávesy pro otevření/zavření menu
     key = cv2.waitKey(1) & 0xFF
-    if key == 27:  # ESC pro ukončení
+    if key == 27 or key == ord('q') or key == ord('Q'):  # ESC nebo 'q' pro ukončení
+        break
+    if cv2.getWindowProperty('AR Menu', cv2.WND_PROP_VISIBLE) < 1:  # Kontrola zavření okna
         break
 
 cap.release()

@@ -1,15 +1,21 @@
 from menu import Menu
+from hand_detection import HandDetection
 import datetime
 import cv2
 
 class UImanager:
-    #def __init__(self):
+    def __init__(self):
+        self.menu = Menu()
+        self.hand_detection = HandDetection()
 
-    def display_UI(self, image, current_menu_selection, menu_visible, h, w):
-        menu = Menu()
-        menu.display_menu(image, current_menu_selection, menu_visible, h)
+    def display_UI(self, image):
+        h, w, _ = image.shape
+
+        image, click_gesture_detected, swipe_gesture_detected, cursor_position = self.hand_detection.process_image(image, w, h)
+
+        self.menu.display_menu(image, click_gesture_detected, swipe_gesture_detected, cursor_position)  # Vykreslení menu
        
-        self.draw_time_bar(image, h, w, menu_visible)  # Vykreslení bubliny s časem
+        self.draw_time_bar(image, h, w, self.menu.get_visible())  # Vykreslení bubliny s časem
 
         return image
       
