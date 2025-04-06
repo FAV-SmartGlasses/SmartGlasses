@@ -2,7 +2,7 @@ import mediapipe as mp
 import cv2
 import math
 from collections import deque
-from menu import Menu
+from menu import Menu, App
 
 class HandDetection:
     DIST_THRESHOLD = 40  # prahová hodnota pro "spojení prstů"
@@ -103,8 +103,10 @@ class HandDetection:
         # otevření app nebo zavření
         if hand_state == 'closed':
             menu_visible = False
-            if self.current_selection != len(Menu.items) - 1:  #kdyč to není poslední položka menu
-                print(f"Spuštěná aplikace: {Menu.items[self.current_selection].get_name()}")
+            selected_item = Menu.items[self.current_selection]
+            if isinstance(selected_item, App):  #kdyč to je aplikace a je otevřená
+                selected_item.clicked()
+
         return menu_visible
             
     

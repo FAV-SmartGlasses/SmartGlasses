@@ -11,16 +11,8 @@ class MenuItem:
         self._selected = False
         self._icon_path = iconPath
 
-    def select(self):
-        print(f"Vybrána položka: {self.name}")
-        self._selected = True
-
-    def unselect(self):
-        print(f"Zrušena volba položky: {self.name}")
-        self.selected = False
-
     def clicked(self):
-        print(f"Položka '{self.name}' byla kliknuta.")
+        print(f"Položka '{self._name}' byla kliknuta.")
 
     def set_display_name(self, display_name):
         self._display_name = display_name
@@ -34,18 +26,29 @@ class MenuItem:
     def get_icon_path(self):
         base_path = os.path.dirname(__file__)  # Získá adresář aktuálního souboru
         return os.path.join(base_path, "..", "resources", "icons", self._icon_path)
-        return "resources\icons\{self._icon_path}"
 
 class App(MenuItem):
     def __init__(self, name, display_name, icon_path):
         super().__init__(name, display_name, icon_path)
         self.opened = False
 
+    def clicked(self):
+        super().clicked()
+        if self.opened:
+            self.close()
+        else:
+            self.launch()
 
     def launch(self):
         print(f"Spuštění aplikace {self._name}")
         #TODO: implementace spuštění aplikace
         self.opened = True
+
+    def close(self):
+        print(f"Zavření aplikace {self._name}")
+        #TODO: implementace zavření aplikace
+        self.opened = False
+
 
 
 class LockMenu(MenuItem):
@@ -64,6 +67,7 @@ class LockMenu(MenuItem):
         print(f"Menu '{self.name}' is unpined.")
         self._icon = self._icon_paths[1]
         self.menu_pined = False
+        #TODO: implementace odepnutí menu
 
     def clicked(self):
         print(f"Menu '{self.name}' was clicked.")
@@ -77,19 +81,20 @@ class CloseMenu(MenuItem):
     def __init__(self, icon_path):
         super().__init__("CloseMenu", "Close Menu", icon_path)
 
+    def clicked(self):
+        super().clicked()
+        self.close()
+
     def close(self):
         print(f"Menu '{self.name}' bylo zavřeno.")
         #TODO: implementace zavření menu"""
 
 class Menu:
-    #items = ["Home", "Settings", "Aplikace 3", "Aplikace 4", "Close menu"]
-    #items_icon = ["Home.png", "Settings.png", "icon3.png", "icon4.png", "Cancel.png"]
-
     items = [
         App("Home", "Home", "Home.png"),
         App("Settings", "Settings", "Settings.png"),
         App("ToDo", "To DO", "Done.png"),
-        #App("Calculator", "Calculator", "Plus.png"),
+        App("Calculator", "Calculator", "Plus.png"),
         #App("Browser", "Browser", "Search.png"),
         #App("Music", "Music", "Music.png"),
         App("Notes", "Notes", "Edit.png"),
@@ -99,9 +104,6 @@ class Menu:
 
     current_selection = 0
     visible = False
-
-    #def __init__(self):
-        
 
     def draw_rounded_rectangle(image, top_left, bottom_right, radius, color, thickness):
         x1, y1 = top_left
@@ -141,18 +143,15 @@ class Menu:
 
             # Zaoblené čtverce pro ikony
             for i, item in enumerate(Menu.items):
-                #color = (0, 255, 255) if i == current_selection else (255, 255, 255)
-                color = (255, 255, 255)
+                if isinstance(item, App) and item.opened:
+                    color = (248, 255, 145) #(238, 255, 0)  # Barva pro otevřenou aplikaci
+                else:
+                    color = (255, 255, 255)
+                
                 item_x = menu_x + padding
                 item_y = menu_y + padding + i * (item_height + padding) #(menu_height // len(Menu.items))
 
-                # Kreslení zaoblených čtverců pro ikony
-                """Menu.draw_rounded_rectangle(image, 
-                                            (item_x, item_y), 
-                                            (item_x + item_height, item_y + item_height), 
-                                            20, 
-                                            color, 
-                                            -1)"""
+                # Vyreslení bublin pro ikony
                 radius = item_height // 2 if i != current_selection else math.ceil(item_height // 2 * 1.5)
                 cv2.circle(image, 
                             (menu_x + (menu_width // 2 ), 
@@ -160,8 +159,6 @@ class Menu:
                             radius, 
                             color, 
                             -1)
-                #Menu.draw_rounded_rectangle(image, (item_x, item_y), (item_x + item_height, item_y + item_height), 20, color, -1)
-
 
                 # Načtení a vykreslení ikony
                 icon_path = item.get_icon_path()
