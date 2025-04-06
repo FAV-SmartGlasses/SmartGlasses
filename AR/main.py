@@ -1,6 +1,7 @@
 import cv2
 from hand_detection import HandDetection
-from menu import Menu
+from UI_manager import UImanager
+#from menu import Menu
 
 # Kamera
 cap = cv2.VideoCapture(1)
@@ -9,7 +10,6 @@ menu_visible = False
 current_selection = 0
 
 hand_detection = HandDetection()
-menu = Menu()
 
 while cap.isOpened():
     success, image = cap.read()
@@ -22,7 +22,7 @@ while cap.isOpened():
 
     image, menu_visible, current_selection = hand_detection.process_image(image, w, h, menu_visible, current_selection)
 
-    image = menu.display_menu(image, current_selection, menu_visible, h)
+    image = UImanager().display_UI(image, current_selection, menu_visible, h, w)
 
     # Zobrazení obrazu
     cv2.imshow('VR Menu', image)

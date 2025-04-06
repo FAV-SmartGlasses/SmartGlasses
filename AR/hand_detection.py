@@ -72,10 +72,6 @@ class HandDetection:
     def get_point(self, hand_landmarks, id, w, h):
         lm = hand_landmarks.landmark[id]
         return int(lm.x * w), int(lm.y * h)
-
-    """def get_point(self, hand_landmarks, w, h):
-        lm = hand_landmarks #.landmark[id]
-        return int(lm.x * w), int(lm.y * h)"""
     
     def DetectMenuItemSelection(self, h, thumb_tip, index_tip):
         menu_width = 300
@@ -94,18 +90,10 @@ class HandDetection:
                 print(f"Zelená čára ukazuje na: {Menu.items[i].get_name()}")
 
     def CheckClickGestureForOpeningApp(self, hand_state, menu_visible):
-        """if hand_state == 'closed':
-            if self.current_selection == len(Menu.menu_items) - 1:  # Poslední položka = zavření menu
-                menu_visible = False  # zavření menu
-            else:
-                print(f"Spuštěná aplikace: {Menu.menu_items[self.current_selection]}")
-                menu_visible = False"""
         # otevření app nebo zavření
         if hand_state == 'closed':
             menu_visible = False
-            selected_item = Menu.items[self.current_selection]
-            if isinstance(selected_item, App):  #kdyč to je aplikace a je otevřená
-                selected_item.clicked()
+            Menu.items[self.current_selection].clicked()
 
         return menu_visible
             
