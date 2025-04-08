@@ -29,11 +29,7 @@ class HandDetection:
                 swipe_gesture_detected = self.swipe_gesture_detected(hand_landmarks, w, h)  # Kontrola gesta pro posun
 
                 cursor_position = self.get_cursor_position(image, w, h)  # Získání pozice kurzoru
-
-                """if menu_visible:
-                    self.DetectMenuItemSelection(h, thumb_tip, index_tip)  # Získání aktuálního výběru položky menu
-                    menu_visible = self.CheckClickGestureForOpeningApp(click_gesture_detected, menu_visible)  # Kontrola gesta pro otevření aplikace"""
-
+                
                 self.draw(w, h, image, hand_landmarks)   #nakreslí čáry a body na ruce
 
         #self.hands.close()
@@ -94,12 +90,6 @@ class HandDetection:
     def get_wrist(self, hand_landmarks, w, h):
         mp_hands = mp.solutions.hands
         return self.get_point(mp_hands.HandLandmark.WRIST, hand_landmarks, w, h)
-
-    """def get_cursor_position(self, thumb_tip, index_tip):
-        middle_point_x = (thumb_tip[0] + index_tip[0]) // 2
-        middle_point_y = (thumb_tip[1] + index_tip[1]) // 2
-
-        return middle_point_x, middle_point_y"""
     
     def get_cursor_position(self, image, w, h):
         results = self.hands.process(image)

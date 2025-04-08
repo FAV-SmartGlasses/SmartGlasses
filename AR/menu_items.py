@@ -45,6 +45,9 @@ class App(MenuItem):
         #TODO: implementace zavření aplikace
         self.opened = False
 
+    def draw(self, image, w, h, click_gesture_detected, cursor_position):
+        return image
+
 class LockMenu(MenuItem):
     def __init__(self, icons_path):
         super().__init__("MenuLock", "Pin Menu", icons_path[0])
@@ -80,4 +83,4 @@ class CloseMenu(MenuItem):
 
     def close(self):
         print(f"Menu '{self._name}' bylo zavřeno.")
-        #TODO: implementace zavření menu"""
+        #jelikož se po vybrání nějaké položky v menu menu automaticky zavře, nění potřeba implementovat zavření menu

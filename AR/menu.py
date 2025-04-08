@@ -3,13 +3,16 @@ import math
 import numpy as np
 from menu_items import MenuItem, App, LockMenu, CloseMenu
 from hand_detection import HandDetection 
+from Apps.calculator import Calculator
+from draw import Draw
 
 class Menu:
-    _items = [
+    items = [
         App("Home", "Home", "Home.png"),
         App("Settings", "Settings", "Settings.png"),
         App("ToDo", "To DO", "Done.png"),
-        App("Calculator", "Calculator", "Plus.png"),
+        #App("Calculator", "Calculator", "Plus.png"),
+        Calculator("Calculator", "Calculator", "Plus.png"),
         #App("Browser", "Browser", "Search.png"),
         #App("Music", "Music", "Music.png"),
         App("Notes", "Notes", "Edit.png"),
@@ -18,7 +21,7 @@ class Menu:
     ]
 
     def __init__(self):
-        self._items = Menu._items
+        self.items = Menu.items
         self._current_selection = 0
         self._visible = False
 
@@ -55,13 +58,13 @@ class Menu:
         padding = 15
         item_height = 50
         menu_width = 2 * padding + item_height#300
-        menu_height = padding + len(self._items) * (item_height + padding)
+        menu_height = padding + len(self.items) * (item_height + padding)
         menu_x = 10
         menu_y = h // 2 - menu_height // 2
 
-        for i, item in enumerate(self._items):
+        for i, item in enumerate(self.items):
             item_x = menu_x + padding
-            item_y = menu_y + padding + i * (menu_height // len(self._items))
+            item_y = menu_y + padding + i * (menu_height // len(self.items))
 
             middle_point_x, middle_point_y = cursor_position
 
@@ -72,26 +75,13 @@ class Menu:
     def check_click_gesture(self, click_gesture_detected):
         if click_gesture_detected == True:
             self._visible = False
-            self._items[self._current_selection].clicked()
+            self.items[self._current_selection].clicked()
 
-    def draw_rounded_rectangle(self, image, top_left, bottom_right, radius, color, thickness):
-        x1, y1 = top_left
-        x2, y2 = bottom_right
-
-        # Kreslíme 4 zaoblené rohy (kruhy) a 4 čáry
-        cv2.circle(image, (x1 + radius, y1 + radius), radius, color, -1)
-        cv2.circle(image, (x2 - radius, y1 + radius), radius, color, -1)
-        cv2.circle(image, (x1 + radius, y2 - radius), radius, color, -1)
-        cv2.circle(image, (x2 - radius, y2 - radius), radius, color, -1)
-    
-        cv2.rectangle(image, (x1 + radius, y1), (x2 - radius, y2), color, -1)
-        cv2.rectangle(image, (x1, y1 + radius), (x2, y2 - radius), color, -1)
-    
     def _draw_menu(self, image, w, h):
         padding = 15
         item_height = 50
         menu_width = 2 * padding + item_height#300
-        menu_height = padding + len(self._items) * (item_height + padding)
+        menu_height = padding + len(self.items) * (item_height + padding)
         menu_x = 10
         menu_y = h // 2 - menu_height // 2
 
@@ -99,7 +89,8 @@ class Menu:
         overlay = image.copy()
 
         if(True): #konstanta zda vykrelit pozadí pro menu
-            self.draw_rounded_rectangle(overlay, 
+            draw = Draw()
+            draw.draw_rounded_rectangle(overlay, 
                                         (menu_x, menu_y), 
                                         (menu_x + menu_width, menu_y + menu_height), 
                                         30, 
@@ -108,7 +99,7 @@ class Menu:
             cv2.addWeighted(overlay, 0.4, image, 1 - 0.4, 0, image)
 
         # Zaoblené čtverce pro ikony
-        for i, item in enumerate(self._items):
+        for i, item in enumerate(self.items):
             if isinstance(item, App) and item.opened:
                 color = (248, 255, 145) #(238, 255, 0)  # Barva pro otevřenou aplikaci
             else:

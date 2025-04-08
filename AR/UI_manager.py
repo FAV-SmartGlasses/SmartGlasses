@@ -2,11 +2,14 @@ from menu import Menu
 from hand_detection import HandDetection
 import datetime
 import cv2
+from Apps.calculator import Calculator, App
 
 class UImanager:
     def __init__(self):
         self.menu = Menu()
         self.hand_detection = HandDetection()
+        self.calculator = Calculator("Calculator", "Calculator", "Plus.png")
+        self.calculator.opened = True
 
     def display_UI(self, image):
         h, w, _ = image.shape
@@ -14,11 +17,23 @@ class UImanager:
         image, click_gesture_detected, swipe_gesture_detected, cursor_position = self.hand_detection.process_image(image, w, h)
 
         self.menu.display_menu(image, click_gesture_detected, swipe_gesture_detected, cursor_position)  # Vykreslení menu
+
+        for item in self.menu.items:
+            if isinstance(item, App) and item.opened: # and isinstance(item, Calculator):
+                item.draw(image, w, h, click_gesture_detected, cursor_position)
+
+        #self.calculator.draw(image, w, h, click_gesture_detected, cursor_position)  # Vykreslení aplikací
        
         self.draw_time_bar(image, h, w, self.menu.get_visible())  # Vykreslení bubliny s časem
 
+        self.draw_cursor(image, cursor_position)  # Vykreslení kurzoru
+
         return image
-      
+    
+
+    def draw_cursor(self, image, cursor_position):
+        if cursor_position != (None, None):
+            cv2.circle(image, (cursor_position[0], cursor_position[1]), 10, (0, 0, 255), -1)
 
     def draw_time_bar(self, image, h, w, menu_visible):
         # Souřadnice a velikost obdélníku
