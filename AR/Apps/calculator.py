@@ -17,38 +17,6 @@ class Calculator(App):
         self.key_size = 50  # Velikost jedné klávesy (čtverec)
         self.padding = 10   # Mezera mezi klávesami
 
-    def is_key_sign(self, key):
-        if key in {"+", "-", "*", "/", "%"}:
-            return True
-        else:
-            return False
-        
-    """def process_detected_key(self, detected_key):
-        if detected_key == "X":
-            # Smazání posledního znaku
-            if self.text:
-                self.text = self.text[:-1]
-        elif detected_key in "0123456789":
-            # Přidání čísla
-            self.text += detected_key
-        elif detected_key in "+-*/%":
-            # Přidání znaménka, pokud poslední znak není znaménko
-            if self.text and self.text[-1] not in "+-*/%(":
-                self.text += detected_key
-        elif detected_key == ",":
-            # Přidání čárky, pokud poslední znak je číslo
-            if self.text and self.text[-1].isdigit():
-                self.text += detected_key
-        elif detected_key == "()":
-            # Přidání závorek s podporou vnořených závorek
-            open_count = self.text.count("(")
-            close_count = self.text.count(")")
-            if open_count > close_count and (not self.text or self.text[-1] not in "+-*/%("):
-                self.text += ")"  # Zavírací závorka
-            else:
-                self.text += "("  # Otevírací závorka
-        print(f"Aktuální text: {self.text}")"""
-    
     def process_detected_key(self, detected_key):
         if detected_key == "X":
             # Smazání posledního znaku
@@ -89,6 +57,13 @@ class Calculator(App):
         print(f"Aktuální text: {self.text}")
 
     def draw(self, image, w, h, click_gesture_detected, cursor_position):
+        #TODO: devide this function to more functions
+        #TODO: make rounded corners for keys
+        #TODO: make this app calculate the result of the expression
+        #TODO: make better design of text box
+        #TODO: add sliders if expression is too long
+        #TODO: add second text box for result
+
         if(self.opened):
             detected_key = self.detect_key_press(cursor_position[0], cursor_position[1], w, h)
 
@@ -101,20 +76,9 @@ class Calculator(App):
                             self.click_history.append(True)
                     else:
                         self.click_history.append(True)
-
-                    #if (len(self.click_history) != 0 and self.click_history[-1] == False) or len(self.click_history) == 0:
-                        """if detected_key == "X":
-                            if len(self.text) != "":
-                                self.text.removesuffix(self.text[-1])
-                        else:
-                            self.text += detected_key
-                        print(f"Stisknuta klávesa: {detected_key}")
-                        self.click_history.append(True)"""
             else:
                 if (len(self.click_history) != 0 and self.click_history[-1] == True):
                     self.click_history.append(False)
-
-                    
 
             # Výpočet počáteční pozice klávesnice
             start_x = w // 2 - (len(self.keys[0]) * (self.key_size + self.padding)) // 2

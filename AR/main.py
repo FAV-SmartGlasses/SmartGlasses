@@ -21,6 +21,8 @@ while cap.isOpened():
 
     image = ui_manager.display_UI(image)
 
+    #TODO: implementace trochu falešného stereoskopického vidění
+
     # Zobrazení obrazu
     cv2.imshow('AR Menu', image)
 

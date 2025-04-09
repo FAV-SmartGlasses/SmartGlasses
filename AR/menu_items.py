@@ -27,6 +27,8 @@ class App(MenuItem):
     def __init__(self, name, display_name, icon_path):
         super().__init__(name, display_name, icon_path)
         self.opened = False
+        self.position = (0, 0)  # Pozice aplikace na obrazovce
+        self.size = (300, 300) # Velikost aplikace
 
     def clicked(self):
         super().clicked()

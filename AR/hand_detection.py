@@ -30,6 +30,8 @@ class HandDetection:
 
                 cursor_position = self.get_cursor_position(image, w, h)  # Získání pozice kurzoru
 
+                #TODO: add gesture for moving and resizing apps
+
                 self.draw(w, h, image, hand_landmarks)   #nakreslí čáry a body na ruce
 
         #self.hands.close()
