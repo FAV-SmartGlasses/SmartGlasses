@@ -29,7 +29,7 @@ class HandDetection:
                 swipe_gesture_detected = self.swipe_gesture_detected(hand_landmarks, w, h)  # Kontrola gesta pro posun
 
                 cursor_position = self.get_cursor_position(image, w, h)  # Získání pozice kurzoru
-                
+
                 self.draw(w, h, image, hand_landmarks)   #nakreslí čáry a body na ruce
 
         #self.hands.close()

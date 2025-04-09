@@ -5,6 +5,8 @@ from draw import Draw
 class Calculator(App):
     def __init__(self, name, display_name, icon_path):
         super().__init__(name, display_name, icon_path)
+        self.text = ""
+        self.click_history = []
         self.keys = [
             ["^", "()", "%", "/"],
             ["7", "8", "9", "*"],
@@ -15,13 +17,104 @@ class Calculator(App):
         self.key_size = 50  # Velikost jedné klávesy (čtverec)
         self.padding = 10   # Mezera mezi klávesami
 
+    def is_key_sign(self, key):
+        if key in {"+", "-", "*", "/", "%"}:
+            return True
+        else:
+            return False
+        
+    """def process_detected_key(self, detected_key):
+        if detected_key == "X":
+            # Smazání posledního znaku
+            if self.text:
+                self.text = self.text[:-1]
+        elif detected_key in "0123456789":
+            # Přidání čísla
+            self.text += detected_key
+        elif detected_key in "+-*/%":
+            # Přidání znaménka, pokud poslední znak není znaménko
+            if self.text and self.text[-1] not in "+-*/%(":
+                self.text += detected_key
+        elif detected_key == ",":
+            # Přidání čárky, pokud poslední znak je číslo
+            if self.text and self.text[-1].isdigit():
+                self.text += detected_key
+        elif detected_key == "()":
+            # Přidání závorek s podporou vnořených závorek
+            open_count = self.text.count("(")
+            close_count = self.text.count(")")
+            if open_count > close_count and (not self.text or self.text[-1] not in "+-*/%("):
+                self.text += ")"  # Zavírací závorka
+            else:
+                self.text += "("  # Otevírací závorka
+        print(f"Aktuální text: {self.text}")"""
+    
+    def process_detected_key(self, detected_key):
+        if detected_key == "X":
+            # Smazání posledního znaku
+            if self.text:
+                self.text = self.text[:-1]
+        elif detected_key in "0123456789":
+            # Přidání čísla
+            if self.text == "0":
+                # Pokud text obsahuje pouze "0", nahradí se novým číslem
+                self.text = detected_key
+            else:
+                self.text += detected_key
+        elif detected_key in "+-*/%":
+            # Přidání znaménka, pokud poslední znak není znaménko
+            if self.text and self.text[-1] not in "+-*/%(":
+                self.text += detected_key
+        elif detected_key == ",":
+            # Přidání čárky, pokud poslední znak je číslo a čárka již není v aktuálním čísle
+            if self.text and self.text[-1].isdigit():
+                # Zkontroluje, zda aktuální číslo již obsahuje čárku
+                last_number = self.text.split()[-1]
+                if "," not in last_number:
+                    self.text += detected_key
+        elif detected_key == "()":
+            # Přidání závorek s podporou vnořených závorek
+            if not self.text or self.text[-1] in "+-*/%(":
+                # Pokud je text prázdný nebo poslední znak je operátor/otevírací závorka, přidá se "("
+                self.text += "("
+            elif self.text[-1].isdigit() or self.text[-1] == ")":
+                # Pokud poslední znak je číslo nebo zavírací závorka, přidá se ")"
+                open_count = self.text.count("(")
+                close_count = self.text.count(")")
+                if open_count > close_count:
+                    self.text += ")"
+            else:
+                # Jinak přidá otevírací závorku
+                self.text += "("
+        print(f"Aktuální text: {self.text}")
+
     def draw(self, image, w, h, click_gesture_detected, cursor_position):
         if(self.opened):
             detected_key = self.detect_key_press(cursor_position[0], cursor_position[1], w, h)
 
             if click_gesture_detected:
                 if detected_key is not None:
-                    print(f"Stisknuta klávesa: {detected_key}")
+                    if len(self.click_history) != 0:
+                        if self.click_history[-1] == False:
+                            self.process_detected_key(detected_key)
+                            print(f"Stisknuta klávesa: {detected_key}")
+                            self.click_history.append(True)
+                    else:
+                        self.click_history.append(True)
+
+                    #if (len(self.click_history) != 0 and self.click_history[-1] == False) or len(self.click_history) == 0:
+                        """if detected_key == "X":
+                            if len(self.text) != "":
+                                self.text.removesuffix(self.text[-1])
+                        else:
+                            self.text += detected_key
+                        print(f"Stisknuta klávesa: {detected_key}")
+                        self.click_history.append(True)"""
+            else:
+                if (len(self.click_history) != 0 and self.click_history[-1] == True):
+                    self.click_history.append(False)
+
+                    
 
             # Výpočet počáteční pozice klávesnice
             start_x = w // 2 - (len(self.keys[0]) * (self.key_size + self.padding)) // 2
@@ -40,6 +133,13 @@ class Calculator(App):
                                           30, 
                                           (0, 0, 0), 
                                           -1)
+            
+            cv2.putText(overlay, self.text, 
+                        (start_x + 10, start_y - textbox_height + 20), 
+                        cv2.FONT_HERSHEY_SIMPLEX, 
+                        1, 
+                        (255, 255, 255), 
+                        2)
 
             """cv2.rectangle(overlay, 
                           (start_x - self.padding, start_y - 50), 
@@ -62,6 +162,20 @@ class Calculator(App):
                     # Vykreslení klávesy (obdélník)
                     cv2.rectangle(overlay, (x1, y1), (x2, y2), color, -1)
                     cv2.rectangle(overlay, (x1, y1), (x2, y2), (0, 0, 0), 2)
+
+                    """draw.draw_rounded_rectangle(overlay, 
+                                                (x1, y1), 
+                                                (x2, y2), 
+                                                2, 
+                                                color, 
+                                                -1)
+                    
+                    draw.draw_rounded_rectangle(overlay, 
+                                                (x1, y1), 
+                                                (x2, y2), 
+                                                2, 
+                                                (0, 0, 0), 
+                                                2)"""
 
                     # Vykreslení textu klávesy
                     text_size = cv2.getTextSize(key, cv2.FONT_HERSHEY_SIMPLEX, 0.8, 2)[0]

@@ -17,7 +17,7 @@ while cap.isOpened():
 
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-    image = cv2.flip(image, 1)
+    image = cv2.flip(image, 1) 
 
     image = ui_manager.display_UI(image)
 
