@@ -2,6 +2,7 @@ from menu_items import App
 import cv2
 from gui.keyboard import Keyboard
 from draw import draw_rounded_rectangle
+from gui.design_manager import *
 
 KEYS = [
             ["^", "()", "%", "/"],
@@ -42,21 +43,21 @@ class Calculator(App):
                                          (start_x + len(KEYS[0]) * (KEY_SIZE + PADDING),
                                           start_y + len(KEYS) * (KEY_SIZE + PADDING)),
                                           30, 
-                                          (0, 0, 0), 
+                                          BLACK, 
                                           -1)
             
             cv2.putText(overlay, self.keyboard.text, 
                         (start_x + 10, start_y - textbox_height + 20), 
                         cv2.FONT_HERSHEY_SIMPLEX, 
                         1, 
-                        (255, 255, 255), 
+                        WHITE,
                         2)
 
             """cv2.rectangle(overlay, 
                           (start_x - PADDING, start_y - 50), 
                           (start_x + len(self.keys[0]) * (KEY_SIZE + PADDING), 
                            start_y + len(self.keys) * (KEY_SIZE + PADDING)), 
-                           (0, 0, 0), -1)"""
+                           BLACK, -1)"""
 
             # Procházení kláves a jejich vykreslení
             for row_idx, row in enumerate(KEYS):
@@ -66,11 +67,11 @@ class Calculator(App):
                     x2 = x1 + KEY_SIZE
                     y2 = y1 + KEY_SIZE
 
-                    color = (248, 255, 145) if self.keyboard.detected_key == key else (255, 255, 255)
+                    color = LIGHT_BLUE if self.keyboard.detected_key == key else WHITE
 
                     # Vykreslení klávesy (obdélník)
                     cv2.rectangle(overlay, (x1, y1), (x2, y2), color, -1)
-                    cv2.rectangle(overlay, (x1, y1), (x2, y2), (0, 0, 0), 2)
+                    cv2.rectangle(overlay, (x1, y1), (x2, y2), BLACK, 2)
 
                     """draw.draw_rounded_rectangle(overlay, 
                                                 (x1, y1), 
@@ -83,14 +84,14 @@ class Calculator(App):
                                                 (x1, y1), 
                                                 (x2, y2), 
                                                 2, 
-                                                (0, 0, 0), 
+                                                BLACK, 
                                                 2)"""
 
                     # Vykreslení textu klávesy
                     text_size = cv2.getTextSize(key, cv2.FONT_HERSHEY_SIMPLEX, 0.8, 2)[0]
                     text_x = x1 + (KEY_SIZE - text_size[0]) // 2
                     text_y = y1 + (KEY_SIZE + text_size[1]) // 2
-                    cv2.putText(overlay, key, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)
+                    cv2.putText(overlay, key, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, 0.8, BLACK, 2)
 
             # Kombinace původního obrázku a překryvného obrázku s průhledností
             alpha = 0.5  # Nastavení průhlednosti (0.0 = zcela průhledné, 1.0 = zcela neprůhledné)

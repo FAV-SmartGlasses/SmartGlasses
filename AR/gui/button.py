@@ -12,8 +12,7 @@ class Button:
         self.rect = (x, y, x + size[0], y + size[1])  # (x1, y1, x2, y2)
         self.is_hovered = False
 
-    def update(self, frame, cursor_pos):
-        self.change_color(cursor_pos)
+    def update(self, frame):
         # Draw button background
         color = self.hovering_color if self.is_hovered else self.base_color
         x1, y1, x2, y2 = self.rect
