@@ -151,7 +151,7 @@ class CalculatorKeyboard(Keyboard):
             try:
                 self.text = str(eval(self.text))
             except SyntaxError:
-                self.text = "Invalid syntax"
+                self.text = "Invalid"
 
             self.evaluated = True
 
