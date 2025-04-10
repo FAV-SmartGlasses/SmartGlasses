@@ -15,6 +15,8 @@ KEYS = [
 PADDING = 10
 KEY_SIZE = 50
 
+MAX_LENGTH = 10
+
 class Calculator(App):
     def __init__(self, name, display_name, icon_path):
         super().__init__(name, display_name, icon_path)
@@ -24,8 +26,6 @@ class Calculator(App):
     def draw(self, image, w, h, click_gesture_detected, cursor_position):
         #TODO: make rounded corners for keys
         #TODO: make better design of text box
-        #TODO: add sliders if expression is too long
-        #TODO: add second text box for result
 
         if self.opened:
             self.keyboard.draw(image, w, h, click_gesture_detected, cursor_position)
@@ -154,5 +154,7 @@ class CalculatorKeyboard(Keyboard):
                 self.text = "Invalid syntax"
 
             self.evaluated = True
+
+        self.text = self.text[:MAX_LENGTH]
 
         print(f"Aktuální text: {self.text}")
