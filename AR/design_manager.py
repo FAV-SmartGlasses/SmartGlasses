@@ -1,5 +1,3 @@
-from Apps.settings import Settings
-
 class DesignManager:
     def __init__(self):
         #these colors are in RGB format, opencv uses BGR format

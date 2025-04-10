@@ -2,7 +2,8 @@ from menu import Menu
 from hand_detection import HandDetection
 import datetime
 import cv2
-from Apps.calculator import Calculator, App
+from Apps.calculator import Calculator
+import menu_items
 
 class UImanager:
     def __init__(self):
@@ -19,7 +20,7 @@ class UImanager:
         self.menu.display_menu(image, click_gesture_detected, swipe_gesture_detected, cursor_position)  # Vykreslení menu
 
         for item in self.menu.items:
-            if isinstance(item, App) and item.opened: # and isinstance(item, Calculator):
+            if isinstance(item, menu_items.App) and item.opened: # and isinstance(item, Calculator):
                 item.draw(image, w, h, click_gesture_detected, cursor_position)
 
         #self.calculator.draw(image, w, h, click_gesture_detected, cursor_position)  # Vykreslení aplikací

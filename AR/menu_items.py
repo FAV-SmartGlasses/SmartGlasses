@@ -1,11 +1,11 @@
 import os
 
 class MenuItem:
-    def __init__(self, name, display_name, iconPath):
+    def __init__(self, name, display_name, icon_path):
         self._name = name
         self._display_name = display_name
         self._selected = False
-        self._icon_path = iconPath
+        self._icon_path = icon_path
 
     def clicked(self):
         print(f"Položka '{self._name}' byla kliknuta.")
@@ -53,6 +53,7 @@ class App(MenuItem):
 class LockMenu(MenuItem):
     def __init__(self, icons_path):
         super().__init__("MenuLock", "Pin Menu", icons_path[0])
+        self._icon = None
         self.menu_pined = False
         self._icon_paths = icons_path
 

@@ -3,7 +3,6 @@ import cv2
 import math
 from collections import deque
 from enum import Enum
-#from menu import Menu, App
 
 class HandDetection:
     DIST_THRESHOLD = 40  # prahová hodnota pro "spojení prstů"

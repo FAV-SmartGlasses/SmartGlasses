@@ -1,10 +1,13 @@
-import cv2
 import math
+
+import cv2
 import numpy as np
-from menu_items import MenuItem, App, LockMenu, CloseMenu
-from hand_detection import HandDetection 
+
 from Apps.calculator import Calculator
-from draw import Draw
+from draw import draw_rounded_rectangle
+from hand_detection import HandDetection
+from menu_items import App, LockMenu, CloseMenu
+
 
 class Menu:
     items = [
@@ -88,9 +91,8 @@ class Menu:
         # Poloprůhledné pozadí menu
         overlay = image.copy()
 
-        if(True): #konstanta zda vykrelit pozadí pro menu
-            draw = Draw()
-            draw.draw_rounded_rectangle(overlay, 
+        if True: #konstanta zda vykrelit pozadí pro menu
+            draw_rounded_rectangle(overlay,
                                         (menu_x, menu_y), 
                                         (menu_x + menu_width, menu_y + menu_height), 
                                         30, 

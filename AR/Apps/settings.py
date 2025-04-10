@@ -1,6 +1,7 @@
-from menu_items import App
-import cv2
 from enum import Enum
+
+from menu_items import App
+
 
 class Settings(App):
     def __init__(self, name, display_name, icon_path):
