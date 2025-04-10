@@ -28,7 +28,6 @@ class Calculator(App):
         #TODO: make better design of text box
 
         if self.opened:
-            self.keyboard.draw(image, w, h, click_gesture_detected, cursor_position)
             # Výpočet počáteční pozice klávesnice
             start_x = w // 2 - (len(KEYS[0]) * (KEY_SIZE + PADDING)) // 2
             start_y = h // 2 - (len(KEYS) * (KEY_SIZE + PADDING)) // 2
@@ -43,14 +42,14 @@ class Calculator(App):
                                          (start_x + len(KEYS[0]) * (KEY_SIZE + PADDING),
                                           start_y + len(KEYS) * (KEY_SIZE + PADDING)),
                                           30, 
-                                          BLACK, 
+                                          LIGHT_BLUE, 
                                           -1)
             
             cv2.putText(overlay, self.keyboard.text, 
                         (start_x + 10, start_y - textbox_height + 20), 
                         cv2.FONT_HERSHEY_SIMPLEX, 
                         1, 
-                        WHITE,
+                        BLACK,
                         2)
 
             """cv2.rectangle(overlay, 
@@ -58,43 +57,16 @@ class Calculator(App):
                           (start_x + len(self.keys[0]) * (KEY_SIZE + PADDING), 
                            start_y + len(self.keys) * (KEY_SIZE + PADDING)), 
                            BLACK, -1)"""
-
-            # Procházení kláves a jejich vykreslení
-            for row_idx, row in enumerate(KEYS):
-                for col_idx, key in enumerate(row):
-                    x1 = start_x + col_idx * (KEY_SIZE + PADDING)
-                    y1 = start_y + row_idx * (KEY_SIZE + PADDING)
-                    x2 = x1 + KEY_SIZE
-                    y2 = y1 + KEY_SIZE
-
-                    color = LIGHT_BLUE if self.keyboard.detected_key == key else WHITE
-
-                    # Vykreslení klávesy (obdélník)
-                    cv2.rectangle(overlay, (x1, y1), (x2, y2), color, -1)
-                    cv2.rectangle(overlay, (x1, y1), (x2, y2), BLACK, 2)
-
-                    """draw.draw_rounded_rectangle(overlay, 
-                                                (x1, y1), 
-                                                (x2, y2), 
-                                                2, 
-                                                color, 
-                                                -1)
-                    
-                    draw.draw_rounded_rectangle(overlay, 
-                                                (x1, y1), 
-                                                (x2, y2), 
-                                                2, 
-                                                BLACK, 
-                                                2)"""
-
-                    # Vykreslení textu klávesy
-                    text_size = cv2.getTextSize(key, cv2.FONT_HERSHEY_SIMPLEX, 0.8, 2)[0]
-                    text_x = x1 + (KEY_SIZE - text_size[0]) // 2
-                    text_y = y1 + (KEY_SIZE + text_size[1]) // 2
-                    cv2.putText(overlay, key, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, 0.8, BLACK, 2)
-
+            
             # Kombinace původního obrázku a překryvného obrázku s průhledností
             alpha = 0.5  # Nastavení průhlednosti (0.0 = zcela průhledné, 1.0 = zcela neprůhledné)
+            cv2.addWeighted(overlay, alpha, image, 1 - alpha, 0, image)
+            
+            overlay = image.copy()
+            self.keyboard.draw(overlay, w, h, click_gesture_detected, cursor_position,
+                               WHITE, BLACK, BLACK, BLACK, LIGHT_BLUE, LIGHT_BLUE)
+
+            alpha = 0.5
             cv2.addWeighted(overlay, alpha, image, 1 - alpha, 0, image)
 
 class CalculatorKeyboard(Keyboard):
@@ -147,7 +119,7 @@ class CalculatorKeyboard(Keyboard):
                 # Jinak přidá otevírací závorku
                 self.text += "("
 
-        elif detected_key == "=":
+        elif detected_key == "=" and len(self.text) > 0:
             try:
                 self.text = str(eval(self.text))
             except SyntaxError:

@@ -4,7 +4,7 @@ from config import *
 
 def main():
     # Kamera
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(1)
 
     ui_manager = UImanager()
 

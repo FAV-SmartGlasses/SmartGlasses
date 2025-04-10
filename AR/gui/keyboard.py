@@ -1,4 +1,6 @@
 import cv2
+from draw import *
+from gui.design_manager import *
 
 class Keyboard:
     def __init__(self, layout : list[list[str]], key_size = 50, padding = 10, text = ""):
@@ -12,7 +14,8 @@ class Keyboard:
     def process_detected_key(self, detected_key):
         raise NotImplemented()
 
-    def draw(self, image, w, h, click_gesture_detected, cursor_position):
+    def draw(self, image, w, h, click_gesture_detected, cursor_position, 
+             color, border_color, font_color, hover_color, hover_border_color, hover_font_color):
         detected_key = self.detect_key_press(cursor_position[0], cursor_position[1], w, h)
 
         if click_gesture_detected:
@@ -43,17 +46,33 @@ class Keyboard:
                 x2 = x1 + self.key_size
                 y2 = y1 + self.key_size
 
-                color = (248, 255, 145) if detected_key == key else (255, 255, 255)
+                new_color = hover_color if detected_key == key else color
+                new_border_color = hover_border_color if detected_key == key else border_color
+                new_font_color = hover_font_color if detected_key == key else font_color
 
                 # Vykreslení klávesy (obdélník)
-                cv2.rectangle(overlay, (x1, y1), (x2, y2), color, -1)
-                cv2.rectangle(overlay, (x1, y1), (x2, y2), (0, 0, 0), 2)
+                #cv2.rectangle(overlay, (x1, y1), (x2, y2), color, -1)
+                #cv2.rectangle(overlay, (x1, y1), (x2, y2), BLACK, 2)
+
+                draw_rounded_rectangle(overlay, 
+                                        (x1, y1), 
+                                        (x2, y2), 
+                                        10, 
+                                        new_color, 
+                                        -1)
+                
+                draw_rounded_notfilled_rectangle(overlay,
+                                        (x1, y1), 
+                                        (x2, y2), 
+                                        10, 
+                                        new_border_color, 
+                                        2)
 
                 # Vykreslení textu klávesy
                 text_size = cv2.getTextSize(key, cv2.FONT_HERSHEY_SIMPLEX, 0.8, 2)[0]
                 text_x = x1 + (self.key_size - text_size[0]) // 2
                 text_y = y1 + (self.key_size + text_size[1]) // 2
-                cv2.putText(overlay, key, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)
+                cv2.putText(overlay, key, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, 0.8, new_font_color, 2)
 
         # Kombinace původního obrázku a překryvného obrázku s průhledností
         alpha = 0.5  # Nastavení průhlednosti (0.0 = zcela průhledné, 1.0 = zcela neprůhledné)
