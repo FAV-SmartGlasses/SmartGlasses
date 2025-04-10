@@ -1,12 +1,9 @@
 import cv2
-from UI_manager import UImanager
+from gui.UI_manager import UImanager
 
 def main():
     # Kamera
     cap = cv2.VideoCapture(0)
-
-    menu_visible = False
-    current_selection = 0
 
     ui_manager = UImanager()
 
@@ -20,8 +17,6 @@ def main():
         image = cv2.flip(image, 1)
 
         image = ui_manager.display_UI(image)
-
-        #TODO: implementace trochu falešného stereoskopického vidění
 
         # Zobrazení obrazu
         cv2.imshow('AR Menu', image)

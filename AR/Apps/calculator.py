@@ -1,6 +1,6 @@
 from menu_items import App
 import cv2
-from keyboard import Keyboard
+from gui.keyboard import Keyboard
 from draw import draw_rounded_rectangle
 
 KEYS = [

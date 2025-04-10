@@ -22,8 +22,6 @@ class UImanager:
         for item in self.menu.items:
             if isinstance(item, menu_items.App) and item.opened: # and isinstance(item, Calculator):
                 item.draw(image, w, h, click_gesture_detected, cursor_position)
-
-        #self.calculator.draw(image, w, h, click_gesture_detected, cursor_position)  # Vykreslení aplikací
        
         self.draw_time_bar(image, h, w, self.menu.get_visible())  # Vykreslení bubliny s časem
 
@@ -38,7 +36,7 @@ class UImanager:
 
     def draw_time_bar(self, image, h, w, menu_visible):
         # Souřadnice a velikost obdélníku
-        if(menu_visible):
+        if menu_visible:
             rect_width = 375
         else:
             rect_width = 125 #200
@@ -68,7 +66,7 @@ class UImanager:
         current_time = datetime.datetime.now().strftime("%H:%M:%S")
         current_date = datetime.datetime.now().strftime("%A %d, %B, %Y")
 
-        if(menu_visible):
+        if menu_visible:
             text = current_date + " " + current_time
         else:
             text = current_time
