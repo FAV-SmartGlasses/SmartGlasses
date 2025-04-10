@@ -2,7 +2,7 @@ import socket
 import struct
 
 IP = "0.0.0.0"  # Listen on all available network interfaces
-PORT = 6969  # Match the port from SlimeVR
+PORT = 22
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind((IP, PORT))
