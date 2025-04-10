@@ -1,6 +1,5 @@
 import cv2
 from UI_manager import UImanager
-#from menu import Menu
 
 def main():
     # Kamera

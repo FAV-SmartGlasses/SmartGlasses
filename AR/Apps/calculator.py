@@ -21,9 +21,7 @@ class Calculator(App):
         self.keyboard = CalculatorKeyboard(KEYS)
 
     def draw(self, image, w, h, click_gesture_detected, cursor_position):
-        #TODO: divide this function to more functions
         #TODO: make rounded corners for keys
-        #TODO: make this app calculate the result of the expression
         #TODO: make better design of text box
         #TODO: add sliders if expression is too long
         #TODO: add second text box for result
@@ -59,8 +57,6 @@ class Calculator(App):
                           (start_x + len(self.keys[0]) * (KEY_SIZE + PADDING), 
                            start_y + len(self.keys) * (KEY_SIZE + PADDING)), 
                            (0, 0, 0), -1)"""
-            
-
 
             # Procházení kláves a jejich vykreslení
             for row_idx, row in enumerate(KEYS):
@@ -100,31 +96,16 @@ class Calculator(App):
             alpha = 0.5  # Nastavení průhlednosti (0.0 = zcela průhledné, 1.0 = zcela neprůhledné)
             cv2.addWeighted(overlay, alpha, image, 1 - alpha, 0, image)
 
-    def detect_key_press(self, x, y, w, h):
-        if x is None or y is None:
-            return None
-
-        # Výpočet počáteční pozice klávesnice
-        start_x = w // 2 - (len(KEYS[0]) * (KEY_SIZE + PADDING)) // 2
-        start_y = h // 2 - (len(KEYS) * (KEY_SIZE + PADDING)) // 2
-
-        # Procházení kláves a kontrola, zda kliknutí spadá do jejich oblasti
-        for row_idx, row in enumerate(KEYS):
-            for col_idx, key in enumerate(row):
-                x1 = start_x + col_idx * (KEY_SIZE + PADDING)
-                y1 = start_y + row_idx * (KEY_SIZE + PADDING)
-                x2 = x1 + KEY_SIZE
-                y2 = y1 + KEY_SIZE
-
-                if x1 <= x <= x2 and y1 <= y <= y2:
-                    return key  # Vrátí stisknutou klávesu
-        return None
-
 class CalculatorKeyboard(Keyboard):
     def __init__(self, layout: list[list[str]]):
         super().__init__(layout)
+        self.evaluated = False
 
     def process_detected_key(self, detected_key):
+        if self.evaluated:
+            self.text = ""
+            self.evaluated = False
+
         if detected_key == "X":
             # Smazání posledního znaku
             if self.text:
@@ -164,4 +145,13 @@ class CalculatorKeyboard(Keyboard):
             else:
                 # Jinak přidá otevírací závorku
                 self.text += "("
+
+        elif detected_key == "=":
+            try:
+                self.text = str(eval(self.text))
+            except SyntaxError:
+                self.text = "Invalid syntax"
+
+            self.evaluated = True
+
         print(f"Aktuální text: {self.text}")
