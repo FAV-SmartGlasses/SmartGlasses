@@ -73,6 +73,7 @@ class CalculatorKeyboard(Keyboard):
     def __init__(self, layout: list[list[str]]):
         super().__init__(layout)
         self.evaluated = False
+        self.text = ""
 
     def process_detected_key(self, detected_key):
         if self.evaluated:

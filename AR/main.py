@@ -1,6 +1,7 @@
 import cv2
 from gui.UI_manager import UImanager
 from config import *
+import numpy as np
 
 def main():
     # Kamera
@@ -19,9 +20,18 @@ def main():
 
         image = cv2.flip(image, 1)
 
+        image = cv2.resize(image, (W//2, H//2))
+
+        target_width = image.shape[1] // 2
+
+        #Crop the image
+        image = image[:, target_width // 2:target_width // 2 + target_width]
+
+        #Draw overlay
         image = ui_manager.display_UI(image)
 
-        #image = cv2.resize(image, (W, H))
+        #Duplicate images
+        image = np.hstack((image, image))
 
         # Zobrazení obrazu
         cv2.imshow('AR Menu', image)
