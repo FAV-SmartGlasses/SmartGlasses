@@ -1,22 +1,36 @@
 import cv2
+from draw import *
 
 class Button:
-    def __init__(self, icon, x, y, text, base_color, hovering_color, size):
+    def __init__(self, icon, x, y, text, size, 
+             color, border_color, font_color, hover_color, hover_border_color, hover_font_color):  # (B, G, R)
+        
         self.icon = icon  # This should be a small cv2 image (numpy array)
         self.x_pos = x
         self.y_pos = y
         self.text = text
-        self.base_color = base_color  # (B, G, R)
-        self.hovering_color = hovering_color  # (B, G, R)
+
+        self.color = color  # (B, G, R)
+        self.border_color = border_color
+        self.font_color = font_color
+        self.hovering_color = hover_color
+        self.hovering_border_color = hover_border_color
+        self.hovering_font_color = hover_font_color
+
         self.size = size  # (width, height)
         self.rect = (x, y, x + size[0], y + size[1])  # (x1, y1, x2, y2)
         self.is_hovered = False
 
     def update(self, frame):
         # Draw button background
-        color = self.hovering_color if self.is_hovered else self.base_color
+        color = self.hovering_color if self.is_hovered else self.color
+        border_color = self.hovering_border_color if self.is_hovered else self.border_color
+        font_color = self.hovering_font_color if self.is_hovered else self.font_color
+        
         x1, y1, x2, y2 = self.rect
-        cv2.rectangle(frame, (x1, y1), (x2, y2), color, -1)
+        #cv2.rectangle(frame, (x1, y1), (x2, y2), color, -1)
+        draw_rounded_rectangle(frame, (x1, y1), (x2, y2), 10, color, -1)
+        draw_rounded_rectangle(frame, (x1, y1), (x2, y2), 10, border_color, 2)
 
         # Draw icon if available
         if self.icon is not None:
