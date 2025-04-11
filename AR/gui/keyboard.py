@@ -61,7 +61,7 @@ class Keyboard:
                                         new_color, 
                                         -1)
                 
-                draw_rounded_notfilled_rectangle(overlay,
+                draw_rounded_rectangle(overlay,
                                         (x1, y1), 
                                         (x2, y2), 
                                         10, 

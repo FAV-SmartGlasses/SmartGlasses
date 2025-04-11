@@ -1,21 +1,23 @@
 import cv2
 from gui.UI_manager import UImanager
 from config import *
+from picamera2 import Picamera2
 
 def main():
     # Kamera
-    cap = cv2.VideoCapture(0)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, W)  # Šířka obrazu
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, H)  # Výška obrazu
+    
+    picam2 = Picamera2()
+    picam2.start()
+    
 
     ui_manager = UImanager()
 
-    while cap.isOpened():
-        success, image = cap.read()
-        if not success:
-            break
+    while True:
+        # Capture the frame
+        image = picam2.capture_array()
 
-        image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        # Convert to RGB (sRGB) if necessary
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
         image = cv2.flip(image, 1)
 
@@ -32,7 +34,6 @@ def main():
         if cv2.getWindowProperty('AR Menu', cv2.WND_PROP_VISIBLE) < 1:  # Kontrola zavření okna
             break
 
-    cap.release()
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":

@@ -122,7 +122,7 @@ class CalculatorKeyboard(Keyboard):
         elif detected_key == "=" and len(self.text) > 0:
             try:
                 self.text = str(eval(self.text))
-            except SyntaxError:
+            except SyntaxError or ZeroDivisionError:
                 self.text = "Invalid"
 
             self.evaluated = True
