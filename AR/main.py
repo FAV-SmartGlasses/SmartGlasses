@@ -3,6 +3,8 @@ from gui.UI_manager import UImanager
 from config import *
 import numpy as np
 
+SCALE_DOWN = 5
+
 def main():
     # Kamera
     cap = cv2.VideoCapture(0)
@@ -19,7 +21,7 @@ def main():
         original_h, original_w = image.shape[:2]
 
         # Resize image
-        resized_image = cv2.resize(image, (original_w - original_w // 10, original_h - original_h // 10))
+        resized_image = cv2.resize(image, (original_w - original_w//SCALE_DOWN, original_h - original_h//SCALE_DOWN))
         resized_h, resized_w = resized_image.shape[:2]
 
         # Calculate padding needed

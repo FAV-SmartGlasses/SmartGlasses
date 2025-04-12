@@ -1,6 +1,8 @@
 import cv2
 import numpy as np
 
+SCALE_DOWN = 5
+
 # Kamera
 cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 3840)  # Šířka obrazu
@@ -13,7 +15,7 @@ while cap.isOpened():
     original_h, original_w = image.shape[:2]
 
     # Resize image
-    resized_image = cv2.resize(image, (original_w - original_w//10, original_h - original_h//10))
+    resized_image = cv2.resize(image, (original_w - original_w//SCALE_DOWN, original_h - original_h//SCALE_DOWN))
     resized_h, resized_w = resized_image.shape[:2]
 
     # Calculate padding needed
