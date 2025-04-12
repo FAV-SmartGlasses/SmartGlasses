@@ -4,10 +4,9 @@ import cv2
 import numpy as np
 
 from Apps.calculator import Calculator
-from draw import draw_rounded_rectangle
+from draw import Draw
 from hand_detection import HandDetection
 from menu_items import App, LockMenu, CloseMenu
-
 
 class Menu:
     items = [
@@ -92,7 +91,7 @@ class Menu:
         overlay = image.copy()
 
         if True: #konstanta zda vykrelit pozadí pro menu
-            draw_rounded_rectangle(overlay,
+            Draw.rounded_rectangle(overlay,
                                         (menu_x, menu_y), 
                                         (menu_x + menu_width, menu_y + menu_height), 
                                         30, 

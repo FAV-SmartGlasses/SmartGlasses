@@ -1,8 +1,9 @@
 from menu_items import App
 import cv2
 from gui.keyboard import Keyboard
-from draw import draw_rounded_rectangle
-from gui.design_manager import *
+from draw import *
+from gui.color_manager import *
+from gui.button import Button
 
 KEYS = [
             ["^", "()", "%", "/"],
@@ -22,9 +23,11 @@ class Calculator(App):
         super().__init__(name, display_name, icon_path)
         
         self.keyboard = CalculatorKeyboard(KEYS)
+        self.btns = []
+        #self.btns += Button(None, 200, 100, "Calculate", (100, 100),
+                            #WHITE, BLACK, BLACK, LIGHT_BLUE, LIGHT_BLUE, BLACK)
 
     def draw(self, image, w, h, click_gesture_detected, cursor_position):
-        #TODO: make rounded corners for keys
         #TODO: make better design of text box
 
         if self.opened:
@@ -37,13 +40,13 @@ class Calculator(App):
 
             textbox_height = 60
 
-            draw_rounded_rectangle(overlay,
-                                         (start_x - PADDING, start_y - textbox_height), 
-                                         (start_x + len(KEYS[0]) * (KEY_SIZE + PADDING),
-                                          start_y + len(KEYS) * (KEY_SIZE + PADDING)),
-                                          30, 
-                                          LIGHT_BLUE, 
-                                          -1)
+            Draw.rounded_rectangle(overlay,
+                                    (start_x - PADDING, start_y - textbox_height), 
+                                    (start_x + len(KEYS[0]) * (KEY_SIZE + PADDING),
+                                    start_y + len(KEYS) * (KEY_SIZE + PADDING)),
+                                    30, 
+                                    LIGHT_BLUE, 
+                                    -1)
             
             cv2.putText(overlay, self.keyboard.text, 
                         (start_x + 10, start_y - textbox_height + 20), 
@@ -51,12 +54,6 @@ class Calculator(App):
                         1, 
                         BLACK,
                         2)
-
-            """cv2.rectangle(overlay, 
-                          (start_x - PADDING, start_y - 50), 
-                          (start_x + len(self.keys[0]) * (KEY_SIZE + PADDING), 
-                           start_y + len(self.keys) * (KEY_SIZE + PADDING)), 
-                           BLACK, -1)"""
             
             # Kombinace původního obrázku a překryvného obrázku s průhledností
             alpha = 0.5  # Nastavení průhlednosti (0.0 = zcela průhledné, 1.0 = zcela neprůhledné)

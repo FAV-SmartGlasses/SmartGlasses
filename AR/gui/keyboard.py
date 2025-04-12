@@ -1,6 +1,6 @@
 import cv2
-from draw import *
-from gui.design_manager import *
+from draw import Draw
+from gui.color_manager import *
 
 class Keyboard:
     def __init__(self, layout : list[list[str]], key_size = 50, padding = 10, text = ""):
@@ -54,14 +54,14 @@ class Keyboard:
                 #cv2.rectangle(overlay, (x1, y1), (x2, y2), color, -1)
                 #cv2.rectangle(overlay, (x1, y1), (x2, y2), BLACK, 2)
 
-                draw_rounded_rectangle(overlay, 
+                Draw.rounded_rectangle(overlay, 
                                         (x1, y1), 
                                         (x2, y2), 
                                         10, 
                                         new_color, 
                                         -1)
                 
-                draw_rounded_rectangle(overlay,
+                Draw.rounded_rectangle(overlay,
                                         (x1, y1), 
                                         (x2, y2), 
                                         10, 

@@ -1,5 +1,5 @@
 import cv2
-from gui.UI_manager import UImanager
+from AR.gui.GUI_manager import GUImanager
 from config import *
 from picamera2 import Picamera2
 import numpy as np
@@ -8,7 +8,6 @@ SCALE_DOWN = 5
 
 def main():
     # Kamera
-    
     picam2 = Picamera2()
     
     # Nastavení okna na celoobrazovkový režim
@@ -21,7 +20,7 @@ def main():
     picam2.start()
 
 
-    ui_manager = UImanager()
+    ui_manager = GUImanager()
 
     while True:
         # Capture the frame
@@ -52,7 +51,7 @@ def main():
         image = image[:, target_width // 2:target_width // 2 + target_width]
 
         # Draw overlay
-        image = ui_manager.display_UI(image)
+        image = ui_manager.display_GUI(image)
 
         # Add padding to restore height
         image = cv2.copyMakeBorder(image, pad_top, pad_bottom, 0, 0, cv2.BORDER_CONSTANT,

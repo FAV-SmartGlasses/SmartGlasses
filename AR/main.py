@@ -1,5 +1,5 @@
 import cv2
-from gui.UI_manager import UImanager
+from gui.GUI_manager import GUImanager
 from config import *
 import numpy as np
 
@@ -12,7 +12,7 @@ def main():
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, W)  # Šířka obrazu
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, H)  # Výška obrazu
 
-    ui_manager = UImanager()
+    ui_manager = GUImanager()
 
     while cap.isOpened():
         success, image = cap.read()
@@ -43,7 +43,7 @@ def main():
         image = image[:, target_width // 2:target_width // 2 + target_width]
 
         #Draw overlay
-        image = ui_manager.display_UI(image)
+        image = ui_manager.display_GUI(image)
 
         if TWO_EYES:
             # Add padding to restore height
