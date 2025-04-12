@@ -4,6 +4,7 @@ from config import *
 import numpy as np
 
 SCALE_DOWN = 5
+TWO_EYES = False
 
 def main():
     # Kamera
@@ -44,11 +45,12 @@ def main():
         #Draw overlay
         image = ui_manager.display_UI(image)
 
-        # Add padding to restore height
-        image = cv2.copyMakeBorder(image, pad_top, pad_bottom, 0, 0, cv2.BORDER_CONSTANT,
-                                   value=[0, 0, 0])
-        #Duplicate images
-        image = np.hstack((image, image))
+        if TWO_EYES:
+            # Add padding to restore height
+            image = cv2.copyMakeBorder(image, pad_top, pad_bottom, 0, 0, cv2.BORDER_CONSTANT,
+                                    value=[0, 0, 0])
+            #Duplicate images
+            image = np.hstack((image, image))
 
         # Zobrazení obrazu
         cv2.imshow('AR Menu', image)
