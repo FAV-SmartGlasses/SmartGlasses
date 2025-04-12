@@ -28,7 +28,21 @@ def main():
         # Convert to RGB (sRGB) if necessary
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-        image = cv2.flip(image, 1)
+        original_h, original_w = image.shape[:2]
+
+        # Resize image
+        resized_image = cv2.resize(image, (original_w - original_w // 10, original_h - original_h // 10))
+        resized_h, resized_w = resized_image.shape[:2]
+
+        # Calculate padding needed
+        pad_top = (original_h - resized_h) // 2
+        pad_bottom = original_h - resized_h - pad_top
+        pad_left = (original_w - resized_w) // 2
+        pad_right = original_w - resized_w - pad_left
+
+        # Add padding to restore original size
+        image = cv2.copyMakeBorder(resized_image, pad_top, pad_bottom, pad_left, pad_right, cv2.BORDER_CONSTANT,
+                                   value=[0, 0, 0])
 
         target_width = image.shape[1] // 2
 
