@@ -22,6 +22,8 @@ class Button:
         self.is_hovered = False
 
     def update(self, frame):
+        self.is_hovered = self.check_for_input((self.x_pos, self.y_pos))
+
         # Draw button background
         color = self.hovering_color if self.is_hovered else self.color
         border_color = self.hovering_border_color if self.is_hovered else self.border_color
@@ -44,13 +46,14 @@ class Button:
         text_size = cv2.getTextSize(self.text, font, font_scale, thickness)[0]
         text_x = x1 + 40
         text_y = y1 + (self.size[1] + text_size[1]) // 2 - 5
-        cv2.putText(frame, self.text, (text_x, text_y), font, font_scale, (255, 255, 255), thickness)
+        cv2.putText(frame, self.text, (text_x, text_y), font, font_scale, font_color, thickness)
 
     def check_for_input(self, position):
+        if position  == (None, None):
+            return False
+        
         x1, y1, x2, y2 = self.rect
         if x1 <= position[0] <= x2 and y1 <= position[1] <= y2:
             return True
+        
         return False
-
-    def change_color(self, position):
-        self.is_hovered = self.check_for_input(position)
