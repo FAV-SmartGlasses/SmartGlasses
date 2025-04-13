@@ -45,7 +45,7 @@ class Calculator(App):
                                     (start_x + len(KEYS[0]) * (KEY_SIZE + PADDING),
                                     start_y + len(KEYS) * (KEY_SIZE + PADDING)),
                                     30, 
-                                    LIGHT_BLUE, 
+                                    ColorManager.LIGHT_BLUE, 
                                     -1)
             
             text_size = cv2.getTextSize(self.keyboard.text, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)[0]
@@ -55,7 +55,7 @@ class Calculator(App):
                         (text_x, text_y), 
                         cv2.FONT_HERSHEY_SIMPLEX, 
                         1, 
-                        BLACK,
+                        ColorManager.BLACK,
                         2)
             
             # Kombinace původního obrázku a překryvného obrázku s průhledností
@@ -64,7 +64,7 @@ class Calculator(App):
             
             overlay = image.copy()
             self.keyboard.draw(overlay, w, h, click_gesture_detected, cursor_position,
-                               WHITE, BLACK, BLACK, BLACK, LIGHT_BLUE, LIGHT_BLUE)
+                               ColorManager.WHITE, ColorManager.BLACK, ColorManager.BLACK, ColorManager.BLACK, ColorManager.LIGHT_BLUE, ColorManager.LIGHT_BLUE)
 
             alpha = 0.5
             cv2.addWeighted(overlay, alpha, image, 1 - alpha, 0, image)

@@ -4,7 +4,7 @@ from gui.toggle_btns import ToggleBtns
 #from gui.keyboard import Keyboard
 from gui.dropdown import Dropdown
 import datetime
-from gui.color_manager import *
+from gui.color_manager import ColorManager
 
 class Draw:
     @staticmethod
@@ -53,8 +53,8 @@ class Draw:
 
         radius = 20  # radius of rounded corners
 
-        fill_color = LIGHT_BLUE  # light blue
-        font_color = BLACK #WHITE
+        fill_color = ColorManager.LIGHT_BLUE  # light blue
+        font_color = ColorManager.BLACK #WHITE
 
         overlay = image.copy()
 

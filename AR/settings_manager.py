@@ -80,3 +80,8 @@ class SettingsManager:
             if hasattr(SettingsManager._settings, key):
                 setattr(SettingsManager._settings, key, value)
         SettingsManager.save_settings()
+
+    @staticmethod
+    def get_theme():
+        SettingsManager.load_settings()
+        return SettingsManager._settings.theme
