@@ -6,10 +6,10 @@ import numpy as np
 SCALE_DOWN = 5
 
 def main():
-    # Kamera
+    # Camera
     cap = cv2.VideoCapture(0)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, W)  # Šířka obrazu
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, H)  # Výška obrazu
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, W)  # Image width
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, H)  # Image height
 
     ui_manager = GUImanager()
 
@@ -38,26 +38,26 @@ def main():
 
         target_width = image.shape[1] // 2
 
-        #Crop the image
+        # Crop the image
         image = image[:, target_width // 2:target_width // 2 + target_width]
 
-        #Draw overlay
+        # Draw overlay
         image = ui_manager.display_GUI(image)
 
         if TWO_EYES:
             # Add padding to restore height
             image = cv2.copyMakeBorder(image, pad_top, pad_bottom, 0, 0, cv2.BORDER_CONSTANT,
                                     value=[0, 0, 0])
-            #Duplicate images
+            # Duplicate images
             image = np.hstack((image, image))
 
-        # Zobrazení obrazu
+        # Display the image
         cv2.imshow('AR Menu', image)
 
         key = cv2.waitKey(1) & 0xFF
-        if key == 27 or key == ord('q') or key == ord('Q'):  # ESC nebo 'q' pro ukončení
+        if key == 27 or key == ord('q') or key == ord('Q'):  # ESC or 'q' to exit
             break
-        if cv2.getWindowProperty('AR Menu', cv2.WND_PROP_VISIBLE) < 1:  # Kontrola zavření okna
+        if cv2.getWindowProperty('AR Menu', cv2.WND_PROP_VISIBLE) < 1:  # Check if the window is closed
             break
 
     cap.release()

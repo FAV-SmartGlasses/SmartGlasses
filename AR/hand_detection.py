@@ -6,13 +6,13 @@ from enum import Enum
 from config import *
 
 class HandDetection:
-    DIST_THRESHOLD = 40  # prahová hodnota pro "spojení prstů"
+    DIST_THRESHOLD = 40  # finger touch threshold
 
     def __init__(self):
         self.mp_hands = mp.solutions.hands
         self.mp_drawing = mp.solutions.drawing_utils
         self.hands = self.mp_hands.Hands(static_image_mode=False, max_num_hands=1, min_detection_confidence=0.7)
-        self.click_gesture_history = deque(maxlen=20)  # ukládá poslední stavy
+        self.click_gesture_history = deque(maxlen=20)  # save the last states
         self.last_wrist_x = None
         self.last_wrist_y = None
 
@@ -25,15 +25,15 @@ class HandDetection:
 
         if results.multi_hand_landmarks:
             for hand_landmarks in results.multi_hand_landmarks:
-                click_gesture_detected = self.is_click_gesture_detected(hand_landmarks, w, h)  # Kontrola gesta pro kliknutí
+                click_gesture_detected = self.is_click_gesture_detected(hand_landmarks, w, h)  # Check for click gesture
 
-                swipe_gesture_detected = self.swipe_gesture_detected(hand_landmarks, w, h)  # Kontrola gesta pro posun
+                swipe_gesture_detected = self.swipe_gesture_detected(hand_landmarks, w, h)  # Check for swipe gesture
 
-                cursor_position = self.get_cursor_position(image, w, h)  # Získání pozice kurzoru
+                cursor_position = self.get_cursor_position(image, w, h)  # Get cursor position
 
-                #TODO: add gesture for moving and resizing apps
+                # TODO: add gesture for moving and resizing apps
 
-                self.draw(w, h, image, hand_landmarks)   #nakreslí čáry a body na ruce
+                self.draw(w, h, image, hand_landmarks)  # Draw lines and points on the hand
 
         #self.hands.close()
 
@@ -47,33 +47,50 @@ class HandDetection:
         UP = 4
 
     def swipe_gesture_detected(self, hand_landmarks, w, h):
-        wrist = self.get_wrist(hand_landmarks, w, h)  # Získání pozice zápěstí
+        wrist = self.get_wrist(hand_landmarks, w, h)  # Get wrist position
 
-        # Pokud jsme již zaznamenali poslední pozici zápěstí, zkontrolujeme pohyb
-        if self.last_wrist_x is not None:
-            if wrist[0] > self.last_wrist_x + 50:
-                gesture_detected = self.SwipeGesture.RIGHT
-                print("Swipe right")
-            elif wrist[0] < self.last_wrist_x - 50:
-                gesture_detected = self.SwipeGesture.LEFT
-                print("Swipe left")
-            else:
-                gesture_detected = self.SwipeGesture.NO
-                #print("No swipe gesture detected")
+        # If the last wrist position is already recorded, check for movement
+        if self.last_wrist_x is not None and self.last_wrist_y is not None:
+            delta_x = wrist[0] - self.last_wrist_x
+            delta_y = wrist[1] - self.last_wrist_y
+
+            # Threshold for movement detection
+            threshold = 50
+
+            if abs(delta_x) > abs(delta_y):  # Horizontal movement
+                if delta_x > threshold:
+                    gesture_detected = self.SwipeGesture.RIGHT
+                    print("Swipe right")
+                elif delta_x < -threshold:
+                    gesture_detected = self.SwipeGesture.LEFT
+                    print("Swipe left")
+                else:
+                    gesture_detected = self.SwipeGesture.NO
+            else:  # Vertical movement
+                if delta_y > threshold:
+                    gesture_detected = self.SwipeGesture.DOWN
+                    print("Swipe down")
+                elif delta_y < -threshold:
+                    gesture_detected = self.SwipeGesture.UP
+                    print("Swipe up")
+                else:
+                    gesture_detected = self.SwipeGesture.NO
         else:
             gesture_detected = self.SwipeGesture.NO
 
-        self.last_wrist_x = wrist[0] # Uložení poslední pozice zápěstí
+        # Save the last wrist position
+        self.last_wrist_x = wrist[0]
+        self.last_wrist_y = wrist[1]
 
         return gesture_detected
 
     def is_click_gesture_detected(self, hand_landmarks, w, h):
-        thumb_tip = self.get_thumb_tip(hand_landmarks, w, h)  # Získání pozice palce
-        index_tip = self.get_index_tip(hand_landmarks, w, h)  # Získání pozice ukazováčku
+        thumb_tip = self.get_thumb_tip(hand_landmarks, w, h)  # Get thumb position
+        index_tip = self.get_index_tip(hand_landmarks, w, h)  # Get index finger position
 
-        distance = math.hypot(index_tip[0] - thumb_tip[0], index_tip[1] - thumb_tip[1]) # Vzdálenost mezi palcem a ukazováčkem
+        distance = math.hypot(index_tip[0] - thumb_tip[0], index_tip[1] - thumb_tip[1])  # Distance between thumb and index finger
 
-        # Detekce stavu spojení palce a ukazováčku
+        # Detect the state of thumb and index finger touching
         click_gesture_detected = True if distance < self.DIST_THRESHOLD else False
         if not self.click_gesture_history or click_gesture_detected != self.click_gesture_history[-1]:
             self.click_gesture_history.append(click_gesture_detected)
@@ -101,8 +118,8 @@ class HandDetection:
 
         if results.multi_hand_landmarks:
             for hand_landmarks in results.multi_hand_landmarks:
-                thumb_tip = self.get_thumb_tip(hand_landmarks, w, h)  # Získání pozice palce
-                index_tip = self.get_index_tip(hand_landmarks, w, h)  # Získání pozice ukazováčku
+                thumb_tip = self.get_thumb_tip(hand_landmarks, w, h)  # Get thumb position
+                index_tip = self.get_index_tip(hand_landmarks, w, h)  # Get index finger position
 
                 middle_point_x = (thumb_tip[0] + index_tip[0]) // 2
                 middle_point_y = (thumb_tip[1] + index_tip[1]) // 2
@@ -111,22 +128,22 @@ class HandDetection:
         return None, None
 
     def draw(self, w, h, image, hand_landmarks):
-        thumb_tip = self.get_thumb_tip(hand_landmarks, w, h)  # Získání pozice palce
-        index_tip = self.get_index_tip(hand_landmarks, w, h)  # Získání pozice ukazováčku
+        thumb_tip = self.get_thumb_tip(hand_landmarks, w, h)  # Get thumb position
+        index_tip = self.get_index_tip(hand_landmarks, w, h)  # Get index finger position
 
-        # Vytvoření bodu mezi palcem a ukazováčkem (polovina mezi těmito dvěma body)
+        # Create a point between thumb and index finger (midpoint between these two points)
         middle_point_x = (thumb_tip[0] + index_tip[0]) // 2
         middle_point_y = (thumb_tip[1] + index_tip[1]) // 2
 
-        # Kreslení kurzoru - bodu mezi palcem a ukazováčkem (červený bod)
+        # Draw the cursor - a point between thumb and index finger (red dot)
         cv2.circle(image, (middle_point_x, middle_point_y), 10, (0, 0, 255), -1)
 
         if DRAW_GREEN_LINE_FOR_MENU_SELECTION:
-            # Kreslení vodorovné čáry v místě bodu mezi palcem a ukazováčkem (zelená čára)
-            cv2.line(image, (0, middle_point_y), (w, middle_point_y), (0, 255, 0), 2)  # Zelená čára
+            # Draw a horizontal line at the point between thumb and index finger (green line)
+            cv2.line(image, (0, middle_point_y), (w, middle_point_y), (0, 255, 0), 2)  # Green line
 
         if SHOW_FINGER_JOINTS:
-            # Kreslení ruky a pozic
+            # Draw the hand and positions
             cv2.circle(image, thumb_tip, 10, (0, 0, 255), -1)
             cv2.circle(image, index_tip, 10, (0, 0, 255), -1)
             cv2.line(image, thumb_tip, index_tip, (255, 255, 0), 2)
