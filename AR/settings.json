@@ -1,0 +1,15 @@
+{
+    "theme": 0,
+    "language": 0,
+    "saved_wifi": {},
+    "saved_bluetooth_devices": {},
+    "airplane_mode_ON": false,
+    "bluetooth_ON": true,
+    "wifi_ON": true,
+    "keyboard_layout": 0,
+    "volume": 50,
+    "microfon_ON": true,
+    "brightness": 50,
+    "assistent_ON": true,
+    "GPS_ON": true
+}
