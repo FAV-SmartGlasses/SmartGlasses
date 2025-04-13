@@ -4,7 +4,6 @@ from config import *
 import numpy as np
 
 SCALE_DOWN = 5
-TWO_EYES = False
 
 def main():
     # Kamera

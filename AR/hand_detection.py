@@ -3,6 +3,7 @@ import cv2
 import math
 from collections import deque
 from enum import Enum
+from config import *
 
 class HandDetection:
     DIST_THRESHOLD = 40  # prahová hodnota pro "spojení prstů"
@@ -13,6 +14,7 @@ class HandDetection:
         self.hands = self.mp_hands.Hands(static_image_mode=False, max_num_hands=1, min_detection_confidence=0.7)
         self.click_gesture_history = deque(maxlen=20)  # ukládá poslední stavy
         self.last_wrist_x = None
+        self.last_wrist_y = None
 
     def process_image(self, image, w, h):
         results = self.hands.process(image)
@@ -41,6 +43,8 @@ class HandDetection:
         NO = 0
         RIGHT = 1
         LEFT = 2
+        DOWN = 3
+        UP = 4
 
     def swipe_gesture_detected(self, hand_landmarks, w, h):
         wrist = self.get_wrist(hand_landmarks, w, h)  # Získání pozice zápěstí
@@ -113,13 +117,17 @@ class HandDetection:
         # Vytvoření bodu mezi palcem a ukazováčkem (polovina mezi těmito dvěma body)
         middle_point_x = (thumb_tip[0] + index_tip[0]) // 2
         middle_point_y = (thumb_tip[1] + index_tip[1]) // 2
-        # Kreslení bodu mezi palcem a ukazováčkem (červený bod)
-        cv2.circle(image, (middle_point_x, middle_point_y), 10, (0, 0, 255), -1)
-        # Kreslení vodorovné čáry v místě bodu mezi palcem a ukazováčkem (zelená čára)
-        cv2.line(image, (0, middle_point_y), (w, middle_point_y), (0, 255, 0), 2)  # Zelená čára
 
-        # Kreslení ruky a pozic
-        cv2.circle(image, thumb_tip, 10, (0, 0, 255), -1)
-        cv2.circle(image, index_tip, 10, (0, 0, 255), -1)
-        cv2.line(image, thumb_tip, index_tip, (255, 255, 0), 2)
-        self.mp_drawing.draw_landmarks(image, hand_landmarks, self.mp_hands.HAND_CONNECTIONS)
+        # Kreslení kurzoru - bodu mezi palcem a ukazováčkem (červený bod)
+        cv2.circle(image, (middle_point_x, middle_point_y), 10, (0, 0, 255), -1)
+
+        if DRAW_GREEN_LINE_FOR_MENU_SELECTION:
+            # Kreslení vodorovné čáry v místě bodu mezi palcem a ukazováčkem (zelená čára)
+            cv2.line(image, (0, middle_point_y), (w, middle_point_y), (0, 255, 0), 2)  # Zelená čára
+
+        if SHOW_FINGER_JOINTS:
+            # Kreslení ruky a pozic
+            cv2.circle(image, thumb_tip, 10, (0, 0, 255), -1)
+            cv2.circle(image, index_tip, 10, (0, 0, 255), -1)
+            cv2.line(image, thumb_tip, index_tip, (255, 255, 0), 2)
+            self.mp_drawing.draw_landmarks(image, hand_landmarks, self.mp_hands.HAND_CONNECTIONS)
