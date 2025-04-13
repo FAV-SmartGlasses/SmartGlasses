@@ -48,8 +48,11 @@ class Calculator(App):
                                     LIGHT_BLUE, 
                                     -1)
             
+            text_size = cv2.getTextSize(self.keyboard.text, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)[0]
+            text_x = start_x + (len(KEYS[0]) * (KEY_SIZE + PADDING) - text_size[0]) // 2
+            text_y = start_y - textbox_height // 2 + text_size[1] // 2
             cv2.putText(overlay, self.keyboard.text, 
-                        (start_x + 10, start_y - textbox_height + 20), 
+                        (text_x, text_y), 
                         cv2.FONT_HERSHEY_SIMPLEX, 
                         1, 
                         BLACK,
