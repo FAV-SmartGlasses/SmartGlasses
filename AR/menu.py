@@ -2,7 +2,8 @@ import math
 
 import numpy as np
 
-from apps.calculator import Calculator
+from Apps.calculator import Calculator
+from Apps.settings import Settings
 from gui.draw import *
 from hand_detection import HandDetection
 from menu_items import App, LockMenu, CloseMenu
@@ -11,7 +12,8 @@ from menu_items import App, LockMenu, CloseMenu
 class Menu:
     items = [
         App("Home", "Home", "Home.png"),
-        App("Settings", "Settings", "Settings.png"),
+        #App("Settings", "Settings", "Settings.png"),
+        Settings("Settings", "Settings", "Settings.png"),
         App("ToDo", "To DO", "Done.png"),
         #App("Calculator", "Calculator", "Plus.png"),
         Calculator("Calculator", "Calculator", "Plus.png"),
