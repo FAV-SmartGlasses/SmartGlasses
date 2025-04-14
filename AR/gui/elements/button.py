@@ -1,4 +1,4 @@
-from draw import *
+from gui.draw import *
 
 class Button:
     def __init__(self, icon, x, y, text, size, 
@@ -25,12 +25,13 @@ class Button:
         self.is_hovered = is_hovered
 
         # setting colors based on hover state
+        color = self.hovering_color if self.is_hovered else self.color
         border_color = self.hovering_border_color if self.is_hovered else self.border_color
         font_color = self.hovering_font_color if self.is_hovered else self.font_color
         
         # Draw button background
         x1, y1, x2, y2 = self.rect
-        draw_rounded_rectangle(frame, (x1, y1), (x2, y2), 10, (0, 0, 255), -1)
+        draw_rounded_rectangle(frame, (x1, y1), (x2, y2), 10, color, -1)
         draw_rounded_rectangle(frame, (x1, y1), (x2, y2), 10, border_color, 2)
 
         # Draw icon if available

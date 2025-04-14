@@ -48,9 +48,9 @@ class HandDetection:
                 self.draw(w, h, image, right_hand)
             elif len(hand_landmarks_list) == 1:
                 hand_landmarks = hand_landmarks_list[0]
-                left_swipe_gesture_detected = self.swipe_gesture_detected(hand_landmarks, w, h, is_left=True)
-                left_click_gesture_detected = self.is_click_gesture_detected(hand_landmarks, w, h)
-                left_cursor_position = self.get_cursor_position(w, h, hand_landmarks)
+                right_swipe_gesture_detected = self.swipe_gesture_detected(hand_landmarks, w, h, is_left=True)
+                right_click_gesture_detected = self.is_click_gesture_detected(hand_landmarks, w, h)
+                right_cursor_position = self.get_cursor_position(w, h, hand_landmarks)
                 self.draw(w, h, image, hand_landmarks)
 
         if left_click_gesture_detected and right_click_gesture_detected:
