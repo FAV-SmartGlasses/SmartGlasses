@@ -2,7 +2,7 @@ import math
 
 import numpy as np
 
-from Apps.calculator import Calculator
+from apps.calculator import Calculator
 from gui.draw import *
 from hand_detection import HandDetection
 from menu_items import App, LockMenu, CloseMenu
