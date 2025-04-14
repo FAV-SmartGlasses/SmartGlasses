@@ -53,8 +53,8 @@ class Draw:
 
         radius = 20  # radius of rounded corners
 
-        fill_color = ColorManager.LIGHT_BLUE  # light blue
-        font_color = ColorManager.BLACK #WHITE
+        fill_color = ColorManager.get_nice_color()  # light blue
+        font_color = ColorManager.get_font_color() #BLACK
 
         overlay = image.copy()
 

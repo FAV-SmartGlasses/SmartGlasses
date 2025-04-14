@@ -7,6 +7,7 @@ from Apps.calculator import Calculator
 from draw import Draw
 from hand_detection import HandDetection
 from menu_items import App, LockMenu, CloseMenu
+from gui.color_manager import ColorManager
 
 class Menu:
     items = [
@@ -95,16 +96,16 @@ class Menu:
                                         (menu_x, menu_y), 
                                         (menu_x + menu_width, menu_y + menu_height), 
                                         30, 
-                                        (0, 0, 0), 
+                                        ColorManager.get_nice_color(), 
                                         -1)
             cv2.addWeighted(overlay, 0.4, image, 1 - 0.4, 0, image)
 
         # Zaoblené čtverce pro ikony
         for i, item in enumerate(self.items):
             if isinstance(item, App) and item.opened:
-                color = (248, 255, 145) #(238, 255, 0)  # Barva pro otevřenou aplikaci
+                color = ColorManager.get_nice_color()  # Barva pro otevřenou aplikaci
             else:
-                color = (255, 255, 255)
+                color = ColorManager.get_neutral_color()  # Barva pro zavřenou aplikaci
             
             item_x = menu_x + padding
             item_y = menu_y + padding + i * (item_height + padding) #(menu_height // len(self._items))
