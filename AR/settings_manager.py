@@ -6,6 +6,7 @@ from pathlib import Path
 class Theme(IntEnum):
     LIGHT = 0
     DARK = 1
+    CUSTOM = 2
 
 class Language(IntEnum):
     ENGLISH = 0
@@ -27,6 +28,11 @@ class WIFI:
 @dataclass
 class Settings:
     theme: Theme = Theme.LIGHT
+    custom_theme_font_color: tuple = (0,0,0)
+    custom_theme_nice_color: tuple = (0,0,0)
+    custom_theme_neutral_color: tuple = (0,0,0)
+    custom_theme_neutral_color2: tuple = (0,0,0)
+
     language: Language = Language.ENGLISH
     saved_wifi: dict = field(default_factory=dict)
     saved_bluetooth_devices: dict = field(default_factory=dict)
@@ -54,9 +60,19 @@ class SettingsManager:
                     #SettingsManager._settings = Settings(**data)
                     SettingsManager._settings = Settings(
                         theme=Theme(data["theme"]),
+                        custom_theme_font_color=tuple(data["custom_theme_font_color"]),
+                        custom_theme_nice_color=tuple(data["custom_theme_nice_color"]),
+                        custom_theme_neutral_color=tuple(data["custom_theme_neutral_color"]),
+                        custom_theme_neutral_color2=tuple(data["custom_theme_neutral_color2"]),
+
                         language=Language(data["language"]),
                         keyboard_layout=KeyboardLayout(data["keyboard_layout"]),
-                        **{k: v for k, v in data.items() if k not in {"theme", "language", "keyboard_layout"}}
+                        **{k: v for k, v in data.items() if k not in {
+                            "theme",
+                            "custom_theme_font_color", "custom_theme_nice_color",
+                            "custom_theme_neutral_color", "custom_theme_neutral_color2",
+                            "language", "keyboard_layout"
+                        }}
                     )
             except (json.JSONDecodeError, KeyError, TypeError) as e:
                 print(f"Error loading settings: {e}. Creating default settings.")
@@ -85,3 +101,23 @@ class SettingsManager:
     def get_theme():
         SettingsManager.load_settings()
         return SettingsManager._settings.theme
+    
+    @staticmethod
+    def get_custom_theme_font_color():
+        SettingsManager.load_settings()
+        return SettingsManager._settings.custom_theme_font_color
+
+    @staticmethod
+    def get_custom_theme_nice_color():
+        SettingsManager.load_settings()
+        return SettingsManager._settings.custom_theme_nice_color
+
+    @staticmethod
+    def get_custom_theme_neutral_color():
+        SettingsManager.load_settings()
+        return SettingsManager._settings.custom_theme_neutral_color
+
+    @staticmethod
+    def get_custom_theme_neutral_color2():
+        SettingsManager.load_settings()
+        return SettingsManager._settings.custom_theme_neutral_color2

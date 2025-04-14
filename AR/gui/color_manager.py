@@ -14,6 +14,8 @@ class ColorManager:
             return ColorManager.BLACK
         elif theme == Theme.DARK:
             return ColorManager.WHITE
+        elif theme == Theme.CUSTOM:
+            return SettingsManager.get_custom_theme_font_color()
         else:
             raise ValueError(f"Unknown theme: {theme}")
         
@@ -24,6 +26,8 @@ class ColorManager:
             return ColorManager.LIGHT_BLUE
         elif theme == Theme.DARK:
             return ColorManager.DARK_BLUE
+        elif theme == Theme.CUSTOM:
+            return SettingsManager.get_custom_theme_nice_color()
         else:
             raise ValueError(f"Unknown theme: {theme}")
     
@@ -34,6 +38,8 @@ class ColorManager:
             return ColorManager.WHITE
         elif theme == Theme.DARK:
             return ColorManager.BLACK
+        elif theme == Theme.CUSTOM:
+            return SettingsManager.get_custom_theme_neutral_color()
         else:
             raise ValueError(f"Unknown theme: {theme}")
         
@@ -44,5 +50,7 @@ class ColorManager:
             return ColorManager.BLACK
         elif theme == Theme.DARK:
             return ColorManager.WHITE
+        elif theme == Theme.CUSTOM:
+            return SettingsManager.get_custom_theme_neutral_color2()
         else:
             raise ValueError(f"Unknown theme: {theme}")
