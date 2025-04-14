@@ -47,7 +47,9 @@ class App(MenuItem):
         #TODO: implementace zavření aplikace
         self.opened = False
 
-    def draw(self, image, w, h, click_gesture_detected, cursor_position):
+    def draw(self, image, w, h, 
+             left_click_gesture_detected, right_click_gesture_detected, 
+             left_cursor_position, right_cursor_position):
         return image
 
 class LockMenu(MenuItem):

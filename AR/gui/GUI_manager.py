@@ -14,17 +14,28 @@ class GUImanager:
     def display_GUI(self, image):
         h, w, _ = image.shape
 
-        image, click_gesture_detected, swipe_gesture_detected, cursor_position = self.hand_detection.process_image(image, w, h) # processing image and detecting gestures
+        (
+            image, 
+            left_click_gesture_detected, right_click_gesture_detected, 
+            swipe_gesture_detected, 
+            left_cursor_position, right_cursor_position
+         ) = self.hand_detection.process_image(image, w, h) # processing image and detecting gestures
 
-        self.menu.display_menu(image, click_gesture_detected, swipe_gesture_detected, cursor_position)  # drawing menu
+        self.menu.display_menu(image, 
+                               left_click_gesture_detected, right_click_gesture_detected,
+                               swipe_gesture_detected, 
+                               left_cursor_position, right_cursor_position)  # drawing menu
 
         for item in self.menu.items:
             if isinstance(item, menu_items.App) and item.opened: # if item is app and is opened
-                item.draw(image, w, h, click_gesture_detected, cursor_position) # drawing app
+                item.draw(image, w, h, 
+                          left_click_gesture_detected, right_click_gesture_detected, 
+                          left_cursor_position, right_cursor_position) # drawing app
        
         Draw.time_bar(image, h, w, self.menu.get_visible())  # drawing time bar
 
-        Draw.cursor(image, cursor_position)  # drawing cursor
+        Draw.cursor(image, left_cursor_position)  # drawing left cursor
+        Draw.cursor(image, right_cursor_position)  # drawing right cursor
 
         return image
 

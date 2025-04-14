@@ -14,11 +14,16 @@ class Keyboard:
     def process_detected_key(self, detected_key):
         raise NotImplemented()
 
-    def draw(self, image, w, h, click_gesture_detected, cursor_position, 
+    def draw(self, image, w, h, 
+             left_click_gesture_detected, right_click_gesture_detected, 
+             left_cursor_position, right_cursor_position, 
              color, border_color, font_color, hover_color, hover_border_color, hover_font_color):
-        detected_key = self.detect_key_press(cursor_position[0], cursor_position[1], w, h)
+        left_detected_key = self.detect_key_press(left_cursor_position[0], left_cursor_position[1], w, h)
+        right_detected_key = self.detect_key_press(right_cursor_position[0], right_cursor_position[1], w, h)
 
-        if click_gesture_detected:
+        if left_click_gesture_detected or right_click_gesture_detected:
+            detected_key = left_detected_key if left_click_gesture_detected else right_detected_key
+
             if detected_key is not None:
                 if len(self.click_history) != 0:
                     if not self.click_history[-1]:
@@ -46,9 +51,9 @@ class Keyboard:
                 x2 = x1 + self.key_size
                 y2 = y1 + self.key_size
 
-                new_color = hover_color if detected_key == key else color
-                new_border_color = hover_border_color if detected_key == key else border_color
-                new_font_color = hover_font_color if detected_key == key else font_color
+                new_color = hover_color if right_detected_key == key or left_detected_key == key else color
+                new_border_color = hover_border_color if right_detected_key == key or left_detected_key == key else border_color
+                new_font_color = hover_font_color if right_detected_key == key or left_detected_key == key else font_color
 
                 # Vykreslení klávesy (obdélník)
                 #cv2.rectangle(overlay, (x1, y1), (x2, y2), color, -1)

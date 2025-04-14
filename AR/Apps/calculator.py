@@ -27,7 +27,9 @@ class Calculator(App):
         #self.btns += Button(None, 200, 100, "Calculate", (100, 100),
                             #WHITE, BLACK, BLACK, LIGHT_BLUE, LIGHT_BLUE, BLACK)
 
-    def draw(self, image, w, h, click_gesture_detected, cursor_position):
+    def draw(self, image, w, h, 
+             left_click_gesture_detected, right_click_gesture_detected, 
+             left_cursor_position, right_cursor_position):
         #TODO: make better design of text box
 
         if self.opened:
@@ -63,9 +65,11 @@ class Calculator(App):
             cv2.addWeighted(overlay, alpha, image, 1 - alpha, 0, image)
             
             overlay = image.copy()
-            self.keyboard.draw(overlay, w, h, click_gesture_detected, cursor_position,
-                               ColorManager.get_neutral_color(), ColorManager.get_neutral_color2(), ColorManager.get_font_color(), 
-                               ColorManager.get_neutral_color2(), ColorManager.get_nice_color(), ColorManager.get_nice_color())
+            self.keyboard.draw(overlay, w, h, 
+                                left_click_gesture_detected, right_click_gesture_detected, 
+                                left_cursor_position, right_cursor_position,
+                                ColorManager.get_neutral_color(), ColorManager.get_neutral_color2(), ColorManager.get_font_color(), 
+                                ColorManager.get_neutral_color2(), ColorManager.get_nice_color(), ColorManager.get_nice_color())
                                             # WHITE, BLACK, BLACK, 
                                             # BLACK, LIGHT_BLUE, LIGHT_BLUE
             alpha = 0.5

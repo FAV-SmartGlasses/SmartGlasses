@@ -34,15 +34,18 @@ class Menu:
     def set_visible(self, visible):
         self._visible = visible
 
-    def display_menu(self, image, click_gesture_detected, swipe_gesture_detected, cursor_position):
+    def display_menu(self, image, 
+                     left_click_gesture_detected, right_click_gesture_detected, 
+                     swipe_gesture_detected, 
+                     left_cursor_position, right_cursor_position):
         h, w, _ = image.shape
 
         self.check_swipe_gesture(swipe_gesture_detected)
         
         if self._visible:
-            self.detect_menu_item_selection(h, cursor_position)
+            self.detect_menu_item_selection(h, right_cursor_position)
             if self._current_selection != None:
-                self.check_click_gesture(click_gesture_detected)
+                self.check_click_gesture(right_click_gesture_detected)
 
             self._draw_menu(image, w, h)
 
