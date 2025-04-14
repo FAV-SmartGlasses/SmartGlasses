@@ -1,4 +1,3 @@
-import cv2
 from draw import *
 
 class Button:
@@ -26,22 +25,21 @@ class Button:
         self.is_hovered = is_hovered
 
         # setting colors based on hover state
-        color = self.hovering_color if self.is_hovered else self.color
         border_color = self.hovering_border_color if self.is_hovered else self.border_color
         font_color = self.hovering_font_color if self.is_hovered else self.font_color
         
         # Draw button background
         x1, y1, x2, y2 = self.rect
-        Draw.rounded_rectangle(frame, (x1, y1), (x2, y2), 10, (0, 0, 255), -1)
-        Draw.rounded_rectangle(frame, (x1, y1), (x2, y2), 10, border_color, 2)
+        draw_rounded_rectangle(frame, (x1, y1), (x2, y2), 10, (0, 0, 255), -1)
+        draw_rounded_rectangle(frame, (x1, y1), (x2, y2), 10, border_color, 2)
 
         # Draw icon if available
-        if self.icon != None:
+        if self.icon is not None:
             icon_resized = cv2.resize(self.icon, (30, 30))
             frame[y1 + 5:y1 + 35, x1 + 5:x1 + 35] = icon_resized
 
         # Draw text if available
-        if self.text != None:
+        if self.text is not None:
             font_scale = 0.6
             thickness = 1
             font = cv2.FONT_HERSHEY_SIMPLEX

@@ -1,7 +1,8 @@
-from enum import Enum, IntEnum
-from dataclasses import dataclass, asdict, field
 import json
+from dataclasses import dataclass, asdict, field
+from enum import IntEnum
 from pathlib import Path
+
 
 class Theme(IntEnum):
     LIGHT = 0

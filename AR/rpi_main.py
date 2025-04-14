@@ -1,10 +1,8 @@
 import cv2
-from AR.gui.GUI_manager import GUImanager
+from gui.GUI_manager import GUImanager
 from config import *
 from picamera2 import Picamera2
 import numpy as np
-
-SCALE_DOWN = 5
 
 def main():
     # Kamera

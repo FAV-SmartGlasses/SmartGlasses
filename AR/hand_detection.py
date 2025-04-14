@@ -83,7 +83,7 @@ class HandDetection:
             last_wrist_x = self.last_right_wrist_x
             last_wrist_y = self.last_right_wrist_y
 
-        if last_wrist_x != None and last_wrist_y != None:
+        if last_wrist_x is not None and last_wrist_y is not None:
             delta_x = wrist[0] - last_wrist_x
             delta_y = wrist[1] - last_wrist_y
             threshold = 50
@@ -157,8 +157,8 @@ class HandDetection:
 
         return click_gesture_detected
 
-    def get_point(self, id, hand_landmarks, w, h):
-        lm = hand_landmarks.landmark[id]
+    def get_point(self, id_, hand_landmarks, w, h):
+        lm = hand_landmarks.landmark[id_]
         return int(lm.x * w), int(lm.y * h)
 
     def get_thumb_tip(self, hand_landmarks, w, h):

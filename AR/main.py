@@ -4,8 +4,6 @@ from settings_manager import SettingsManager
 from config import *
 import numpy as np
 
-SCALE_DOWN = 5
-
 def main():
     # Camera
     cap = cv2.VideoCapture(0)

@@ -1,10 +1,8 @@
-from menu import Menu
-from hand_detection import HandDetection
-import datetime
-import cv2
-from Apps.calculator import Calculator
 import menu_items
-from draw import Draw
+from gui.draw import *
+from hand_detection import HandDetection
+from menu import Menu
+
 
 class GUImanager:
     def __init__(self):
@@ -32,10 +30,10 @@ class GUImanager:
                           left_click_gesture_detected, right_click_gesture_detected, 
                           left_cursor_position, right_cursor_position) # drawing app
        
-        Draw.time_bar(image, h, w, self.menu.get_visible())  # drawing time bar
+        draw_time_bar(image, h, w, self.menu.get_visible())  # drawing time bar
 
-        Draw.cursor(image, left_cursor_position)  # drawing left cursor
-        Draw.cursor(image, right_cursor_position)  # drawing right cursor
+        draw_cursor(image, left_cursor_position)  # drawing left cursor
+        draw_cursor(image, right_cursor_position)  # drawing right cursor
 
         return image
 

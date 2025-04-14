@@ -1,6 +1,8 @@
 W = 1920
 H = 1080
 
+SCALE_DOWN = 5
+
 TWO_EYES = False
 
 SHOW_FINGER_JOINTS = True

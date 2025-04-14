@@ -1,13 +1,12 @@
 import math
 
-import cv2
 import numpy as np
 
 from Apps.calculator import Calculator
-from draw import Draw
+from gui.draw import *
 from hand_detection import HandDetection
 from menu_items import App, LockMenu, CloseMenu
-from gui.color_manager import ColorManager
+
 
 class Menu:
     items = [
@@ -44,7 +43,7 @@ class Menu:
         
         if self._visible:
             self.detect_menu_item_selection(h, right_cursor_position)
-            if self._current_selection != None:
+            if self._current_selection is not None:
                 self.check_click_gesture(right_click_gesture_detected)
 
             self._draw_menu(image, w, h)
@@ -63,13 +62,10 @@ class Menu:
         
         padding = 15
         item_height = 50
-        menu_width = 2 * padding + item_height#300
         menu_height = padding + len(self.items) * (item_height + padding)
-        menu_x = 10
         menu_y = h // 2 - menu_height // 2
 
         for i, item in enumerate(self.items):
-            item_x = menu_x + padding
             item_y = menu_y + padding + i * (menu_height // len(self.items))
 
             middle_point_x, middle_point_y = cursor_position
@@ -79,7 +75,7 @@ class Menu:
                 #print(f"Zelená čára ukazuje na: {self._items[i].get_name()}")
         
     def check_click_gesture(self, click_gesture_detected):
-        if click_gesture_detected == True:
+        if click_gesture_detected:
             self._visible = False
             self.items[self._current_selection].clicked()
 
@@ -95,20 +91,20 @@ class Menu:
         overlay = image.copy()
 
         if True: #konstanta zda vykrelit pozadí pro menu
-            Draw.rounded_rectangle(overlay,
+            draw_rounded_rectangle(overlay,
                                         (menu_x, menu_y), 
                                         (menu_x + menu_width, menu_y + menu_height), 
                                         30, 
-                                        ColorManager.get_nice_color(), 
+                                        get_nice_color(), 
                                         -1)
             cv2.addWeighted(overlay, 0.4, image, 1 - 0.4, 0, image)
 
         # Zaoblené čtverce pro ikony
         for i, item in enumerate(self.items):
             if isinstance(item, App) and item.opened:
-                color = ColorManager.get_nice_color()  # Barva pro otevřenou aplikaci
+                color = get_nice_color()  # Barva pro otevřenou aplikaci
             else:
-                color = ColorManager.get_neutral_color()  # Barva pro zavřenou aplikaci
+                color = get_neutral_color()  # Barva pro zavřenou aplikaci
             
             item_x = menu_x + padding
             item_y = menu_y + padding + i * (item_height + padding) #(menu_height // len(self._items))

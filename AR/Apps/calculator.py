@@ -1,9 +1,6 @@
-from menu_items import App
-import cv2
+from gui.draw import *
 from gui.keyboard import Keyboard
-from draw import *
-from gui.color_manager import *
-from gui.button import Button
+from menu_items import App
 
 KEYS = [
             ["^", "()", "%", "/"],
@@ -42,12 +39,12 @@ class Calculator(App):
 
             textbox_height = 60
 
-            Draw.rounded_rectangle(overlay,
+            draw_rounded_rectangle(overlay,
                                     (start_x - PADDING, start_y - textbox_height), 
                                     (start_x + len(KEYS[0]) * (KEY_SIZE + PADDING),
                                     start_y + len(KEYS) * (KEY_SIZE + PADDING)),
                                     30, 
-                                    ColorManager.get_nice_color(), 
+                                    get_nice_color(), 
                                     -1)
             
             text_size = cv2.getTextSize(self.keyboard.text, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)[0]
@@ -57,7 +54,7 @@ class Calculator(App):
                         (text_x, text_y), 
                         cv2.FONT_HERSHEY_SIMPLEX, 
                         1, 
-                        ColorManager.get_font_color(),
+                        get_font_color(),
                         2)
             
             # Kombinace původního obrázku a překryvného obrázku s průhledností
@@ -68,8 +65,8 @@ class Calculator(App):
             self.keyboard.draw(overlay, w, h, 
                                 left_click_gesture_detected, right_click_gesture_detected, 
                                 left_cursor_position, right_cursor_position,
-                                ColorManager.get_neutral_color(), ColorManager.get_neutral_color2(), ColorManager.get_font_color(), 
-                                ColorManager.get_neutral_color2(), ColorManager.get_nice_color(), ColorManager.get_nice_color())
+                                get_neutral_color(), get_neutral_color2(), get_font_color(), 
+                                get_neutral_color2(), get_nice_color(), get_nice_color())
                                             # WHITE, BLACK, BLACK, 
                                             # BLACK, LIGHT_BLUE, LIGHT_BLUE
             alpha = 0.5
