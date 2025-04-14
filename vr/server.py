@@ -1,7 +1,8 @@
 import socket
+import time
 import board
 import busio
-import adafruit_bno055
+import adafruit_bno055  # pip install adafruit-circuitpython-bno055
 import array
 
 # Set up I2C and the sensor
@@ -25,17 +26,18 @@ try:
         print(f"Client connected from {client_address}")
 
         with client_socket:
-            # Wait for any data
-            data = client_socket.recv(1024)
-            print(f"Received: {data}")
+            try:
+                while True:
+                    quat = sensor.quaternion
+                    if quat is not None:
+                        quat = [quat[1], quat[0], quat[2], quat[3]]  # Reorder if needed
+                        packet = array.array('f', quat).tobytes()
+                        client_socket.sendall(packet)
+                        print(f"Sent quaternion: {quat}")
 
-            # Read and send quaternion
-            quat = sensor.quaternion
-            if quat is not None:
-                quat = [quat[1], quat[0], quat[2], quat[3]]  # Reorder if needed
-                packet = array.array('f', quat).tobytes()
-                client_socket.sendall(packet)
-                print(f"Sent quaternion: {quat}")
+                    time.sleep(0.01)  # 100 Hz update rate
+            except ConnectionResetError or BrokenPipeError:
+                print("Client disconnected unexpectedly.")
 
         print("Client disconnected.")
 
