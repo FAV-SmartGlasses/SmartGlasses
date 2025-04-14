@@ -33,7 +33,6 @@ try:
                         quat = [quat[1], quat[0], quat[2], quat[3]]  # Reorder if needed
                         packet = array.array('f', quat).tobytes()
                         client_socket.sendall(packet)
-                        print(f"Sent quaternion: {quat}")
 
                     time.sleep(0.01)  # 100 Hz update rate
             except ConnectionResetError or BrokenPipeError:
