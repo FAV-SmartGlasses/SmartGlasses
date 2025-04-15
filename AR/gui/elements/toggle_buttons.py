@@ -1,40 +1,57 @@
-from draw import *
+from gui.draw import *
+from gui.elements.element import Element
+from gui.color_manager import *
 
-class ToggleButton:
-    def __init__(self, x, y, height, text):
-        self.x = x
-        self.y = y
-        self.width = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 2)[0][0] + 20  # Calculate width based on text size
-        self.height = height
+class ToggleButton(Element):
+    def __init__(self, position, height, text):
+        width = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 2)[0][0] + 20  # Calculate width based on text size
+        super().__init__(position, (width, height))
         self.text = text
 
-class ToggleButtons:
-    def __init__(self, x, y, button_height, toggle_buttons_textes, base_color, toggled_color, font_color):
-        self.text1 = None
-        self.text2 = None
-        self.current_text = None
-        self.height = None
-        self.y = None
-        self.width = None
-        self.x = None
+    def draw(self, image, toggled=False):
+        """background_color = get_nice_color() if toggled else (0, 0, 255)  # Green if toggled, red if not
+        draw_rounded_rectangle(image, self.position, (self.position[0] + self.size[0], self.position[0] + self.size[1]), 10, (0, 0, 0), -1)
+        cv2.putText(image, self.text, (self.x + 10, self.y + 25), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)"""
+
+        
+        background_color = get_nice_color() if toggled else get_neutral_color()
+        draw_rounded_rectangle(image, 
+                                self.position, 
+                                (self.position[0] + self.size[0], self.position[1] + self.size[1]), 
+                                10, background_color, -1)
+        cv2.putText(image, self.text, (self.position[0] + 10, self.position[1] + 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+
+        return image
+
+class ToggleButtons(Element):
+    def __init__(self, text, position, button_height, toggle_buttons_textes):
+        height = (button_height + 10) * len(toggle_buttons_textes)
+        width = max([cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 2)[0][0] for text in toggle_buttons_textes]) + 20
+        super().__init__(position, (width, height))
+        self.text = text
         self.clicked = None
         self.buttons = []
         for i, text in enumerate(toggle_buttons_textes):
-            x_pos = x
-            y_pos = y + i * (button_height + 10)  # Adjust spacing dynamically
-            self.buttons.append(ToggleButton(x_pos, y_pos, button_height, text))  # Add ToggleButton objects
+            x_pos = position[0]
+            y_pos = position[1] + i * (button_height + 10)  # Adjust spacing dynamically
+            self.buttons.append(ToggleButton((x_pos, y_pos), button_height, text))  # Add ToggleButton objects
 
-        self.base_color = base_color
-        self.toggled_color = toggled_color
         self.toggled = 0
 
     def draw(self, image):
         # Draw the button with transparency (50%)
         overlay = image.copy()
+
+        draw_rounded_rectangle(overlay, (self.position[0], self.position[1]), 
+                               (self.position[0] + self.size[0], self.position[1] + self.size[0]), 
+                               10, get_nice_color(), -1)
+
+        alpha = 0.5
+        cv2.addWeighted(overlay, alpha, image, 1 - alpha, 0, image)
+
         for i, button in enumerate(self.buttons):
-            color = self.toggled_color if self.toggled == i else self.base_color
-            draw_rounded_rectangle(overlay, (button.x, button.y), (button.x + button.width, button.y + button.height), 10, color, -1)
-            cv2.putText(overlay, button.text, (button.x + 10, button.y + 25), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+            toggled = i == self.toggled
+            button.draw(image, toggled)
 
     def handle_click(self, pos):
         if pos is None or pos[0] is None or pos[1] is None:

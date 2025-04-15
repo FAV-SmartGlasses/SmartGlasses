@@ -24,11 +24,15 @@ class GUImanager:
                                swipe_gesture_detected, 
                                left_cursor_position, right_cursor_position)  # drawing menu
 
+        print(left_cursor_position, right_cursor_position)
+
         for item in self.menu.items:
             if isinstance(item, menu_items.App) and item.opened: # if item is app and is opened
+                #print(left_cursor_position, right_cursor_position)
                 item.draw(image, w, h, 
                           left_click_gesture_detected, right_click_gesture_detected, 
                           left_cursor_position, right_cursor_position) # drawing app
+                #print(left_cursor_position, right_cursor_position)
        
         draw_time_bar(image, h, w, self.menu.get_visible())  # drawing time bar
 
@@ -36,20 +40,3 @@ class GUImanager:
         draw_cursor(image, right_cursor_position)  # drawing right cursor
 
         return image
-
-    def draw_gui_objects(self, image, objects, cursor_position, click_gesture_detected):
-        for obj in objects:
-            match obj.__class__:
-                case Button:
-                    is_hovered = self.is_cursor_in_rect(cursor_position, obj.rect)
-                    obj.draw(image, is_hovered)
-
-    def is_cursor_in_rect(self, position, rect):
-        if position  == (None, None) or rect  == ((None, None),(None, None)):
-            return False
-        
-        x1, y1, x2, y2 = rect
-        if x1 <= position[0] <= x2 and y1 <= position[1] <= y2:
-            return True
-        
-        return False

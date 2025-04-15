@@ -25,7 +25,7 @@ class Button:
         self.is_hovered = is_hovered
 
         # setting colors based on hover state
-        color = self.hovering_color if self.is_hovered else self.color
+        color = self.hovering_color if is_hovered else self.color
         border_color = self.hovering_border_color if self.is_hovered else self.border_color
         font_color = self.hovering_font_color if self.is_hovered else self.font_color
         

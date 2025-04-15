@@ -57,6 +57,10 @@ class Menu:
             self._visible = True
         elif swipe_gesture_detected == HandDetection.SwipeGesture.LEFT and self._visible == True:
             self._visible = False
+        elif swipe_gesture_detected == HandDetection.SwipeGesture.BOTH_OUT:
+            for item in self.items:
+                if isinstance(item, App):
+                    item.close()
     
     def detect_menu_item_selection(self, h, cursor_position):
         if cursor_position == (None, None):

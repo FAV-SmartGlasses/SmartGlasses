@@ -9,6 +9,25 @@ def draw_cursor(image, cursor_position):
     if cursor_position != (None, None):
         cv2.circle(image, (cursor_position[0], cursor_position[1]), 10, (0, 0, 255), -1)
 
+
+
+def draw_gui_objects(self, image, objects, cursor_position, click_gesture_detected):
+    for obj in objects:
+        match obj.__class__:
+            case Button:
+                is_hovered = self.is_cursor_in_rect(cursor_position, obj.rect)
+                obj.draw(image, is_hovered)
+
+def is_cursor_in_rect(position, rect):
+    if position  == (None, None) or rect  == (None, None, None, None):
+        return False
+    
+    x1, y1, x2, y2 = rect
+    if x1 <= position[0] <= x2 and y1 <= position[1] <= y2:
+        return True
+    
+    return False
+
 def draw_rounded_rectangle(image, top_left, bottom_right, radius, color, thickness):
     x1, y1 = top_left
     x2, y2 = bottom_right
