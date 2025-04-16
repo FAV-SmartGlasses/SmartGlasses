@@ -23,35 +23,6 @@ class MenuItem:
         base_path = os.path.dirname(__file__)  # Získá adresář aktuálního souboru
         return os.path.join(base_path, "..", "resources", "icons", self._icon_path)
 
-class App(MenuItem):
-    def __init__(self, name, display_name, icon_path):
-        super().__init__(name, display_name, icon_path)
-        self.opened = False
-        self.position = (0, 0)  # Pozice aplikace na obrazovce
-        self.size = (300, 300) # Velikost aplikace
-
-    def clicked(self):
-        super().clicked()
-        if self.opened:
-            self.close()
-        else:
-            self.launch()
-
-    def launch(self):
-        print(f"Spuštění aplikace {self._name}")
-        #TODO: implementace spuštění aplikace
-        self.opened = True
-
-    def close(self):
-        print(f"Zavření aplikace {self._name}")
-        #TODO: implementace zavření aplikace
-        self.opened = False
-
-    def draw(self, image, w, h, 
-             left_click_gesture_detected, right_click_gesture_detected, 
-             left_cursor_position, right_cursor_position):
-        return image
-
 class LockMenu(MenuItem):
     def __init__(self, icons_path):
         super().__init__("MenuLock", "Pin Menu", icons_path[0])

@@ -1,6 +1,6 @@
 import cv2
 
-from menu_items import App
+from app_base import App
 from gui.color_manager import *
 from gui.draw import *
 from gui.elements.button import Button

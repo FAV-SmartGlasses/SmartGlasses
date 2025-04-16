@@ -1,7 +1,7 @@
-import menu_items
 from gui.draw import *
 from hand_detection import HandDetection
 from menu import Menu
+from Apps.app_base import App
 
 
 class GUImanager:
@@ -27,7 +27,7 @@ class GUImanager:
         print(left_cursor_position, right_cursor_position)
 
         for item in self.menu.items:
-            if isinstance(item, menu_items.App) and item.opened: # if item is app and is opened
+            if isinstance(item, App) and item.opened: # if item is app and is opened
                 #print(left_cursor_position, right_cursor_position)
                 item.draw(image, w, h, 
                           left_click_gesture_detected, right_click_gesture_detected, 

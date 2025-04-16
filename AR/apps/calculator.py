@@ -1,6 +1,6 @@
 from gui.draw import *
 from gui.keyboard import Keyboard
-from menu_items import App
+from app_base import App
 
 KEYS = [
             ["^", "()", "%", "/"],
