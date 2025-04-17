@@ -1,8 +1,7 @@
-from Apps.page_base import Page, CalculatorPage
+import numpy as np
+from apps.page_base import CalculatorPage
 from gui.draw import *
 from gui.keyboard import Keyboard
-import numpy as np
-import os
 
 MAX_LENGTH = 10
 
@@ -17,7 +16,7 @@ KEYS = [
 PADDING = 10
 KEY_SIZE = 50
 
-class Standart(CalculatorPage):
+class Standard(CalculatorPage):
     def __init__(self):
         self.keyboard = CalculatorKeyboard(KEYS)
 

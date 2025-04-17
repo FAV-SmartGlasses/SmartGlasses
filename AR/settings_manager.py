@@ -14,12 +14,10 @@ class Language(IntEnum):
     CZECH = 1
 
 class KeyboardLayout(IntEnum):
-    QWERTY_ENGLISCH = 0
-    AZERTY_ENGLISCH = 1
-    QWERTZ_ENGLISCH = 2
-    QWERTY_CZECH = 4
-    AZERTY_CZECH = 5
-    QWERTZ_CZECH = 6
+    QWERTY_ENGLISH = 0
+    QWERTZ_ENGLISH = 1
+    QWERTY_CZECH = 2
+    QWERTZ_CZECH = 3
 
 class WIFI:
     def __init__(self, name, password):
@@ -40,7 +38,7 @@ class Settings:
     airplane_mode_ON: bool = False
     bluetooth_ON: bool = True
     wifi_ON: bool = True
-    keyboard_layout: KeyboardLayout = KeyboardLayout.QWERTY_ENGLISCH
+    keyboard_layout: KeyboardLayout = KeyboardLayout.QWERTY_ENGLISH
     volume: int = 50  # (0-100)
     microfon_ON: bool = True
     brightness: int = 50  # (0-100)
@@ -48,77 +46,70 @@ class Settings:
     GPS_ON: bool = True
     # TODO: implementation of other headset settings
 
-class SettingsManager:
-    _settings_file = Path(__file__).parent / "settings.json"  # saves JSON into folder AR
-    _settings = Settings()
 
-    @staticmethod
-    def load_settings():
-        if SettingsManager._settings_file.exists():
-            try:
-                with open(SettingsManager._settings_file, "r") as file:
-                    data = json.load(file)
-                    #SettingsManager._settings = Settings(**data)
-                    SettingsManager._settings = Settings(
-                        theme=Theme(data["theme"]),
-                        custom_theme_font_color=tuple(data["custom_theme_font_color"]),
-                        custom_theme_nice_color=tuple(data["custom_theme_nice_color"]),
-                        custom_theme_neutral_color=tuple(data["custom_theme_neutral_color"]),
-                        custom_theme_neutral_color2=tuple(data["custom_theme_neutral_color2"]),
+_settings_file = Path(__file__).parent / "settings.json"  # saves JSON into folder AR
+_settings = Settings()
 
-                        language=Language(data["language"]),
-                        keyboard_layout=KeyboardLayout(data["keyboard_layout"]),
-                        **{k: v for k, v in data.items() if k not in {
-                            "theme",
-                            "custom_theme_font_color", "custom_theme_nice_color",
-                            "custom_theme_neutral_color", "custom_theme_neutral_color2",
-                            "language", "keyboard_layout"
-                        }}
-                    )
-            except (json.JSONDecodeError, KeyError, TypeError) as e:
-                print(f"Error loading settings: {e}. Creating default settings.")
-                SettingsManager.save_settings()  # Uloží výchozí nastavení
-        else:
-            SettingsManager.save_settings()  # Save default settings if file doesn't exist
-
-    @staticmethod
-    def save_settings():
-        with open(SettingsManager._settings_file, "w") as file:
-            json.dump(asdict(SettingsManager._settings), file, indent=4)
-
-    @staticmethod
-    def get_settings():
-        SettingsManager.load_settings()
-        return SettingsManager._settings
-
-    @staticmethod
-    def set_settings(**kwargs):
-        for key, value in kwargs.items():
-            if hasattr(SettingsManager._settings, key):
-                setattr(SettingsManager._settings, key, value)
-        SettingsManager.save_settings()
-
-    @staticmethod
-    def get_theme():
-        SettingsManager.load_settings()
-        return SettingsManager._settings.theme
+def load_settings():
+    global _settings
     
-    @staticmethod
-    def get_custom_theme_font_color():
-        SettingsManager.load_settings()
-        return SettingsManager._settings.custom_theme_font_color
+    if _settings_file.exists():
+        try:
+            with open(_settings_file, "r") as file:
+                data = json.load(file)
+                #_settings = Settings(**data)
+                _settings = Settings(
+                    theme=Theme(data["theme"]),
+                    custom_theme_font_color=tuple(data["custom_theme_font_color"]),
+                    custom_theme_nice_color=tuple(data["custom_theme_nice_color"]),
+                    custom_theme_neutral_color=tuple(data["custom_theme_neutral_color"]),
+                    custom_theme_neutral_color2=tuple(data["custom_theme_neutral_color2"]),
 
-    @staticmethod
-    def get_custom_theme_nice_color():
-        SettingsManager.load_settings()
-        return SettingsManager._settings.custom_theme_nice_color
+                    language=Language(data["language"]),
+                    keyboard_layout=KeyboardLayout(data["keyboard_layout"]),
+                    **{k: v for k, v in data.items() if k not in {
+                        "theme",
+                        "custom_theme_font_color", "custom_theme_nice_color",
+                        "custom_theme_neutral_color", "custom_theme_neutral_color2",
+                        "language", "keyboard_layout"
+                    }}
+                )
+        except (json.JSONDecodeError, KeyError, TypeError) as e:
+            print(f"Error loading settings: {e}. Creating default settings.")
+            save_settings()  # Uloží výchozí nastavení
+    else:
+        save_settings()  # Save default settings if file doesn't exist
 
-    @staticmethod
-    def get_custom_theme_neutral_color():
-        SettingsManager.load_settings()
-        return SettingsManager._settings.custom_theme_neutral_color
+def save_settings():
+    with open(_settings_file, "w") as file:
+        json.dump(asdict(_settings), file, indent=4)
 
-    @staticmethod
-    def get_custom_theme_neutral_color2():
-        SettingsManager.load_settings()
-        return SettingsManager._settings.custom_theme_neutral_color2
+def get_settings():
+    load_settings()
+    return _settings
+
+def set_settings(**kwargs):
+    for key, value in kwargs.items():
+        if hasattr(_settings, key):
+            setattr(_settings, key, value)
+    save_settings()
+
+def get_theme():
+    load_settings()
+    return _settings.theme
+
+def get_custom_theme_font_color():
+    load_settings()
+    return _settings.custom_theme_font_color
+
+def get_custom_theme_nice_color():
+    load_settings()
+    return _settings.custom_theme_nice_color
+
+def get_custom_theme_neutral_color():
+    load_settings()
+    return _settings.custom_theme_neutral_color
+
+def get_custom_theme_neutral_color2():
+    load_settings()
+    return _settings.custom_theme_neutral_color2

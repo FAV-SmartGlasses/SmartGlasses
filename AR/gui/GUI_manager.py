@@ -1,7 +1,7 @@
-from gui.draw import *
+from draw import *
 from hand_detection import HandDetection
 from menu import Menu
-from Apps.app_base import App
+from apps.app_base import App
 
 
 class GUImanager:

@@ -28,8 +28,8 @@
     "wifi_ON": true,
     "keyboard_layout": 0,
     "volume": 50,
-    "microfon_ON": true,
+    "microphone_ON": true,
     "brightness": 50,
-    "assistent_ON": true,
+    "assistant_ON": true,
     "GPS_ON": true
 }

@@ -1,8 +1,10 @@
 import cv2
-from gui.GUI_manager import GUImanager
-from settings_manager import SettingsManager
-from config import *
 import numpy as np
+
+from config import *
+from gui.GUI_manager import GUImanager
+from settings_manager import load_settings
+
 
 def main():
     # Camera
@@ -40,7 +42,7 @@ def main():
         # Crop the image
         image = image[:, target_width // 2:target_width // 2 + target_width]
 
-        SettingsManager.load_settings()
+        load_settings()
 
         # Draw overlay
         image = ui_manager.display_GUI(image)

@@ -1,10 +1,9 @@
-import cv2
+from apps.app_base import App
 
-from Apps.app_base import App
-from gui.color_manager import *
 from gui.draw import *
 from gui.elements.button import Button
 from gui.elements.toggle_buttons import ToggleButtons
+
 
 class Settings(App):
     def __init__(self, name, display_name, icon_path):

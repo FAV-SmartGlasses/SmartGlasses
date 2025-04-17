@@ -8,7 +8,7 @@ class ToggleButton(Element):
         super().__init__(position, (width, height))
         self.text = text
 
-    def draw(self, image, toggled=False):
+    def draw(self, image, w, h, toggled = False):
         """background_color = get_nice_color() if toggled else (0, 0, 255)  # Green if toggled, red if not
         draw_rounded_rectangle(image, self.position, (self.position[0] + self.size[0], self.position[0] + self.size[1]), 10, (0, 0, 0), -1)
         cv2.putText(image, self.text, (self.x + 10, self.y + 25), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)"""
@@ -38,7 +38,7 @@ class ToggleButtons(Element):
 
         self.toggled = 0
 
-    def draw(self, image):
+    def draw(self, image, w = 0, h = 0, toggled = False):
         # Draw the button with transparency (50%)
         overlay = image.copy()
 

@@ -3,5 +3,5 @@ class Element:
         self.position = position
         self.size = size
 
-    def draw(self, image, w, h):
+    def draw(self, image, w, h, toggled = False):
         raise NotImplementedError("This method should be overridden in subclasses") 
