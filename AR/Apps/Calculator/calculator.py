@@ -1,9 +1,7 @@
-from gui.draw import *
-from gui.keyboard import Keyboard
-from Apps.app_base import App
-from Apps.Calculator.page_converter import Converter
-from Apps.Calculator.page_standart_calculator import Standart
 import numpy as np
+from apps.Calculator.page_converter import Converter
+from apps.Calculator.page_standart_calculator import Standard
+from apps.app_base import App
 
 MAX_LENGTH = 10
 
@@ -12,7 +10,7 @@ class Calculator(App):
         super().__init__(name, display_name, icon_path)
         
         self.pages = [
-            Standart(),
+            Standard(),
             Converter()
         ]
         self.current_page = 0
