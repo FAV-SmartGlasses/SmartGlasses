@@ -2,7 +2,7 @@ import math
 
 import numpy as np
 
-from AR.Apps.calculator import Calculator
+from Apps.Calculator.calculator import Calculator
 from Apps.settings import Settings
 from gui.draw import *
 from hand_detection import HandDetection

@@ -50,3 +50,19 @@ def get_neutral_color2():
         return SettingsManager.get_custom_theme_neutral_color2()
     else:
         raise ValueError(f"Unknown theme: {theme}")
+
+def get_font_color_bgra():
+    font_color = get_font_color()
+    return (*font_color, 255)  # Convert BGR to BGRA (add alpha channel)
+
+def get_nice_color_bgra():
+    nice_color = get_nice_color()  # Reuse the existing method
+    return (*nice_color, 255)  # Convert BGR to BGRA (add alpha channel)
+
+def get_neutral_color_bgra():
+    neutral_color = get_neutral_color()
+    return (*neutral_color, 255)  # Convert BGR to BGRA (add alpha channel)
+
+def get_neutral_color2_bgra():
+    neutral_color2 = get_neutral_color2()
+    return (*neutral_color2, 255)  # Convert BGR to BGRA (add alpha channel)
