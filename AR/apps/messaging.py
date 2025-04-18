@@ -1,14 +1,23 @@
 import os.path
-import time
 import threading
+import time
 
 import requests
 from dotenv import load_dotenv
 
 import settings_manager
 from apps.app_base import App
+from gui import keyboard
 
 load_dotenv(os.path.abspath("../resources/.env"))
+
+layout = [
+    ['`', "1", "2", '3', '4', '5', '6', '7', '8', '9', '0', '-', '='],
+    ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]"],
+    ["A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "\\"],
+    ["\\", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/"],
+    [" "]
+]
 
 messages = []
 
@@ -16,6 +25,7 @@ class MessagingApp(App):
     def __init__(self, name, display_name, icon_path):
         super().__init__(name, display_name, icon_path)
         self.message_fetch = threading.Thread(target=self.fetch_messages)
+        self.keyboard = keyboard.Keyboard()
 
     def launch(self):
         self.message_fetch.start()
@@ -44,7 +54,9 @@ class MessagingApp(App):
     def draw(self, image, w, h,
              left_click_gesture_detected, right_click_gesture_detected,
              left_cursor_position, right_cursor_position):
-        pass
+        if self.opened:
+            overlay = image.copy()
+
 
 def send_message(message, server, channel):
     if server == "DM" or server == "DMraw":
@@ -106,7 +118,4 @@ def get_webhook(server, channel):
     return webhooks.get(server).get(channel)
 
 if __name__ == "__main__":
-    MessagingApp("Hello", "Hello", "")
-    while True:
-        pass
-    #send_message("Hello from OptiForge gui", "DM", "Miky")
+    send_message("Hello from OptiForge gui", "DM", "Tomáš Krůta")

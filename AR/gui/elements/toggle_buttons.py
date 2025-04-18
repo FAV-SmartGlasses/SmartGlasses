@@ -51,7 +51,7 @@ class ToggleButtons(Element):
 
         for i, button in enumerate(self.buttons):
             toggled = i == self.toggled
-            button.draw(image, toggled, h, toggled)
+            button.draw(image, w, h, toggled)
 
     def handle_click(self, pos):
         if pos is None or pos[0] is None or pos[1] is None:
