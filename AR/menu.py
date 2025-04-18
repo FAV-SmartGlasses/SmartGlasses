@@ -2,11 +2,11 @@ import math
 
 import numpy as np
 
-from resources.apps.Calculator.calculator import Calculator, settings
+from AR.apps.Calculator.calculator import Calculator, settings
 from gui.draw import *
 from hand_detection import HandDetection
 from menu_items import LockMenu, CloseMenu
-from resources.apps.app_base import App
+from AR.apps.app_base import App
 
 
 class Menu:
