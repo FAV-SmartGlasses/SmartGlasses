@@ -1,4 +1,4 @@
-from draw import *
+from .draw import *
 from hand_detection import HandDetection
 from menu import Menu
 from apps.app_base import App

@@ -2,7 +2,7 @@ import datetime
 
 import cv2
 
-from color_manager import *
+from .color_manager import *
 
 
 def draw_cursor(image, cursor_position):

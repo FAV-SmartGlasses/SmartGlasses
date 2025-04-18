@@ -1,4 +1,4 @@
-from draw import *
+from .draw import *
 
 
 class Keyboard:
