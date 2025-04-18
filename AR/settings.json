@@ -1,5 +1,5 @@
 {
-    "theme": 1,
+    "theme": 0,
     "custom_theme_font_color": [
         0,
         0,
@@ -7,12 +7,12 @@
     ],
     "custom_theme_nice_color": [
         0,
-        255,
-        255
+        0,
+        0
     ],
     "custom_theme_neutral_color": [
-        255,
-        255,
+        0,
+        0,
         0
     ],
     "custom_theme_neutral_color2": [

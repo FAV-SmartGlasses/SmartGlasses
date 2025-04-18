@@ -1,6 +1,10 @@
 import requests
+import dotenv
+import os
 
-WEBHOOK_URL = 'https://discord.com/api/webhooks/your_webhook_id/your_webhook_token'
+dotenv.load_dotenv(os.path.abspath("../resources/.env"))
+
+WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK")
 
 
 def send_discord_message(content, username='RPiUser', avatar_url=None):
