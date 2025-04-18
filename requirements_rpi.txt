@@ -1,0 +1,4 @@
+opencv-python
+mediapipe
+requests
+adafruit-circuitpython-bno055
