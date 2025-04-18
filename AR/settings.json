@@ -32,5 +32,6 @@
     "brightness": 50,
     "assistant_ON": true,
     "GPS_ON": true,
-    "aps_transparency": 0.5
+    "aps_transparency": 0.5,
+    "discord_api_ip": "127.0.0.1:8080"
 }

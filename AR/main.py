@@ -5,6 +5,7 @@ from config import *
 from gui.GUI_manager import GUImanager
 from settings_manager import load_settings
 
+import apps.messaging
 
 def main():
     # Camera

@@ -1,0 +1,102 @@
+import os.path
+import time
+import threading
+
+import requests
+from dotenv import load_dotenv
+
+import settings_manager
+from apps.app_base import App
+
+load_dotenv(os.path.abspath("../resources/.env"))
+
+messages = []
+
+class MessagingApp(App):
+    def __init__(self, name, display_name, icon_path):
+        super().__init__(name, display_name, icon_path)
+        self.message_fetch = threading.Thread(target=self.fetch_messages)
+        self.message_fetch.start()
+
+    def fetch_messages(self):
+        global messages
+
+        url = get_endpoint_address("/messages/get")
+
+        while True: #self.opened: TODO: Replace with self.opened after full implementation
+            response = requests.get(url)
+            if response.status_code == 200:
+                messages = response.json()
+                print(f"Updated messages to {messages}")
+            else:
+                print(response.text)
+
+            time.sleep(10)
+
+    def close(self):
+        self.message_fetch.join()
+
+def send_message(message, server, channel):
+    if server == "DM" or server == "DMraw":
+        if server == "DMraw":
+            tags = [channel]
+        else:
+            tags = get_tag(channel)
+
+        for i in tags:
+            send_dm(message, i["username"])
+
+        return
+
+    url = get_endpoint_address("/messages/send")
+
+    webhook = get_webhook(server, channel)
+
+    payload = {
+        "message": message,
+        "name": settings_manager.get_settings().discord_name,
+        "pfp": settings_manager.get_settings().discord_pfp_url,
+        "webhook": webhook
+    }
+
+    response = requests.post(url, json=payload)
+    print(response.text)
+
+def get_endpoint_address(endpoint):
+    return "http://" + settings_manager.get_settings().discord_api_ip + endpoint + "?auth=" + os.getenv("DISCORD_API_AUTH_KEY")
+
+def send_dm(message, tag):
+    url = get_endpoint_address("/messages/send_private")
+
+    payload = {
+        "message": message,
+        "name": settings_manager.get_settings().discord_name,
+        "tag": tag
+    }
+
+    response = requests.post(url, json= payload)
+
+    print(response.text + " to " + str(tag))
+
+def get_tag(username):
+    url = get_endpoint_address("/tag")
+
+    response = requests.post(url, json={"username": username})
+    return response.json()
+
+def get_webhook(server, channel):
+    url = get_endpoint_address("/webhooks")
+    response = requests.get(url)
+
+    if response.status_code != 200:
+        print(f"Could not get the webhook! error code: {response.status_code}")
+        return None
+
+    webhooks = response.json()
+    return webhooks.get(server).get(channel)
+
+if __name__ == "__main__":
+    MessagingApp("Hello", "Hello", "")
+    while True:
+        pass
+    #send_message("Hello from OptiForge gui", "DM", "Miky")

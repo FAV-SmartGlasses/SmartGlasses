@@ -1,8 +1,9 @@
 import cv2
-from gui.GUI_manager import GUImanager
-from config import *
-from picamera2 import Picamera2
 import numpy as np
+from picamera2 import Picamera2
+
+from config import *
+from gui.GUI_manager import GUImanager
 
 def main():
     # Kamera
