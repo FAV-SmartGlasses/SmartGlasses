@@ -2,12 +2,11 @@ import math
 
 import numpy as np
 
-from apps.Calculator.calculator import Calculator
-from apps import settings
+from resources.apps.Calculator.calculator import Calculator, settings
 from gui.draw import *
 from hand_detection import HandDetection
 from menu_items import LockMenu, CloseMenu
-from apps.app_base import App
+from resources.apps.app_base import App
 
 
 class Menu:
