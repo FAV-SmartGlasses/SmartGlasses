@@ -3,6 +3,8 @@ from apps.Calculator.page_converter import Converter
 from apps.Calculator.page_standart_calculator import Standard
 from apps.app_base import App
 from settings_manager import *
+from gui.elements.dropdown import Dropdown
+from gui.draw import *
 
 MAX_LENGTH = 10
 
@@ -15,14 +17,43 @@ class Calculator(App):
             Converter()
         ]
         self.current_page = 0
+        self.dropdown = Dropdown((self.position[0] + 200, self.position[1] + 50), (200, 35), ["Standard", "Converter"], 0)
 
     def draw(self, image, w, h, 
              left_click_gesture_detected, right_click_gesture_detected, 
              left_cursor_position, right_cursor_position):
         
         if self.opened:
-            overlay = self.pages[self.current_page].draw(w, h, image,
-                            left_click_gesture_detected, right_click_gesture_detected, 
+            overlay = np.zeros((h, w, 4), dtype=np.uint8)
+            """draw_rounded_rectangle(overlay,
+                                self.position, 
+                                (self.position[0] + self.size[0], self.position[1] + self.size[1]),
+                                30, 
+                                get_nice_color_bgra(),  # Use BGRA color
+                                -1)"""
+            
+
+
+            #overlay = 
+            self.pages[self.current_page].dynamic_draw(w, h, overlay,
+                                                        left_click_gesture_detected, right_click_gesture_detected, 
+                                                        left_cursor_position, right_cursor_position)
+            
+            """# Extrahujte RGB a alfa kanály
+            rgb1, alpha1 = overlay[..., :3], overlay[..., 3] / 255.0
+            rgb2, alpha2 = overlay[..., :3], overlay[..., 3] / 255.0
+
+            # Vypočtěte výsledný alfa kanál
+            alpha_result = alpha1 + alpha2 * (1 - alpha1)
+
+            # Vypočtěte výslednou RGB hodnotu
+            rgb_result = (rgb1 * alpha1[..., np.newaxis] + rgb2 * alpha2[..., np.newaxis] * (1 - alpha1[..., np.newaxis])) / alpha_result[..., np.newaxis]
+
+            # Sloučte RGB a alfa kanál zpět do jednoho obrázku
+            merged_overlay = np.dstack((rgb_result, (alpha_result * 255).astype(np.uint8)))"""
+            
+            self.dropdown.draw(image, w, h,
+                            left_click_gesture_detected, right_click_gesture_detected,
                             left_cursor_position, right_cursor_position)
             
             # Ensure overlay is smaller than image

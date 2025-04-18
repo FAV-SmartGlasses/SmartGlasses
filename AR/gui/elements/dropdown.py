@@ -1,60 +1,62 @@
 import cv2
+from .element_base import Element
+from gui.draw import *
 
-class Dropdown:
-    def __init__(self, x, y, width, height, options, base_color, option_color):
-        self.x = x
-        self.y = y
-        self.width = width
-        self.height = height
+
+class Dropdown(Element):
+    def __init__(self, position, size, options, selected_option=None):
+        super().__init__(position, size)
+        self.open = False
         self.options = options
-        self.base_color = base_color
-        self.option_color = option_color
-        self.active = False
-        self.selected = options[0]
+        self.selected_option = selected_option
+        self.padding = 10
+        self.click_history = []
 
-    @property
-    def rect(self):
-        return self.x, self.y, self.width, self.height
+    def draw(self, image, w, h, left_click_gesture_detected, right_click_gesture_detected, 
+             left_cursor_position, right_cursor_position):
+        
+        is_left_hovered = is_cursor_in_rect(left_cursor_position, (self.position[0], self.position[1], self.position[0] + self.size[0], self.position[1] + self.size[1]))
+        is_right_hovered = is_cursor_in_rect(right_cursor_position, (self.position[0], self.position[1], self.position[0] + self.size[0], self.position[1] + self.size[1]))
+        is_left_clicked = is_left_hovered and left_click_gesture_detected
+        is_right_clicked = is_right_hovered and right_click_gesture_detected
+        is_clicked = is_left_clicked or is_right_clicked
 
-    @rect.setter
-    def rect(self, value):
-        self.x, self.y, self.width, self.height = value
+        if is_clicked:
+            if len(self.click_history) == 0 or (len(self.click_history) != 0 and self.click_history[-1] == False):
+                self.open = not self.open
+                self.click_history.append(True)
+        else:
+            if len(self.click_history) == 0 or (len(self.click_history) != 0 and self.click_history[-1]):
+                self.click_history.append(False)
+        
 
-    def draw(self, image):
-        if self.active:
-            overlay = image.copy()
-            # Apply transparency (50%) to the dropdown
-            for i, option in enumerate(self.options):
-                option_y = self.y + self.height * (i + 1)
-                cv2.rectangle(overlay, (self.x, int(option_y)), (self.x + self.width, int(option_y + self.height)),
-                              self.option_color, -1)
-            cv2.addWeighted(overlay, 0.5, image, 0.5, 0, image)  # 50% transparency for dropdown
+        text = self.selected_option if self.selected_option else "Select an option"
+        self.draw_element(image, text)
 
-            # Draw options with borders and text
-            for i, option in enumerate(self.options):
-                option_y = self.y + self.height * (i + 1)
-                cv2.rectangle(image, (self.x, int(option_y)), (self.x + self.width, int(option_y + self.height)),
-                              (0, 0, 0), 2)
-                cv2.putText(image, option, (self.x + 10, int(option_y + self.height * 0.7)),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+        if self.open:
+            for idx, option in enumerate(self.options):
+                option_x = self.position[0]
+                option_y = self.position[1] + (idx + 1) * (self.size[1] + self.padding)
 
-    def handle_mouse(self, event, x, y, flags, param):
-        if event == cv2.EVENT_LBUTTONDOWN:
-            # Check if clicked within dropdown bounds
-            if self.x <= x <= self.x + self.width and self.y <= y <= self.y + self.height:
-                self.active = not self.active  # Toggle the dropdown visibility
+                # Zkontrolujeme, jestli je kurzor nad možností
+                rect = (option_x, option_y, option_x + self.size[0], option_y + self.size[1])
+                hovered = False
+                if is_cursor_in_rect(left_cursor_position, rect) or is_cursor_in_rect(right_cursor_position, rect):
+                    hovered = True
 
-            # Handle option clicks when dropdown is active
-            elif self.active:
-                for i, option in enumerate(self.options):
-                    option_y = self.y + self.height * (i + 1)
-                    if option_y <= y <= option_y + self.height:
-                        self.selected = option
-                        self.active = False  # Close the dropdown after selection
-                        break
-                else:
-                    # If clicked outside options, close the dropdown
-                    self.active = False
+                    if (left_click_gesture_detected and is_cursor_in_rect(left_cursor_position, rect)) or (right_click_gesture_detected and is_cursor_in_rect(right_cursor_position, rect)):
+                        self.selected_option = option
+                        self.open = False
 
-    def get_selected(self):
-        return self.selected
+                self.draw_option(image, option_x, option_y, hovered, option)
+        
+    def draw_element(self, image, text):
+        size_y = self.size[1] * (len(self.options) + 1) + self.padding * (len(self.options) + 1) if self.open else self.size[1]
+        draw_rounded_rectangle(image, self.position, (self.position[0] + self.size[0], self.position[1] + size_y), 15, get_nice_color(), -1)
+        cv2.putText(image, text, (self.position[0] + 10, self.position[1] + 30), 
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, get_font_color(), 2)
+
+    def draw_option(self, image, x, y, hovered, text):
+        color = get_nice_color() if hovered else get_neutral_color()
+        draw_rounded_rectangle(image, (x + self.padding, y), (x + self.size[0] - self.padding, y + self.size[1]), 15, color, -1)
+        cv2.putText(image, text, (x + self.padding + 10, y + 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, get_font_color(), 2)

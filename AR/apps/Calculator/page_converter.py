@@ -9,7 +9,7 @@ from apps.page_base import CalculatorPage
 class Converter(CalculatorPage):
     _file_path = Path(__file__).parent / "page_converter_data.json"  # cesta k JSON souboru
 
-    def draw(self, w, h, image, 
+    def draw(self, w, h,
              left_click_gesture_detected, right_click_gesture_detected, 
              left_cursor_position, right_cursor_position):
         image = w.new_image(640, 480, (255, 255, 255))
