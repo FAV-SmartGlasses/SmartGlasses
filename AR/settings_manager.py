@@ -25,7 +25,7 @@ class WIFI:
         self.password = password
 
 @dataclass
-class Settings:
+class SettingsModel:
     theme: Theme = Theme.LIGHT
     custom_theme_font_color: tuple = (0,0,0)
     custom_theme_nice_color: tuple = (0,0,0)
@@ -49,7 +49,7 @@ class Settings:
 
 
 _settings_file = Path(__file__).parent / "settings.json"  # saves JSON into folder AR
-_settings = Settings()
+_settings = SettingsModel()
 
 # region Settings saving/loading methods
 def load_settings():
@@ -60,7 +60,7 @@ def load_settings():
             with open(_settings_file, "r") as file:
                 data = json.load(file)
                 #_settings = Settings(**data)
-                _settings = Settings(
+                _settings = SettingsModel(
                     theme=Theme(data["theme"]),
                     custom_theme_font_color=tuple(data["custom_theme_font_color"]),
                     custom_theme_nice_color=tuple(data["custom_theme_nice_color"]),

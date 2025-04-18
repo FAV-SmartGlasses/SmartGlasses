@@ -2,18 +2,19 @@ import math
 
 import numpy as np
 
-from AR.apps.Calculator.calculator import Calculator, settings
+from apps.Calculator.calculator import Calculator
+from apps.settings import *
 from gui.draw import *
 from hand_detection import HandDetection
 from menu_items import LockMenu, CloseMenu
-from AR.apps.app_base import App
+from apps.app_base import App
 
 
 class Menu:
     items = [
         App("Home", "Home", "Home.png"),
         #App("Settings", "Settings", "Settings.png"),
-        settings.Settings("Settings", "Settings", "Settings.png"),
+        Settings("Settings", "Settings", "Settings.png"),
         App("ToDo", "To DO", "Done.png"),
         #App("Calculator", "Calculator", "Plus.png"),
         Calculator("Calculator", "Calculator", "Plus.png"),
