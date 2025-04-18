@@ -16,7 +16,7 @@ layout = [
     ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]"],
     ["A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "\\"],
     ["\\", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/"],
-    [" "]
+    [" ", "->", "-<"]
 ]
 
 messages = []
@@ -25,7 +25,7 @@ class MessagingApp(App):
     def __init__(self, name, display_name, icon_path):
         super().__init__(name, display_name, icon_path)
         self.message_fetch = threading.Thread(target=self.fetch_messages)
-        self.keyboard = keyboard.Keyboard()
+        self.keyboard = keyboard.Keyboard(layout)
 
     def launch(self):
         self.message_fetch.start()

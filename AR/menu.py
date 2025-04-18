@@ -3,6 +3,7 @@ import math
 import numpy as np
 
 from apps.Calculator.calculator import Calculator
+from apps.messaging import MessagingApp
 from apps.settings import *
 from gui.draw import *
 from hand_detection import HandDetection
@@ -18,6 +19,7 @@ class Menu:
         App("ToDo", "To DO", "Done.png"),
         #App("Calculator", "Calculator", "Plus.png"),
         Calculator("Calculator", "Calculator", "Plus.png"),
+        MessagingApp("MessagingApp", "Discord", "Discord.png"),
         #App("Browser", "Browser", "Search.png"),
         #App("Music", "Music", "Music.png"),
         App("Notes", "Notes", "Edit.png"),
