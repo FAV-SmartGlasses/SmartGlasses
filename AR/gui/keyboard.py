@@ -16,9 +16,14 @@ class Keyboard:
     def draw(self, image, w, h, 
              left_click_gesture_detected, right_click_gesture_detected, 
              left_cursor_position, right_cursor_position, 
-             color, border_color, font_color, hover_color, hover_border_color, hover_font_color):
+             color, border_color, font_color, hover_color, hover_border_color, hover_font_color,
+             scaled_key_size, scaled_padding):
+        
+        self.key_size = int(scaled_key_size)
+        self.padding = int(scaled_padding)
+
         left_detected_key = self.detect_key_press(left_cursor_position[0], left_cursor_position[1], w, h)
-        right_detected_key = self.detect_key_press(right_cursor_position[0], right_cursor_position[1], w, h)
+        right_detected_key = self.detect_key_press(right_cursor_position[0], right_cursor_position[1], w, h,)
 
         if left_click_gesture_detected or right_click_gesture_detected:
             detected_key = left_detected_key if left_click_gesture_detected else right_detected_key
