@@ -1,5 +1,4 @@
 from apps.app_base import App
-
 from gui.draw import *
 from gui.elements.button import Button
 from gui.elements.toggle_buttons import ToggleButtons

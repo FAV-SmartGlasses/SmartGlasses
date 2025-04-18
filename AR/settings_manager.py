@@ -40,16 +40,18 @@ class Settings:
     wifi_ON: bool = True
     keyboard_layout: KeyboardLayout = KeyboardLayout.QWERTY_ENGLISH
     volume: int = 50  # (0-100)
-    microfon_ON: bool = True
+    microphone_ON: bool = True
     brightness: int = 50  # (0-100)
-    assistent_ON: bool = True
+    assistant_ON: bool = True
     GPS_ON: bool = True
+    aps_transparency: float = 0.5 # (0-1)
     # TODO: implementation of other headset settings
 
 
 _settings_file = Path(__file__).parent / "settings.json"  # saves JSON into folder AR
 _settings = Settings()
 
+# region Settings saving/loading methods
 def load_settings():
     global _settings
     
@@ -93,7 +95,9 @@ def set_settings(**kwargs):
         if hasattr(_settings, key):
             setattr(_settings, key, value)
     save_settings()
+#endregion
 
+# region Theme-related methods
 def get_theme():
     load_settings()
     return _settings.theme
@@ -113,3 +117,8 @@ def get_custom_theme_neutral_color():
 def get_custom_theme_neutral_color2():
     load_settings()
     return _settings.custom_theme_neutral_color2
+# endregion
+
+def get_app_transparency():
+    load_settings()
+    return _settings.aps_transparency

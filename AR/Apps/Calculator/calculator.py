@@ -2,6 +2,7 @@ import numpy as np
 from apps.Calculator.page_converter import Converter
 from apps.Calculator.page_standart_calculator import Standard
 from apps.app_base import App
+from settings_manager import *
 
 MAX_LENGTH = 10
 
@@ -36,8 +37,7 @@ class Calculator(App):
             y_offset = (image_h - overlay_h) // 2
 
             # Blend overlay onto image using OpenCV
-            transparency_factor = 0.5  # Adjust this value for transparency (0.0 to 1.0)
-            alpha_channel = (overlay[:, :, 3] / 255.0) * transparency_factor  # Adjust alpha channel by transparency factor
+            alpha_channel = (overlay[:, :, 3] / 255.0) * get_app_transparency()  # Adjust alpha channel by transparency factor
             alpha_channel = np.clip(alpha_channel, 0, 1)  # Ensure alpha values are within [0, 1]
             for c in range(3):  # Blend RGB channels
                 image[y_offset:y_offset + overlay_h, x_offset:x_offset + overlay_w, c] = (
