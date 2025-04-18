@@ -8,7 +8,7 @@ class ToggleButton(Element):
         super().__init__(position, (width, height))
         self.text = text
 
-    def draw(self, image, w, h, toggled = False):
+    def draw(self, image, w, h, toggled = False): # TODO: teach Thomas how function overriding works
         """background_color = get_nice_color() if toggled else (0, 0, 255)  # Green if toggled, red if not
         draw_rounded_rectangle(image, self.position, (self.position[0] + self.size[0], self.position[0] + self.size[1]), 10, (0, 0, 0), -1)
         cv2.putText(image, self.text, (self.x + 10, self.y + 25), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)"""
@@ -24,14 +24,14 @@ class ToggleButton(Element):
         return image
 
 class ToggleButtons(Element):
-    def __init__(self, text, position, button_height, toggle_buttons_textes):
-        height = (button_height + 10) * len(toggle_buttons_textes)
-        width = max([cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 2)[0][0] for text in toggle_buttons_textes]) + 20
+    def __init__(self, text, position, button_height, toggle_buttons_texts):
+        height = (button_height + 10) * len(toggle_buttons_texts)
+        width = max([cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 2)[0][0] for text in toggle_buttons_texts]) + 20
         super().__init__(position, (width, height))
         self.text = text
         self.clicked = None
         self.buttons = []
-        for i, text in enumerate(toggle_buttons_textes):
+        for i, text in enumerate(toggle_buttons_texts):
             x_pos = position[0]
             y_pos = position[1] + i * (button_height + 10)  # Adjust spacing dynamically
             self.buttons.append(ToggleButton((x_pos, y_pos), button_height, text))  # Add ToggleButton objects
@@ -51,7 +51,7 @@ class ToggleButtons(Element):
 
         for i, button in enumerate(self.buttons):
             toggled = i == self.toggled
-            button.draw(image, toggled)
+            button.draw(image, toggled, h, toggled)
 
     def handle_click(self, pos):
         if pos is None or pos[0] is None or pos[1] is None:

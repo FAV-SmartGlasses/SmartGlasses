@@ -1,10 +1,10 @@
 import numpy as np
+
 from apps.Calculator.page_converter import Converter
-from apps.Calculator.page_standart_calculator import Standard
+from apps.Calculator.page_standard_calculator import Standard
 from apps.app_base import App
-from settings_manager import *
-from gui.elements.dropdown import Dropdown
 from gui.draw import *
+from gui.elements.dropdown import Dropdown
 
 MAX_LENGTH = 10
 

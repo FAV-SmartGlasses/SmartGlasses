@@ -56,14 +56,14 @@ class Standard(CalculatorPage):
                            left_click_gesture_detected, right_click_gesture_detected, 
                            left_cursor_position, right_cursor_position,
                            get_neutral_color_bgra(), get_neutral_color2_bgra(), get_font_color_bgra(), 
-                           get_neutral_color2_bgra(), get_nice_color_bgra(), get_nice_color_bgra())
+                           get_neutral_color2_bgra(), get_nice_color_bgra(), get_nice_color_bgra()) # TODO: [PyCharm Warning] Add parameters
 
         return overlay
     
     
 
     def dynamic_draw(self, w, h, overlay,
-                    left_click_gesture_detected, right_click_gesture_detected, 
+                    left_click_gesture_detected, right_click_gesture_detected,
                     left_cursor_position, right_cursor_position):
         
         # Dynamic scaling factor based on screen dimensions

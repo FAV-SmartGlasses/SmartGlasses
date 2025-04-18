@@ -1,6 +1,5 @@
-import cv2
-from .element_base import Element
 from gui.draw import *
+from .element_base import Element
 
 
 class Dropdown(Element):
@@ -13,7 +12,7 @@ class Dropdown(Element):
         self.click_history = []
 
     def draw(self, image, w, h, left_click_gesture_detected, right_click_gesture_detected, 
-             left_cursor_position, right_cursor_position):
+             left_cursor_position, right_cursor_position): # TODO: teach Thomas how function overriding works
         
         is_left_hovered = is_cursor_in_rect(left_cursor_position, (self.position[0], self.position[1], self.position[0] + self.size[0], self.position[1] + self.size[1]))
         is_right_hovered = is_cursor_in_rect(right_cursor_position, (self.position[0], self.position[1], self.position[0] + self.size[0], self.position[1] + self.size[1]))

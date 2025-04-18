@@ -14,8 +14,8 @@ def main():
     cv2.namedWindow(window_name, cv2.WND_PROP_FULLSCREEN)
     cv2.setWindowProperty(window_name, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
-    camer_config = picam2.create_still_configuration(main={"size": (W, H)})
-    picam2.configure(camer_config)
+    camera_config = picam2.create_still_configuration(main={"size": (W, H)})
+    picam2.configure(camera_config)
     picam2.start()
 
 

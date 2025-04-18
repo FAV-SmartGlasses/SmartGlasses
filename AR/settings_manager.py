@@ -46,7 +46,7 @@ class SettingsModel:
     GPS_ON: bool = True
     aps_transparency: float = 0.5 # (0-1)
     discord_api_ip: str = "127.0.0.1:8080"
-    discord_name: str = "Optiforge user"
+    discord_name: str = "OptiForge user"
     discord_pfp_url: str = "https://avatars.githubusercontent.com/u/189787689?s=96&v=4"
     # TODO: implementation of other headset settings
 
@@ -57,7 +57,7 @@ _settings = SettingsModel()
 # region Settings saving/loading methods
 def load_settings():
     global _settings
-    
+
     if _settings_file.exists():
         try:
             with open(_settings_file, "r") as file:

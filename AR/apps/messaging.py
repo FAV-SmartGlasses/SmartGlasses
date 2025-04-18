@@ -16,14 +16,17 @@ class MessagingApp(App):
     def __init__(self, name, display_name, icon_path):
         super().__init__(name, display_name, icon_path)
         self.message_fetch = threading.Thread(target=self.fetch_messages)
+
+    def launch(self):
         self.message_fetch.start()
+        self.opened = True
 
     def fetch_messages(self):
         global messages
 
         url = get_endpoint_address("/messages/get")
 
-        while True: #self.opened: TODO: Replace with self.opened after full implementation
+        while self.opened:
             response = requests.get(url)
             if response.status_code == 200:
                 messages = response.json()
@@ -35,6 +38,13 @@ class MessagingApp(App):
 
     def close(self):
         self.message_fetch.join()
+        self.opened = False
+
+
+    def draw(self, image, w, h,
+             left_click_gesture_detected, right_click_gesture_detected,
+             left_cursor_position, right_cursor_position):
+        pass
 
 def send_message(message, server, channel):
     if server == "DM" or server == "DMraw":
