@@ -13,14 +13,44 @@ KEYS = [
             ["0", ".", "X", "="]
         ]
 
-PADDING = 10
+PADDING = 20
 KEY_SIZE = 50
 
 class Standard(CalculatorPage):
     def __init__(self):
         self.keyboard = CalculatorKeyboard(KEYS)
 
-    def draw(self, w, h,
+        self.aspect_ratio = self.compute_aspect_ratio()
+
+        self.size = (800, int(800 / self.aspect_ratio))
+
+#region computing and setting size
+    def compute_aspect_ratio(self):
+        cols = len(KEYS[0])
+        rows = len(KEYS)
+        sample_key_size = 10  # libovolná jednotka, důležité jsou proporce
+        padding = sample_key_size // 5
+        textbox_height = sample_key_size
+
+        total_width = cols * sample_key_size + (cols - 1) * padding + padding + padding
+        total_height = rows * sample_key_size + (rows - 1) * padding + textbox_height + 2 * padding
+
+        return total_width / total_height
+
+    def set_size(self, w, h):
+        self.size = (w, h)
+
+    def set_width(self, w):
+        h = int(w / self.aspect_ratio)
+        self.set_size(w, h)
+
+    def set_height(self, h):
+        w = int(h * self.aspect_ratio)
+        self.set_size(w, h)
+#endregion
+
+
+    def draw(self, w, h, 
              left_click_gesture_detected, right_click_gesture_detected, 
              left_cursor_position, right_cursor_position):
         # Create an overlay with transparency (BGRA)
@@ -52,7 +82,7 @@ class Standard(CalculatorPage):
                     2)
 
         # Draw the keyboard
-        self.keyboard.draw(overlay, w, h, 
+        self.keyboard.draw(overlay, start_x, start_y, 
                            left_click_gesture_detected, right_click_gesture_detected, 
                            left_cursor_position, right_cursor_position,
                            get_neutral_color_bgra(), get_neutral_color2_bgra(), get_font_color_bgra(), 
@@ -60,14 +90,13 @@ class Standard(CalculatorPage):
 
         return overlay
     
-    
 
-    def dynamic_draw(self, w, h, overlay,
+    def dynamic_draw(self, overlay,
                     left_click_gesture_detected, right_click_gesture_detected,
                     left_cursor_position, right_cursor_position):
         
         # Dynamic scaling factor based on screen dimensions
-        scale_factor = min(w, h) / 800  # Base size is 800px (could be adjusted)
+        scale_factor = min(*self.size) / 800  # Base size is 800px (could be adjusted)
         scaled_key_size = int(KEY_SIZE * scale_factor)  # Scale the key size
         scaled_padding = int(PADDING * scale_factor)  # Scale padding between keys
 
@@ -75,23 +104,23 @@ class Standard(CalculatorPage):
         #overlay = np.zeros((h, w, 4), dtype=np.uint8)
 
         # Calculate starting position for the keyboard
-        start_x = w // 2 - (len(KEYS[0]) * (scaled_key_size + scaled_padding)) // 2
-        start_y = h // 2 - (len(KEYS) * (scaled_key_size + scaled_padding)) // 2
+        #start_x = w // 2 - (len(KEYS[0]) * (scaled_key_size + scaled_padding)) // 2
+        #start_y = h // 2 - (len(KEYS) * (scaled_key_size + scaled_padding)) // 2
 
         # Draw the textbox background
         textbox_height = int(60 * scale_factor)  # Scale textbox height
         draw_rounded_rectangle(overlay,
-                                (start_x - scaled_padding, start_y - textbox_height), 
-                                (start_x + len(KEYS[0]) * (scaled_key_size + scaled_padding),
-                                 start_y + len(KEYS) * (scaled_key_size + scaled_padding)),
+                                (0, 0), 
+                                (len(KEYS[0]) * (scaled_key_size + scaled_padding),
+                                 textbox_height + len(KEYS) * (scaled_key_size + scaled_padding)),
                                 30, 
                                 get_nice_color_bgra(),  # Use BGRA color
                                 -1)
 
         # Draw the text inside the textbox with dynamic text size
         text_size = cv2.getTextSize(self.keyboard.text, cv2.FONT_HERSHEY_SIMPLEX, scale_factor, 2)[0]
-        text_x = start_x + (len(KEYS[0]) * (scaled_key_size + scaled_padding) - text_size[0]) // 2
-        text_y = start_y - textbox_height // 2 + text_size[1] // 2
+        text_x = scaled_padding + (len(KEYS[0]) * (scaled_key_size + scaled_padding) - text_size[0]) // 2
+        text_y = (textbox_height - text_size[1]) // 2
         cv2.putText(overlay, self.keyboard.text, 
                     (text_x, text_y), 
                     cv2.FONT_HERSHEY_SIMPLEX, 
@@ -100,7 +129,7 @@ class Standard(CalculatorPage):
                     2)
 
         # Draw the keyboard with dynamically scaled keys
-        self.keyboard.draw(overlay, w, h, 
+        self.keyboard.draw(overlay, scaled_padding, textbox_height, 
                            left_click_gesture_detected, right_click_gesture_detected, 
                            left_cursor_position, right_cursor_position,
                            get_neutral_color_bgra(), get_neutral_color2_bgra(), get_font_color_bgra(), 

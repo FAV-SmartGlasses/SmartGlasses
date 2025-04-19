@@ -9,8 +9,6 @@ def draw_cursor(image, cursor_position):
     if cursor_position != (None, None):
         cv2.circle(image, (cursor_position[0], cursor_position[1]), 10, (0, 0, 255), -1)
 
-
-
 def draw_gui_objects(self, image, objects, cursor_position, click_gesture_detected):
     for obj in objects:
         match obj.__class__:

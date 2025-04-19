@@ -13,7 +13,7 @@ class Keyboard:
     def process_detected_key(self, detected_key):
         raise NotImplemented()
 
-    def draw(self, image, w, h, 
+    def draw(self, image, start_x, start_y, 
              left_click_gesture_detected, right_click_gesture_detected, 
              left_cursor_position, right_cursor_position, 
              color, border_color, font_color, hover_color, hover_border_color, hover_font_color,
@@ -22,8 +22,8 @@ class Keyboard:
         self.key_size = int(scaled_key_size)
         self.padding = int(scaled_padding)
 
-        left_detected_key = self.detect_key_press(left_cursor_position[0], left_cursor_position[1], w, h)
-        right_detected_key = self.detect_key_press(right_cursor_position[0], right_cursor_position[1], w, h,)
+        left_detected_key = self.detect_key_press(left_cursor_position[0], left_cursor_position[1], start_x, start_y)
+        right_detected_key = self.detect_key_press(right_cursor_position[0], right_cursor_position[1], start_x, start_y)
 
         if left_click_gesture_detected or right_click_gesture_detected:
             detected_key = left_detected_key if left_click_gesture_detected else right_detected_key
@@ -41,8 +41,8 @@ class Keyboard:
                 self.click_history.append(False)
 
         # Výpočet počáteční pozice klávesnice
-        start_x = w // 2 - (len(self.keys[0]) * (self.key_size + self.padding)) // 2
-        start_y = h // 2 - (len(self.keys) * (self.key_size + self.padding)) // 2
+        #start_x = w // 2 - (len(self.keys[0]) * (self.key_size + self.padding)) // 2
+        #start_y = h // 2 - (len(self.keys) * (self.key_size + self.padding)) // 2
 
         # Vytvoření překryvného obrázku
         overlay = image.copy()
@@ -87,13 +87,13 @@ class Keyboard:
         alpha = 0.5  # Nastavení průhlednosti (0.0 = zcela průhledné, 1.0 = zcela neprůhledné)
         cv2.addWeighted(overlay, alpha, image, 1 - alpha, 0, image)
 
-    def detect_key_press(self, x, y, w, h):
+    def detect_key_press(self, x, y, start_x, start_y):
         if x is None or y is None:
             return None
 
         # Výpočet počáteční pozice klávesnice
-        start_x = w // 2 - (len(self.keys[0]) * (self.key_size + self.padding)) // 2
-        start_y = h // 2 - (len(self.keys) * (self.key_size + self.padding)) // 2
+        #start_x = w // 2 - (len(self.keys[0]) * (self.key_size + self.padding)) // 2
+        #start_y = h // 2 - (len(self.keys) * (self.key_size + self.padding)) // 2
 
         # Procházení kláves a kontrola, zda kliknutí spadá do jejich oblasti
         for row_idx, row in enumerate(self.keys):
