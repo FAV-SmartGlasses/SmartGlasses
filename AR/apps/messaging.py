@@ -2,12 +2,13 @@ import os.path
 import threading
 import time
 
+import numpy as np
 import requests
 from dotenv import load_dotenv
 
 import settings_manager
 from apps.app_base import App
-from gui import keyboard
+from gui import keyboard, color_manager
 
 load_dotenv(os.path.abspath("../resources/.env"))
 
@@ -21,6 +22,9 @@ layout = [
 
 messages = []
 
+scaled_key_size = 0
+scaled_padding = 0
+
 class MessagingApp(App):
     def __init__(self, name, display_name, icon_path):
         super().__init__(name, display_name, icon_path)
@@ -28,7 +32,7 @@ class MessagingApp(App):
         self.keyboard = keyboard.Keyboard(layout)
 
     def launch(self):
-        self.message_fetch.start()
+        #self.message_fetch.start()
         self.opened = True
 
     def fetch_messages(self):
@@ -55,7 +59,13 @@ class MessagingApp(App):
              left_click_gesture_detected, right_click_gesture_detected,
              left_cursor_position, right_cursor_position):
         if self.opened:
-            overlay = image.copy()
+            overlay = np.zeros((h, w, 4), dtype=np.uint8)
+
+            self.keyboard.draw(overlay, w, h,
+                           left_click_gesture_detected, right_click_gesture_detected,
+                           left_cursor_position, right_cursor_position,
+                           color_manager.get_neutral_color_bgra(), color_manager.get_neutral_color2_bgra(), color_manager.get_font_color_bgra(),
+                           color_manager.get_neutral_color2_bgra(), color_manager.get_nice_color_bgra(), color_manager.get_nice_color_bgra(), scaled_key_size, scaled_padding)
 
 
 def send_message(message, server, channel):

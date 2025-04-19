@@ -9,7 +9,7 @@ class Settings(App):
         super().__init__(name, display_name, icon_path)
         self.position = (100, 100)  # Pozice aplikace na obrazovce
         self.size = (400, 400)  # Velikost aplikace
-        self.btn = Button(None, 300, 400, "Settings", (100, 50),
+        self.button = Button(None, 300, 400, "Settings", (100, 50),
                           get_neutral_color(), get_neutral_color(), get_font_color(), 
                           get_nice_color(), get_neutral_color2(), get_font_color())
         self.toggle = ToggleButtons("neco", (self.position[0] + 10, self.position[1] + 10), 20, ["Option 1", "Option 2", "Option 3"])
@@ -32,12 +32,12 @@ class Settings(App):
             alpha = 0.5  # Nastavení průhlednosti (0.0 = zcela průhledné, 1.0 = zcela neprůhledné)
             cv2.addWeighted(overlay, alpha, image, 1 - alpha, 0, image)
 
-            left_in_rect = is_cursor_in_rect(left_cursor_position, (self.btn.x_pos, self.btn.y_pos, self.btn.x_pos + self.btn.size[0], self.btn.y_pos + self.btn.size[1]))
-            right_in_rect = is_cursor_in_rect(right_cursor_position, (self.btn.x_pos, self.btn.y_pos, self.btn.x_pos + self.btn.size[0], self.btn.y_pos + self.btn.size[1]))
+            left_in_rect = is_cursor_in_rect(left_cursor_position, (self.button.x_pos, self.button.y_pos, self.button.x_pos + self.button.size[0], self.button.y_pos + self.button.size[1]))
+            right_in_rect = is_cursor_in_rect(right_cursor_position, (self.button.x_pos, self.button.y_pos, self.button.x_pos + self.button.size[0], self.button.y_pos + self.button.size[1]))
             
             is_in_rect = left_in_rect or right_in_rect
 
-            self.btn.draw(image, is_in_rect)
+            self.button.draw(image, is_in_rect)
             
             self.toggle.draw(image)
         
