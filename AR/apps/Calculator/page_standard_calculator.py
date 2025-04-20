@@ -14,6 +14,7 @@ KEYS = [
         ]
 
 PADDING = 20
+KEY_PADDING = PADDING/2
 KEY_SIZE = 50
 
 class Standard(CalculatorPage):
@@ -33,7 +34,7 @@ class Standard(CalculatorPage):
         textbox_height = sample_key_size
 
         total_width = cols * sample_key_size + (cols - 1) * padding + padding + padding
-        total_height = rows * sample_key_size + (rows - 1) * padding + textbox_height + 2 * padding
+        total_height = rows * sample_key_size + (rows - 1) * padding / 2 + textbox_height + 2 * padding
 
         return total_width / total_height
 
@@ -134,7 +135,7 @@ class Standard(CalculatorPage):
                            left_cursor_position, right_cursor_position,
                            get_neutral_color_bgra(), get_neutral_color2_bgra(), get_font_color_bgra(), 
                            get_neutral_color2_bgra(), get_nice_color_bgra(), get_nice_color_bgra(), 
-                           scaled_key_size, scaled_padding)
+                           scaled_key_size, scaled_padding/2)
 
         #return overlay
 
