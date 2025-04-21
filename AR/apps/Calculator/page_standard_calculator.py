@@ -31,10 +31,11 @@ class Standard(CalculatorPage):
         rows = len(KEYS)
         sample_key_size = 10  # libovolná jednotka, důležité jsou proporce
         padding = sample_key_size // 5
+        key_padding = padding/2
         textbox_height = sample_key_size
 
-        total_width = cols * sample_key_size + (cols - 1) * padding + padding + padding
-        total_height = rows * sample_key_size + (rows - 1) * padding / 2 + textbox_height + 2 * padding
+        total_width = cols * sample_key_size + (cols - 1) * key_padding + 2 * padding
+        total_height = rows * sample_key_size + (rows - 1) * key_padding + textbox_height + padding
 
         return total_width / total_height
 
@@ -100,6 +101,7 @@ class Standard(CalculatorPage):
         scale_factor = min(*self.size) / 800  # Base size is 800px (could be adjusted)
         scaled_key_size = int(KEY_SIZE * scale_factor)  # Scale the key size
         scaled_padding = int(PADDING * scale_factor)  # Scale padding between keys
+        scaled_key_padding = int(scaled_padding/2)
 
         # Create an overlay with transparency (BGRA)
         #overlay = np.zeros((h, w, 4), dtype=np.uint8)
@@ -112,15 +114,15 @@ class Standard(CalculatorPage):
         textbox_height = int(60 * scale_factor)  # Scale textbox height
         draw_rounded_rectangle(overlay,
                                 (0, 0), 
-                                (len(KEYS[0]) * (scaled_key_size + scaled_padding),
-                                 textbox_height + len(KEYS) * (scaled_key_size + scaled_padding)),
+                                (len(KEYS[0]) * (scaled_key_size + scaled_key_padding) - scaled_key_padding + 2 * scaled_padding,
+                                 textbox_height + len(KEYS) * (scaled_key_size + scaled_key_padding) - scaled_key_padding + scaled_padding),
                                 30, 
                                 get_nice_color_bgra(),  # Use BGRA color
                                 -1)
 
         # Draw the text inside the textbox with dynamic text size
         text_size = cv2.getTextSize(self.keyboard.text, cv2.FONT_HERSHEY_SIMPLEX, scale_factor, 2)[0]
-        text_x = scaled_padding + (len(KEYS[0]) * (scaled_key_size + scaled_padding) - text_size[0]) // 2
+        text_x = scaled_padding + (len(KEYS[0]) * (scaled_key_size + scaled_key_padding) - scaled_key_padding - text_size[0]) // 2
         text_y = (textbox_height - text_size[1]) // 2
         cv2.putText(overlay, self.keyboard.text, 
                     (text_x, text_y), 
@@ -135,7 +137,7 @@ class Standard(CalculatorPage):
                            left_cursor_position, right_cursor_position,
                            get_neutral_color_bgra(), get_neutral_color2_bgra(), get_font_color_bgra(), 
                            get_neutral_color2_bgra(), get_nice_color_bgra(), get_nice_color_bgra(), 
-                           scaled_key_size, scaled_padding/2)
+                           scaled_key_size, scaled_key_padding)
 
         #return overlay
 
