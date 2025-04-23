@@ -1,3 +1,4 @@
+import asyncio
 import os.path
 import threading
 import time
@@ -20,7 +21,9 @@ layout = [
     [" ", "->", "-<"]
 ]
 
-messages = []
+messages = {}
+ai_messages = {}
+models = []
 
 scaled_key_size = 0
 scaled_padding = 0
@@ -36,14 +39,15 @@ class MessagingApp(App):
         self.opened = True
 
     def fetch_messages(self):
-        global messages
+        global messages, ai_messages
 
         url = get_endpoint_address("/messages/get")
 
         while self.opened:
             response = requests.get(url)
             if response.status_code == 200:
-                messages = response.json()
+                messages = response.json()[0]
+                ai_messages = response.json()[1]
                 print(f"Updated messages to {messages}")
             else:
                 print(response.text)
@@ -78,6 +82,10 @@ def send_message(message, server, channel):
         for i in tags:
             send_dm(message, i["username"])
 
+        return
+
+    if server.lower() == "ai":
+        asyncio.run(send_llm(channel, message))
         return
 
     url = get_endpoint_address("/messages/send")
@@ -127,5 +135,59 @@ def get_webhook(server, channel):
     webhooks = response.json()
     return webhooks.get(server).get(channel)
 
+def create_ai_message_from_text(text : str):
+    text = text.split(":")
+    role = text[0]
+    message = ""
+    for index, i in enumerate(text[1:]):
+        message += i
+        if index != len(text[1:]) - 1:
+            message += ":"
+
+    return create_ai_message(role, message)
+
+def create_ai_message(role, message):
+    return {
+        "role": role,
+        "content": message
+            }
+
+def get_models():
+    url = get_endpoint_address("/models")
+    response = requests.get(url)
+
+    if response.ok:
+        data = response.json()
+
+        for i in data:
+            models.append(i.get("id"))
+
+        return models
+    else:
+        return None
+
+async def send_llm(model, message, temperature = .7):
+    url = get_endpoint_address("/llm")
+
+    if ai_messages.get(model) is None:
+        ai_messages[model] = []
+
+    ai_messages.get(model).append(create_ai_message_from_text(message))
+
+    chat = ai_messages
+
+    payload = {
+        "model": model,
+        "messages": chat,
+        "temperature": temperature
+    }
+    response = requests.post(url, json=payload)
+
+    if response.ok:
+        ai_messages.get(model).append({"role": "assistant", "content": response.text})
+        print(ai_messages)
+    else:
+        print(f"Error: {response.status_code} - {response.text}")
+
 if __name__ == "__main__":
-    send_message("Hello from OptiForge gui", "DM", "Tomáš Krůta")
+    send_message("user:Hello", "ai", "dolphin-2.8-mistral-7b-v02")
