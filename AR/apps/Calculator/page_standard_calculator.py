@@ -49,53 +49,11 @@ class Standard(CalculatorPage):
     def set_height(self, h):
         w = int(h * self.aspect_ratio)
         self.set_size(w, h)
-#endregion
+#endregion    
 
-
-    def draw(self, w, h, 
-             left_click_gesture_detected, right_click_gesture_detected, 
-             left_cursor_position, right_cursor_position):
-        # Create an overlay with transparency (BGRA)
-        overlay = np.zeros((h, w, 4), dtype=np.uint8)
-
-        # Calculate starting position for the keyboard
-        start_x = w // 2 - (len(KEYS[0]) * (KEY_SIZE + PADDING)) // 2
-        start_y = h // 2 - (len(KEYS) * (KEY_SIZE + PADDING)) // 2
-
-        # Draw the textbox background
-        textbox_height = 60
-        draw_rounded_rectangle(overlay,
-                                (start_x - PADDING, start_y - textbox_height), 
-                                (start_x + len(KEYS[0]) * (KEY_SIZE + PADDING),
-                                start_y + len(KEYS) * (KEY_SIZE + PADDING)),
-                                30, 
-                                get_nice_color_bgra(),  # Use BGRA color
-                                -1)
-
-        # Draw the text inside the textbox
-        text_size = cv2.getTextSize(self.keyboard.text, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)[0]
-        text_x = start_x + (len(KEYS[0]) * (KEY_SIZE + PADDING) - text_size[0]) // 2
-        text_y = start_y - textbox_height // 2 + text_size[1] // 2
-        cv2.putText(overlay, self.keyboard.text, 
-                    (text_x, text_y), 
-                    cv2.FONT_HERSHEY_SIMPLEX, 
-                    1, 
-                    get_font_color_bgra(),  # Use BGRA color
-                    2)
-
-        # Draw the keyboard
-        self.keyboard.draw(overlay, start_x, start_y, 
-                           left_click_gesture_detected, right_click_gesture_detected, 
-                           left_cursor_position, right_cursor_position,
-                           get_neutral_color_bgra(), get_neutral_color2_bgra(), get_font_color_bgra(), 
-                           get_neutral_color2_bgra(), get_nice_color_bgra(), get_nice_color_bgra()) # TODO: [PyCharm Warning] Add parameters
-
-        return overlay
-    
-
-    def dynamic_draw(self, overlay,
-                    left_click_gesture_detected, right_click_gesture_detected,
-                    left_cursor_position, right_cursor_position):
+    def draw(self, overlay,
+            left_click_gesture_detected, right_click_gesture_detected,
+            left_cursor_position, right_cursor_position):
         
         # Dynamic scaling factor based on screen dimensions
         scale_factor = min(*self.size) / 800  # Base size is 800px (could be adjusted)
@@ -104,7 +62,7 @@ class Standard(CalculatorPage):
         scaled_key_padding = int(scaled_padding/2)
 
         # Create an overlay with transparency (BGRA)
-        #overlay = np.zeros((h, w, 4), dtype=np.uint8)
+        #overlay = np.zeros((self.size[1], self.size[0], 4), dtype=np.uint8)
 
         # Calculate starting position for the keyboard
         #start_x = w // 2 - (len(KEYS[0]) * (scaled_key_size + scaled_padding)) // 2
@@ -139,7 +97,7 @@ class Standard(CalculatorPage):
                            get_neutral_color2_bgra(), get_nice_color_bgra(), get_nice_color_bgra(), 
                            scaled_key_size, scaled_key_padding)
 
-        #return overlay
+        return overlay
 
 class CalculatorKeyboard(Keyboard):
     def __init__(self, layout: list[list[str]]):

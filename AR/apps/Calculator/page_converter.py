@@ -31,10 +31,10 @@ class Converter(CalculatorPage):
                                       get_neutral_color(), get_nice_color(), get_font_color())
                                       
 
-    def draw(self, size,
-             left_click_gesture_detected, right_click_gesture_detected, 
-             left_cursor_position, right_cursor_position):
-        w, h = size
+    def draw(self, overlay,
+            left_click_gesture_detected, right_click_gesture_detected,
+            left_cursor_position, right_cursor_position):
+        w, h = self.size
 
         overlay = np.zeros((h, w, 4), dtype=np.uint8)
 

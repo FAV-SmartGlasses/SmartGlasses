@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import time
 
 from config import *
 from gui.GUI_manager import GUImanager
@@ -13,6 +14,10 @@ def main():
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, H)  # Image height
 
     ui_manager = GUImanager()
+
+    prev_time = time.time()  # Čas před první smyčkou
+    frame_count = 0  # Počítadlo snímků
+    cam_fps = None
 
     while cap.isOpened():
         success, image = cap.read()
@@ -53,6 +58,27 @@ def main():
                                     value=[0, 0, 0])
             # Duplicate images
             image = np.hstack((image, image))
+
+        frame_count += 1
+        
+        # Měření času
+        current_time = time.time()
+        elapsed_time = current_time - prev_time
+        
+        # Pokud uplynulo více než 1 sekunda, vypočteme FPS
+        if elapsed_time > 1:
+            cam_fps = frame_count / elapsed_time
+            print(f'FPS aplikace: {cam_fps}')
+            
+            # Resetujeme počítadla pro další sekundu
+            frame_count = 0
+            prev_time = current_time
+        if SHOW_FPS and cam_fps is not None:
+            text = "{:.2f}".format(cam_fps)
+            text_size = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 1)[0]
+            text_x = (resized_w - text_size[0]) // 2
+            text_y = (resized_h - text_size[1]) // 2
+            cv2.putText(image, text, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0,0,0), 1, cv2.LINE_AA)
 
         # Display the image
         cv2.imshow('AR Menu', image)
