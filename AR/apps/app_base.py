@@ -1,4 +1,5 @@
 from menu_items import MenuItem
+from apps.other_utilities import Position, Size
 
 class App(MenuItem):
     def __init__(self, name, display_name, icon_path):
@@ -6,8 +7,11 @@ class App(MenuItem):
         self.opened = False
         self.position = (0, 0)  # Pozice aplikace na obrazovce
         self.size = (300, 300) # Velikost aplikace
+        #self.position: Position  # Pozice aplikace na obrazovce
+        #self.size: Size # Velikost aplikace
         self.pages = []  # Seznam stránek aplikace
         self.current_page = 0  # Index aktuální stránky
+        self.does_have_aspect_ratio: bool
 
     def add_page(self, page):
         self.pages.append(page)
@@ -35,7 +39,27 @@ class App(MenuItem):
         #TODO: implementace zavření aplikace
         self.opened = False
 
-    def draw(self, image, w, h, 
+    
+#region computing and setting size
+    def compute_aspect_ratio(self):
+        if self.does_have_aspect_ratio:
+            #implement
+            raise NotImplementedError
+
+    def set_size(self, w, h):
+        self.size = (w, h)
+
+    def set_width(self, w):
+        h = int(w / self.aspect_ratio)
+        self.set_size(w, h)
+
+    def set_height(self, h):
+        w = int(h * self.aspect_ratio)
+        self.set_size(w, h)
+#endregion    
+
+
+    def draw(self, image, w, h,
              left_click_gesture_detected, right_click_gesture_detected, 
              left_cursor_position, right_cursor_position):
         return image

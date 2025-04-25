@@ -26,21 +26,13 @@ class Calculator(App):
              left_cursor_position: tuple[int, int], right_cursor_position: tuple[int, int]):
         
         if self.opened:
-            #self.size = 
-
             overlay = np.zeros((h, w, 4), dtype=np.uint8)
-            #image_pil = Image.fromarray(overlay, mode="RGBA")  # nebo "RGB" podle kanálů
-            #image_pil.save("overlay1.png")
             """draw_rounded_rectangle(overlay,
                                 self.position, 
                                 (self.position[0] + self.size[0], self.position[1] + self.size[1]),
                                 30, 
                                 get_nice_color_bgra(),  # Use BGRA color
                                 -1)"""
-            
-            #image_pil = Image.fromarray(overlay, mode="RGBA")  # nebo "RGB" podle kanálů
-            #image_pil.save("overlay2.png")
-
 
             #page_overlay = np.zeros((h, w, 4), dtype=np.uint8)
             page_w = w - 100
@@ -49,18 +41,12 @@ class Calculator(App):
             page_overlay = self.pages[self.current_page].draw(overlay, 
                                                                     left_click_gesture_detected, right_click_gesture_detected, 
                                                                     left_cursor_position, right_cursor_position)
-            #image_pil = Image.fromarray(page_overlay, mode="RGBA")  # nebo "RGB" podle kanálů
-            #image_pil.save("page_overlay.png")
             
             overlay = self.alpha_blend(overlay, page_overlay)
             """page_overlay = self.insert_overlay(page_overlay, 50, 50, w, h)
             
-            #image_pil = Image.fromarray(page_overlay, mode="RGBA")  # nebo "RGB" podle kanálů
-            #image_pil.save("page_overlay_bigger.png")
             #overlay = self.alpha_blend(overlay, page_overlay)
             overlay = self.blend_overlays(overlay, page_overlay)"""
-            #image_pil = Image.fromarray(overlay, mode="RGBA")  # nebo "RGB" podle kanálů
-            #image_pil.save("overlay_3.png")
             
             self.dropdown.draw(image, w, h,
                             left_click_gesture_detected, right_click_gesture_detected,
@@ -77,9 +63,6 @@ class Calculator(App):
             x_offset = (image_w - overlay_w) // 2
             y_offset = (image_h - overlay_h) // 2
 
-            
-            #image_pil = Image.fromarray(image, mode="RGB")  # nebo "RGB" podle kanálů
-            #image_pil.save("image1.png")
             # Blend overlay onto image using OpenCV
             alpha_channel = (overlay[:, :, 3] / 255.0) * get_app_transparency()  # Adjust alpha channel by transparency factor
             alpha_channel = np.clip(alpha_channel, 0, 1)  # Ensure alpha values are within [0, 1]

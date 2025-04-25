@@ -4,7 +4,6 @@ import time
 
 from config import *
 from gui.GUI_manager import GUImanager
-from settings_manager import load_settings
 
 
 def main():
@@ -46,8 +45,6 @@ def main():
 
         # Crop the image
         image = image[:, target_width // 2:target_width // 2 + target_width]
-
-        load_settings()
 
         # Draw overlay
         image = ui_manager.display_GUI(image)

@@ -55,7 +55,7 @@ class MessagingApp(App):
             time.sleep(10)
 
     def close(self):
-        self.message_fetch.join()
+        #self.message_fetch.join()
         self.opened = False
 
 
