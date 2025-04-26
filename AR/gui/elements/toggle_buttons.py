@@ -1,14 +1,15 @@
 from gui.draw import *
 from gui.elements.element_base import Element
 from gui.color_manager import *
+from apps.other_utilities import Position, Size
 
 class ToggleButton(Element):
-    def __init__(self, position, height, text):
+    def __init__(self, position: Position, height, text):
         width = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 2)[0][0] + 20  # Calculate width based on text size
-        super().__init__(position, (width, height))
+        super().__init__(position, Size(width, height))
         self.text = text
 
-    def draw(self, image, w, h, toggled = False): # TODO: teach Thomas how function overriding works
+    def draw(self, image, toggled = False): # TODO: teach Thomas how function overriding works
         """background_color = get_nice_color() if toggled else (0, 0, 255)  # Green if toggled, red if not
         draw_rounded_rectangle(image, self.position, (self.position[0] + self.size[0], self.position[0] + self.size[1]), 10, (0, 0, 0), -1)
         cv2.putText(image, self.text, (self.x + 10, self.y + 25), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)"""
@@ -16,34 +17,34 @@ class ToggleButton(Element):
         
         background_color = get_nice_color() if toggled else get_neutral_color()
         draw_rounded_rectangle(image, 
-                                self.position, 
-                                (self.position[0] + self.size[0], self.position[1] + self.size[1]), 
+                                (self._position.x, self._position.y), 
+                                (self._position.x + self._size.w, self._position.y + self._size.h), 
                                 10, background_color, -1)
-        cv2.putText(image, self.text, (self.position[0] + 10, self.position[1] + 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+        cv2.putText(image, self.text, (self._position.x + 10, self._position.y + 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
 
         return image
 
 class ToggleButtons(Element):
-    def __init__(self, text, position, button_height, toggle_buttons_texts):
+    def __init__(self, text: str, position: Position, button_height: int, toggle_buttons_texts: tuple[str]):
         height = (button_height + 10) * len(toggle_buttons_texts)
         width = max([cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 2)[0][0] for text in toggle_buttons_texts]) + 20
-        super().__init__(position, (width, height))
+        super().__init__(position, Size(width, height))
         self.text = text
         self.clicked = None
         self.buttons = []
         for i, text in enumerate(toggle_buttons_texts):
-            x_pos = position[0]
-            y_pos = position[1] + i * (button_height + 10)  # Adjust spacing dynamically
-            self.buttons.append(ToggleButton((x_pos, y_pos), button_height, text))  # Add ToggleButton objects
+            x_pos = position.x
+            y_pos = position.y + i * (button_height + 10)  # Adjust spacing dynamically
+            self.buttons.append(ToggleButton(Position(x_pos, y_pos), button_height, text))  # Add ToggleButton objects
 
         self.toggled = 0
 
-    def draw(self, image, w = 0, h = 0, toggled = False):
+    def draw(self, image, toggled = False):
         # Draw the button with transparency (50%)
         overlay = image.copy()
 
-        draw_rounded_rectangle(overlay, (self.position[0], self.position[1]), 
-                               (self.position[0] + self.size[0], self.position[1] + self.size[0]), 
+        draw_rounded_rectangle(overlay, (self._position.x, self._position.y), 
+                               (self._position.x + self._size.w, self._position.y + self._size.h), 
                                10, get_nice_color(), -1)
 
         alpha = 0.5
@@ -51,13 +52,13 @@ class ToggleButtons(Element):
 
         for i, button in enumerate(self.buttons):
             toggled = i == self.toggled
-            button.draw(image, w, h, toggled)
+            button.draw(image, toggled)
 
-    def handle_click(self, pos):
-        if pos is None or pos[0] is None or pos[1] is None:
+    def handle_click(self, pos: Position):
+        if pos is None or pos.x is None or pos.y is None:
             return False
 
-        if self.x <= pos[0] <= self.x + self.width and self.y <= pos[1] <= self.y + self.height:
+        if self.x <= pos.x <= self.x + self.width and self.y <= pos.y <= self.y + self.height:
             if self.clicked:
                 return False
             self.toggled = not self.toggled

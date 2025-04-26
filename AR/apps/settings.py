@@ -1,39 +1,47 @@
-from apps.app_base import App
+import numpy as np
+
+from apps.app_base import FreeResizeApp
 from gui.draw import *
 from gui.elements.button import Button
 from gui.elements.toggle_buttons import ToggleButtons
+from apps.other_utilities import Position, Size
+from settings_manager import *
 
 
-class Settings(App):
-    def __init__(self, name, display_name, icon_path):
+class Settings(FreeResizeApp):
+    def __init__(self, name: str, display_name: str, icon_path: str):
         super().__init__(name, display_name, icon_path)
-        self.position = (100, 100)  # Pozice aplikace na obrazovce
-        self.size = (400, 400)  # Velikost aplikace
-        self.button = Button(None, 300, 400, "Settings", (100, 50),
+        self._position: Position = Position(100, 100)  # Pozice aplikace na obrazovce
+        self._size: Size = Size(400, 400)  # Velikost aplikace
+        self.button = Button(None, Position(300, 400), Size(100, 50), "Settings",
                           get_neutral_color(), get_neutral_color(), get_font_color(), 
                           get_nice_color(), get_neutral_color2(), get_font_color())
-        self.toggle = ToggleButtons("neco", (self.position[0] + 10, self.position[1] + 10), 20, ["Option 1", "Option 2", "Option 3"])
+        self.toggle = ToggleButtons("neco", Position(self._position.x + 10, self._position.y + 10), 20, ["Option 1", "Option 2", "Option 3"])
 
-    def draw(self, image, w, h, 
-             left_click_gesture_detected, right_click_gesture_detected, 
-             left_cursor_position, right_cursor_position):
+    def draw(self, image: np.ndarray,
+             left_click_gesture_detected: bool, right_click_gesture_detected: bool, 
+             left_cursor_position: tuple[int, int], right_cursor_position: tuple[int, int]):
         
         if self.opened:
             overlay = image.copy()
 
             draw_rounded_rectangle(overlay,
-                                    self.position, 
-                                    (self.position[0] + self.size[0], self.position[1] + self.size[1]),
+                                    (self._position.x, self._position.y), 
+                                    (self._position.x + self._size.w, self._position.y + self._size.h),
                                     30, 
                                     get_nice_color(), 
                                     -1)
             
             # Kombinace původního obrázku a překryvného obrázku s průhledností
-            alpha = 0.5  # Nastavení průhlednosti (0.0 = zcela průhledné, 1.0 = zcela neprůhledné)
+            alpha = get_app_transparency()
             cv2.addWeighted(overlay, alpha, image, 1 - alpha, 0, image)
 
-            left_in_rect = is_cursor_in_rect(left_cursor_position, (self.button.x_pos, self.button.y_pos, self.button.x_pos + self.button.size[0], self.button.y_pos + self.button.size[1]))
-            right_in_rect = is_cursor_in_rect(right_cursor_position, (self.button.x_pos, self.button.y_pos, self.button.x_pos + self.button.size[0], self.button.y_pos + self.button.size[1]))
+            left_in_rect = is_cursor_in_rect(left_cursor_position, 
+                                             (self.button._position.x, self.button._position.y, 
+                                              self.button._position.x + self.button._size.w, self.button._position.y + self.button._size.h))
+            right_in_rect = is_cursor_in_rect(right_cursor_position, 
+                                              (self.button._position.x, self.button._position.y, 
+                                               self.button._position.x + self.button._size.w, self.button._position.y + self.button._size.h))
             
             is_in_rect = left_in_rect or right_in_rect
 
@@ -42,5 +50,3 @@ class Settings(App):
             self.toggle.draw(image)
         
             #TODO: implementace vykreslení aplikace nastavení
-        
-        return image

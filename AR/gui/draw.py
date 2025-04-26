@@ -1,6 +1,6 @@
 import datetime
-
 import cv2
+import numpy as np
 
 from .color_manager import *
 
@@ -26,7 +26,7 @@ def is_cursor_in_rect(position, rect):
     
     return False
 
-def draw_rounded_rectangle(image, top_left, bottom_right, radius, color, thickness):
+def draw_rounded_rectangle(image: np.ndarray, top_left: tuple[int, int], bottom_right: tuple[int, int], radius: int, color: tuple[int, int, int], thickness: int):
     x1, y1 = top_left
     x2, y2 = bottom_right
 

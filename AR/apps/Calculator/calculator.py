@@ -4,13 +4,14 @@ from PIL import Image
 
 from apps.Calculator.page_converter import Converter
 from apps.Calculator.page_standard_calculator import Standard
-from apps.app_base import App
+from apps.app_base import FixedAspectApp
 from gui.draw import *
 from gui.elements.dropdown import Dropdown
+from apps.other_utilities import Position, Size
 
 MAX_LENGTH = 10
 
-class Calculator(App):
+class Calculator(FixedAspectApp):
     def __init__(self, name: str, display_name: str, icon_path: str):
         super().__init__(name, display_name, icon_path)
         
@@ -19,13 +20,19 @@ class Calculator(App):
             Converter()
         ]
         self.current_page = 0
-        self.dropdown = Dropdown((self.position[0] + 200, self.position[1] + 50), (200, 35), ["Standard", "Converter"], 0)
+        self.dropdown = Dropdown(Position(self._position.x + 200, self._position.y + 50), Size(200, 35), ["Standard", "Converter"], 0)
 
-    def draw(self, image: np.ndarray, w: int, h: int, 
+    def compute_aspect_ratio(self):
+        pass
+
+    def draw(self, image: np.ndarray,
              left_click_gesture_detected: bool, right_click_gesture_detected: bool, 
              left_cursor_position: tuple[int, int], right_cursor_position: tuple[int, int]):
         
+        cv2.setUseOptimized(True)
+        
         if self.opened:
+            h, w, _ = image.shape
             overlay = np.zeros((h, w, 4), dtype=np.uint8)
             """draw_rounded_rectangle(overlay,
                                 self.position, 
@@ -36,16 +43,15 @@ class Calculator(App):
 
             #page_overlay = np.zeros((h, w, 4), dtype=np.uint8)
             page_w = w - 100
-            page_h = h - 100
             self.pages[self.current_page].set_width(page_w)
-            page_overlay = self.pages[self.current_page].draw(overlay, 
-                                                                    left_click_gesture_detected, right_click_gesture_detected, 
-                                                                    left_cursor_position, right_cursor_position)
-            
-            overlay = self.alpha_blend(overlay, page_overlay)
-            """page_overlay = self.insert_overlay(page_overlay, 50, 50, w, h)
+            #overlay = 
+            self.pages[self.current_page].draw(overlay, 
+                                                        left_click_gesture_detected, right_click_gesture_detected, 
+                                                        left_cursor_position, right_cursor_position)
             
             #overlay = self.alpha_blend(overlay, page_overlay)
+            """page_overlay = self.insert_overlay(page_overlay, 50, 50, w, h)
+            
             overlay = self.blend_overlays(overlay, page_overlay)"""
             
             self.dropdown.draw(image, w, h,
@@ -72,9 +78,6 @@ class Calculator(App):
                     (1 - alpha_channel) * image[y_offset:y_offset + overlay_h, x_offset:x_offset + overlay_w, c]
                 )
 
-            
-            #image_pil = Image.fromarray(image, mode="RGB")  # nebo "RGB" podle kanálů
-            #image_pil.save("image2.png")
 
     def blend_overlays(self, bottom: np.ndarray, top: np.ndarray) -> np.ndarray:
         """
@@ -104,51 +107,3 @@ class Calculator(App):
         result[:, :, 3] = np.clip(out_alpha, 0, 1)[:, :, 0] * 255
 
         return result.astype(np.uint8)
-
-    def alpha_blend(self, overlay_bottom: np.ndarray, overlay_top: np.ndarray) -> np.ndarray:
-        # Předpokládáme stejnou velikost a formát (h, w, 4)
-        alpha_top = overlay_top[:, :, 3] / 255.0
-        alpha_bottom = overlay_bottom[:, :, 3] / 255.0
-
-        out_rgb = np.zeros_like(overlay_top[:, :, :3], dtype=np.float32)
-        for c in range(3):  # RGB kanály
-            out_rgb[:, :, c] = (overlay_top[:, :, c] * alpha_top +
-                                overlay_bottom[:, :, c] * alpha_bottom * (1 - alpha_top))
-
-        out_alpha = alpha_top + alpha_bottom * (1 - alpha_top)
-        out = np.dstack((out_rgb, out_alpha[:, :, np.newaxis] * 255)).astype(np.uint8)
-        return out
-    
-    def insert_overlay(self, overlay: np.ndarray, x_offset: int, y_offset: int, w: int, h: int) -> np.ndarray:
-        new_overlay = np.zeros((h, w, 4), dtype=np.uint8)
-        H, W, _ = overlay.shape
-
-        for y in range(H):
-            for x in range(W):
-                new_x = x + x_offset
-                new_y = y + y_offset
-                if 0 <= new_x < w and 0 <= new_y < h:
-                    new_overlay[new_y, new_x] = overlay[y, x]
-
-        return new_overlay
-        
-        output = np.zeros((h, w, 4), dtype=np.uint8)
-
-        oh, ow = overlay.shape[:2]
-
-        # Vypočítání hranic pro vložení s oříznutím, pokud je potřeba
-        x1 = max(x, 0)
-        y1 = max(y, 0)
-        x2 = min(x + ow, w)
-        y2 = min(y + oh, h)
-
-        # Odpovídající oblast ve zdroji (page_overlay)
-        src_x1 = max(0, -x)
-        src_y1 = max(0, -y)
-        src_x2 = src_x1 + (x2 - x1)
-        src_y2 = src_y1 + (y2 - y1)
-
-        if x1 < x2 and y1 < y2:
-            output[y1:y2, x1:x2] = overlay[src_y1:src_y2, src_x1:src_x2]
-
-        return output

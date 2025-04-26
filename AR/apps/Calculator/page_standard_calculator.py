@@ -1,5 +1,5 @@
 import numpy as np
-from apps.page_base import CalculatorPage
+from apps.page_base import FixedAspectPage
 from gui.draw import *
 from gui.keyboard import Keyboard
 
@@ -17,15 +17,16 @@ PADDING = 20
 KEY_PADDING = PADDING/2
 KEY_SIZE = 50
 
-class Standard(CalculatorPage):
+class Standard(FixedAspectPage):
     def __init__(self):
+        super().__init__()
+
         self.keyboard = CalculatorKeyboard(KEYS)
 
         self.aspect_ratio = self.compute_aspect_ratio()
 
         self.size = (800, int(800 / self.aspect_ratio))
 
-#region computing and setting size
     def compute_aspect_ratio(self):
         cols = len(KEYS[0])
         rows = len(KEYS)
@@ -39,21 +40,11 @@ class Standard(CalculatorPage):
 
         return total_width / total_height
 
-    def set_size(self, w, h):
-        self.size = (w, h)
-
-    def set_width(self, w):
-        h = int(w / self.aspect_ratio)
-        self.set_size(w, h)
-
-    def set_height(self, h):
-        w = int(h * self.aspect_ratio)
-        self.set_size(w, h)
-#endregion    
-
-    def draw(self, overlay,
-            left_click_gesture_detected, right_click_gesture_detected,
-            left_cursor_position, right_cursor_position):
+    def draw(self, image_overlay: np.ndarray,
+             left_click_gesture_detected: bool, right_click_gesture_detected: bool, 
+             left_cursor_position: tuple[int, int], right_cursor_position: tuple[int, int]):
+        
+        cv2.setUseOptimized(True)
         
         # Dynamic scaling factor based on screen dimensions
         scale_factor = min(*self.size) / 800  # Base size is 800px (could be adjusted)
@@ -61,16 +52,9 @@ class Standard(CalculatorPage):
         scaled_padding = int(PADDING * scale_factor)  # Scale padding between keys
         scaled_key_padding = int(scaled_padding/2)
 
-        # Create an overlay with transparency (BGRA)
-        #overlay = np.zeros((self.size[1], self.size[0], 4), dtype=np.uint8)
-
-        # Calculate starting position for the keyboard
-        #start_x = w // 2 - (len(KEYS[0]) * (scaled_key_size + scaled_padding)) // 2
-        #start_y = h // 2 - (len(KEYS) * (scaled_key_size + scaled_padding)) // 2
-
         # Draw the textbox background
         textbox_height = int(60 * scale_factor)  # Scale textbox height
-        draw_rounded_rectangle(overlay,
+        draw_rounded_rectangle(image_overlay,
                                 (0, 0), 
                                 (len(KEYS[0]) * (scaled_key_size + scaled_key_padding) - scaled_key_padding + 2 * scaled_padding,
                                  textbox_height + len(KEYS) * (scaled_key_size + scaled_key_padding) - scaled_key_padding + scaled_padding),
@@ -82,7 +66,7 @@ class Standard(CalculatorPage):
         text_size = cv2.getTextSize(self.keyboard.text, cv2.FONT_HERSHEY_SIMPLEX, scale_factor, 2)[0]
         text_x = scaled_padding + (len(KEYS[0]) * (scaled_key_size + scaled_key_padding) - scaled_key_padding - text_size[0]) // 2
         text_y = (textbox_height - text_size[1]) // 2
-        cv2.putText(overlay, self.keyboard.text, 
+        cv2.putText(image_overlay, self.keyboard.text, 
                     (text_x, text_y), 
                     cv2.FONT_HERSHEY_SIMPLEX, 
                     scale_factor,  # Adjust font size dynamically
@@ -90,14 +74,12 @@ class Standard(CalculatorPage):
                     2)
 
         # Draw the keyboard with dynamically scaled keys
-        self.keyboard.draw(overlay, scaled_padding, textbox_height, 
+        self.keyboard.draw(image_overlay, scaled_padding, textbox_height, 
                            left_click_gesture_detected, right_click_gesture_detected, 
                            left_cursor_position, right_cursor_position,
                            get_neutral_color_bgra(), get_neutral_color2_bgra(), get_font_color_bgra(), 
                            get_neutral_color2_bgra(), get_nice_color_bgra(), get_nice_color_bgra(), 
                            scaled_key_size, scaled_key_padding)
-
-        return overlay
 
 class CalculatorKeyboard(Keyboard):
     def __init__(self, layout: list[list[str]]):

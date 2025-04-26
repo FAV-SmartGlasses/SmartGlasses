@@ -7,6 +7,8 @@ from gui.GUI_manager import GUImanager
 
 
 def main():
+    cv2.setUseOptimized(True)
+    
     # Camera
     cap = cv2.VideoCapture(0)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, W)  # Image width

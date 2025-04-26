@@ -1,16 +1,18 @@
 from gui.draw import *
+from apps.other_utilities import Position, Size
+from gui.elements.element_base import Element
 
-class Button:
-    def __init__(self, icon, x, y, text, size, 
-             color, border_color, font_color, hover_color, hover_border_color, hover_font_color):  # (B, G, R)
+class Button(Element):
+    def __init__(self, icon, position: Position, size: Size, text: str,
+                color: tuple[int, int, int], border_color: tuple[int, int, int], font_color: tuple[int, int, int],
+                hover_color: tuple[int, int, int], hover_border_color: tuple[int, int, int], hover_font_color: tuple[int, int, int]):  # (B, G, R)
         
+        super().__init__(position, size)
+
         self.icon = icon  # This should be a small cv2 image (numpy array)
         self.text = text
 
-        self.x_pos = x
-        self.y_pos = y
-        self.size = size  # (width, height)
-        self.rect = (x, y, x + size[0], y + size[1])  # (x1, y1, x2, y2)
+        self.rect = (position.x, position.y, position.x + size.w, position.y + size.w)  # (x1, y1, x2, y2)
 
         self.is_hovered = False
         self.color = color  # (B, G, R)
@@ -45,6 +47,6 @@ class Button:
             thickness = 1
             font = cv2.FONT_HERSHEY_SIMPLEX
             text_size = cv2.getTextSize(self.text, font, font_scale, thickness)[0]
-            text_x = x1 + (self.size[0] - text_size[0]) // 2
-            text_y = y1 + (self.size[1] + text_size[1]) // 2 - 5
+            text_x = x1 + (self._size.w - text_size[0]) // 2
+            text_y = y1 + (self._size.h + text_size[1]) // 2 - 5
             cv2.putText(frame, self.text, (text_x, text_y), font, font_scale, font_color, thickness)

@@ -1,7 +1,14 @@
-class Element:
-    def __init__(self, position, size):
-        self.position = position
-        self.size = size
+from abc import ABC, abstractmethod
+import numpy as np
 
-    def draw(self, image, w, h, toggled = False):
+from apps.other_utilities import Position, Size
+
+class Element(ABC):
+    @abstractmethod
+    def __init__(self, position: Position, size: Size):
+        self._position = position
+        self._size = size
+
+    @abstractmethod
+    def draw(self, image: np.ndarray):
         raise NotImplementedError("This method should be overridden in subclasses") 

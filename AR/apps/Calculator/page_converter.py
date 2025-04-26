@@ -7,12 +7,13 @@ import numpy as np
 from gui.elements.dropdown import Dropdown
 from gui.elements.number_box import NumberBox
 from gui.elements.button import Button
-from apps.page_base import CalculatorPage
+from apps.page_base import FixedAspectPage
 from gui.color_manager import *
 from gui.draw import is_cursor_in_rect
+from apps.other_utilities import Position, Size
 
 
-class Converter(CalculatorPage):
+class Converter(FixedAspectPage):
     _file_path = Path(__file__).parent / "page_converter_data.json"  #  path to json file
 
     def __init__(self):
@@ -21,14 +22,17 @@ class Converter(CalculatorPage):
         self.quantities_options = [unit_data.name for unit_data in self.quantities_data_list] 
         self.current_units_options = []  # list of current unit options for the dropdown menus
 
-        self.quantity_dropdown = Dropdown((50, 50), (200, 40), self.quantities_options, None)
-        self.unit_from_dropdown = Dropdown((50, 100), (200, 40), [], None)
-        self.unit_to_dropdown = Dropdown((50, 150), (200, 40), [], None)
-        self.numberbox_in = NumberBox((50, 200), (200, 40))
-        self.numberbox_out = NumberBox((50, 250), (200, 40))
-        self.btn_convert_num = Button(None, 50, 300, "Convert", (200, 40),
+        self.quantity_dropdown = Dropdown(Position(50, 50), Size(200, 40), self.quantities_options, None)
+        self.unit_from_dropdown = Dropdown(Position(50, 100), Size(200, 40), [], None)
+        self.unit_to_dropdown = Dropdown(Position(50, 150), Size(200, 40), [], None)
+        self.numberbox_in = NumberBox(Position(50, 200), Size(200, 40))
+        self.numberbox_out = NumberBox(Position(50, 250), Size(200, 40))
+        self.btn_convert_num = Button(None, Position(50, 300), Size(200, 40), "Convert",
                                       get_nice_color(), get_neutral_color2(), get_font_color(),
                                       get_neutral_color(), get_nice_color(), get_font_color())
+        
+    def compute_aspect_ratio(self):
+        pass
                                       
 
     def draw(self, overlay,
@@ -63,8 +67,8 @@ class Converter(CalculatorPage):
         return overlay
     
     def draw_btn(self, image, left_click_gesture_detected, right_click_gesture_detected, left_cursor_position, right_cursor_position):
-        is_left_hovered = is_cursor_in_rect(left_cursor_position, (self.btn_convert_num.x_pos, self.btn_convert_num.y_pos, self.btn_convert_num.x_pos + self.btn_convert_num.size[0], self.btn_convert_num.y_pos + self.btn_convert_num.size[1]))
-        is_right_hovered = is_cursor_in_rect(right_cursor_position, (self.btn_convert_num.x_pos, self.btn_convert_num.y_pos, self.btn_convert_num.x_pos + self.btn_convert_num.size[0], self.btn_convert_num.y_pos + self.btn_convert_num.size[1]))
+        is_left_hovered = is_cursor_in_rect(left_cursor_position, (self.btn_convert_num.x_pos, self.btn_convert_num.y_pos, self.btn_convert_num.x_pos + self.btn_convert_num._size[0], self.btn_convert_num.y_pos + self.btn_convert_num._size[1]))
+        is_right_hovered = is_cursor_in_rect(right_cursor_position, (self.btn_convert_num.x_pos, self.btn_convert_num.y_pos, self.btn_convert_num.x_pos + self.btn_convert_num._size[0], self.btn_convert_num.y_pos + self.btn_convert_num._size[1]))
         is_left_clicked = is_left_hovered and left_click_gesture_detected
         is_right_clicked = is_right_hovered and right_click_gesture_detected
         is_clicked = is_left_clicked or is_right_clicked
