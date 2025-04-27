@@ -1,5 +1,5 @@
 from .element_base import Element
-from apps.other_utilities import Position, Size
+from other_utilities import Position, Size
 
 class NumberBox(Element):
     def __init__(self, position: Position, size:Size, step: float=1, min_value: float=None, max_value: float=None):

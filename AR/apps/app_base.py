@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 from menu_items import MenuItem
-from apps.other_utilities import Position, Size
+from other_utilities import Position, Size
 
 class App(MenuItem):
     @abstractmethod

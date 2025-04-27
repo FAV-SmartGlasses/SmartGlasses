@@ -10,7 +10,7 @@ from gui.elements.button import Button
 from apps.page_base import FixedAspectPage
 from gui.color_manager import *
 from gui.draw import is_cursor_in_rect
-from apps.other_utilities import Position, Size
+from other_utilities import Position, Size
 
 
 class Converter(FixedAspectPage):

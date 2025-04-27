@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import numpy as np
 
-from apps.other_utilities import Position, Size
+from other_utilities import Position, Size
 
 class Page(ABC):
     @abstractmethod

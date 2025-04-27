@@ -7,8 +7,10 @@ from apps.messaging import MessagingApp
 from apps.settings import *
 from gui.draw import *
 from hand_detection import HandDetection
+from hand_detection_models import *
 from menu_items import LockMenu, CloseMenu
 from apps.app_base import App
+from hand_detection_models import *
 
 
 class Menu:
@@ -38,35 +40,32 @@ class Menu:
     def set_visible(self, visible):
         self._visible = visible
 
-    def display_menu(self, image, 
-                     left_click_gesture_detected, right_click_gesture_detected, 
-                     swipe_gesture_detected, 
-                     left_cursor_position, right_cursor_position):
+    def display_menu(self, image: np.ndarray, gestures: DetectionModel):
         h, w, _ = image.shape
 
-        self.check_swipe_gesture(swipe_gesture_detected)
+        self.check_swipe_gesture(gestures.swipe)
         
         if self._visible:
-            self.detect_menu_item_selection(h, right_cursor_position)
+            self.detect_menu_item_selection(h, gestures.right_hand.cursor)
             if self._current_selection is not None:
-                self.check_click_gesture(right_click_gesture_detected)
+                self.check_click_gesture(gestures.right_hand.cursor)
 
-            self._draw_menu(image, w, h)
+            self._draw_menu(image)
 
         return image
     
-    def check_swipe_gesture(self, swipe_gesture_detected):
-        if swipe_gesture_detected == HandDetection.SwipeGesture.RIGHT and self._visible == False:
+    def check_swipe_gesture(self, swipe_gesture_detected: SwipeGesture):
+        if swipe_gesture_detected == SwipeGesture.RIGHT and self._visible == False:
             self._visible = True
-        elif swipe_gesture_detected == HandDetection.SwipeGesture.LEFT and self._visible == True:
+        elif swipe_gesture_detected == SwipeGesture.LEFT and self._visible == True:
             self._visible = False
-        elif swipe_gesture_detected == HandDetection.SwipeGesture.BOTH_OUT:
+        elif swipe_gesture_detected == SwipeGesture.BOTH_OUT:
             for item in self.items:
                 if isinstance(item, App):
                     item.close()
     
-    def detect_menu_item_selection(self, h, cursor_position):
-        if cursor_position == (None, None):
+    def detect_menu_item_selection(self, h, cursor: Position):
+        if cursor.get_array() == (None, None):
             return
         
         padding = 15
@@ -77,18 +76,17 @@ class Menu:
         for i, item in enumerate(self.items):
             item_y = menu_y + padding + i * (menu_height // len(self.items))
 
-            middle_point_x, middle_point_y = cursor_position
-
-            if item_y <= middle_point_y <= item_y + item_height:
+            if item_y <= cursor.y <= item_y + item_height:
                 self._current_selection = i
                 #print(f"Zelená čára ukazuje na: {self._items[i].get_name()}")
         
-    def check_click_gesture(self, click_gesture_detected):
+    def check_click_gesture(self, click_gesture_detected: bool):
         if click_gesture_detected:
             self._visible = False
             self.items[self._current_selection].clicked()
 
-    def _draw_menu(self, image, w, h):
+    def _draw_menu(self, image):
+        h, w, _ = image.shape
         padding = 15
         item_height = 50
         menu_width = 2 * padding + item_height#300

@@ -1,6 +1,6 @@
 from gui.draw import *
 from .element_base import Element
-from apps.other_utilities import Position, Size
+from other_utilities import Position, Size
 
 
 class Dropdown(Element):

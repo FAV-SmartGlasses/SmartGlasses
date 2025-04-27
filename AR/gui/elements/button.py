@@ -1,5 +1,5 @@
 from gui.draw import *
-from apps.other_utilities import Position, Size
+from other_utilities import Position, Size
 from gui.elements.element_base import Element
 
 class Button(Element):

@@ -7,7 +7,7 @@ from apps.Calculator.page_standard_calculator import Standard
 from apps.app_base import FixedAspectApp
 from gui.draw import *
 from gui.elements.dropdown import Dropdown
-from apps.other_utilities import Position, Size
+from other_utilities import Position, Size
 
 MAX_LENGTH = 10
 

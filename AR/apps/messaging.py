@@ -15,7 +15,7 @@ load_dotenv(os.path.abspath("../resources/.env"))
 
 layout = [
     ['`', "1", "2", '3', '4', '5', '6', '7', '8', '9', '0', '-', '='],
-    ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]"],
+    ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "(", ")"],
     ["A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "\\"],
     ["\\", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/"],
     [" ", "->", "-<"]
@@ -35,7 +35,7 @@ class MessagingApp(App):
         self.keyboard = keyboard.Keyboard(layout)
 
     def launch(self):
-        #self.message_fetch.start()
+        #self.message_fetch.start()      #uncomment this when using discord messaging
         self.opened = True
 
     def fetch_messages(self):
@@ -55,14 +55,15 @@ class MessagingApp(App):
             time.sleep(10)
 
     def close(self):
-        self.message_fetch.join()
+        #self.message_fetch.join()    #uncomment this when using discord messaging
         self.opened = False
 
 
-    def draw(self, image, w, h,
+    def draw(self, image,
              left_click_gesture_detected, right_click_gesture_detected,
              left_cursor_position, right_cursor_position):
         if self.opened:
+            h, w, _ = image.shape
             overlay = np.zeros((h, w, 4), dtype=np.uint8)
 
             self.keyboard.draw(overlay, w, h,

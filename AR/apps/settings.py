@@ -4,7 +4,7 @@ from apps.app_base import FreeResizeApp
 from gui.draw import *
 from gui.elements.button import Button
 from gui.elements.toggle_buttons import ToggleButtons
-from apps.other_utilities import Position, Size
+from other_utilities import Position, Size
 from settings_manager import *
 
 

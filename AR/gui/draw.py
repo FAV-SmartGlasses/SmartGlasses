@@ -7,7 +7,7 @@ from .color_manager import *
 
 def draw_cursor(image, cursor_position):
     if cursor_position != (None, None):
-        cv2.circle(image, (cursor_position[0], cursor_position[1]), 10, (0, 0, 255), -1)
+        cv2.circle(image, (cursor_position.x, cursor_position.y), 10, (0, 0, 255), -1)
 
 def draw_gui_objects(self, image, objects, cursor_position, click_gesture_detected):
     for obj in objects:
@@ -52,7 +52,9 @@ def draw_rounded_rectangle(image: np.ndarray, top_left: tuple[int, int], bottom_
         cv2.line(image, (x1, y1 + radius), (x1, y2 - radius), color, thickness)  # left side
         cv2.line(image, (x2, y1 + radius), (x2, y2 - radius), color, thickness)  # right side
 
-def draw_time_bar(image, h, w, menu_visible):
+def draw_time_bar(image, menu_visible):
+    h, w, _ = image.shape
+
     # size
     if menu_visible:
         rect_width = 375
