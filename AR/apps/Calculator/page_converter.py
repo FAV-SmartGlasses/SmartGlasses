@@ -11,7 +11,7 @@ from apps.page_base import FixedAspectPage
 from gui.color_manager import *
 from gui.draw import is_cursor_in_rect
 from other_utilities import Position, Size
-
+from hand_detection_models import *
 
 class Converter(FixedAspectPage):
     _file_path = Path(__file__).parent / "page_converter_data.json"  #  path to json file
@@ -35,16 +35,14 @@ class Converter(FixedAspectPage):
         pass
                                       
 
-    def draw(self, overlay,
-            left_click_gesture_detected, right_click_gesture_detected,
-            left_cursor_position, right_cursor_position):
+    def draw(self, overlay: np.ndarray, gestures: DetectionModel):
         w, h = self.size
 
         overlay = np.zeros((h, w, 4), dtype=np.uint8)
 
         self.convert_json()
 
-        self.quantity_dropdown.draw(overlay, w, h, left_click_gesture_detected, right_click_gesture_detected, left_cursor_position, right_cursor_position)
+        self.quantity_dropdown.draw(overlay, w, h, gestures)
 
         if(self.quantity_dropdown.selected_option is not None):
             selected_quantity = self.quantity_dropdown.options[self.quantity_dropdown.selected_option]
@@ -55,14 +53,14 @@ class Converter(FixedAspectPage):
                     self.unit_from_dropdown.options = self.current_units_options
                     self.unit_to_dropdown.options = self.current_units_options
         
-        self.unit_from_dropdown.draw(overlay, w, h, left_click_gesture_detected, right_click_gesture_detected, left_cursor_position, right_cursor_position)
-        self.unit_to_dropdown.draw(overlay, w, h, left_click_gesture_detected, right_click_gesture_detected, left_cursor_position, right_cursor_position)
+        self.unit_from_dropdown.draw(overlay, w, h, gestures)
+        self.unit_to_dropdown.draw(overlay, w, h, gestures)
 
-        self.numberbox_in.draw(overlay, w, h, left_click_gesture_detected, right_click_gesture_detected, left_cursor_position, right_cursor_position)
+        self.numberbox_in.draw(overlay, gestures)
         
-        self.draw_btn(overlay, left_click_gesture_detected, right_click_gesture_detected, left_cursor_position, right_cursor_position)
+        self.draw_btn(overlay, gestures)
 
-        self.numberbox_out.draw(overlay, w, h, left_click_gesture_detected, right_click_gesture_detected, left_cursor_position, right_cursor_position)
+        self.numberbox_out.draw(overlay, w, h, gestures)
 
         return overlay
     

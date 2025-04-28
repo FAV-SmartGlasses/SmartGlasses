@@ -1,4 +1,5 @@
 from .draw import *
+from hand_detection_models import *
 
 
 class Keyboard:
@@ -13,20 +14,19 @@ class Keyboard:
     def process_detected_key(self, detected_key):
         raise NotImplemented()
 
-    def draw(self, image, start_x, start_y, 
-             left_click_gesture_detected, right_click_gesture_detected, 
-             left_cursor_position, right_cursor_position, 
+    def draw(self, image: np.ndarray, start_x: int, start_y: int, 
+             gesture: DetectionModel, 
              color, border_color, font_color, hover_color, hover_border_color, hover_font_color,
              scaled_key_size, scaled_padding):
         
         self.key_size = int(scaled_key_size)
         self.padding = int(scaled_padding)
 
-        left_detected_key = self.detect_key_press(left_cursor_position[0], left_cursor_position[1], start_x, start_y)
-        right_detected_key = self.detect_key_press(right_cursor_position[0], right_cursor_position[1], start_x, start_y)
+        left_detected_key = self.detect_key_press(*gesture.left_hand.cursor.get_array(), start_x, start_y)
+        right_detected_key = self.detect_key_press(*gesture.right_hand.cursor.get_array(), start_x, start_y)
 
-        if left_click_gesture_detected or right_click_gesture_detected:
-            detected_key = left_detected_key if left_click_gesture_detected else right_detected_key
+        if gesture.left_hand.click_gesture_detected or gesture.right_hand.click_gesture_detected:
+            detected_key = left_detected_key if gesture.left_hand.click_gesture_detected else right_detected_key
 
             if detected_key is not None:
                 if len(self.click_history) != 0:

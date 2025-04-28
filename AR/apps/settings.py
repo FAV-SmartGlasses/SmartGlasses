@@ -6,6 +6,7 @@ from gui.elements.button import Button
 from gui.elements.toggle_buttons import ToggleButtons
 from other_utilities import Position, Size
 from settings_manager import *
+from hand_detection_models import DetectionModel
 
 
 class Settings(FreeResizeApp):
@@ -18,9 +19,7 @@ class Settings(FreeResizeApp):
                           get_nice_color(), get_neutral_color2(), get_font_color())
         self.toggle = ToggleButtons("neco", Position(self._position.x + 10, self._position.y + 10), 20, ["Option 1", "Option 2", "Option 3"])
 
-    def draw(self, image: np.ndarray,
-             left_click_gesture_detected: bool, right_click_gesture_detected: bool, 
-             left_cursor_position: tuple[int, int], right_cursor_position: tuple[int, int]):
+    def draw(self, image: np.ndarray, gestures: DetectionModel):
         
         if self.opened:
             overlay = image.copy()
@@ -36,10 +35,10 @@ class Settings(FreeResizeApp):
             alpha = get_app_transparency()
             cv2.addWeighted(overlay, alpha, image, 1 - alpha, 0, image)
 
-            left_in_rect = is_cursor_in_rect(left_cursor_position, 
+            left_in_rect = is_cursor_in_rect(gestures.left_hand.cursor, 
                                              (self.button._position.x, self.button._position.y, 
                                               self.button._position.x + self.button._size.w, self.button._position.y + self.button._size.h))
-            right_in_rect = is_cursor_in_rect(right_cursor_position, 
+            right_in_rect = is_cursor_in_rect(gestures.right_hand.cursor, 
                                               (self.button._position.x, self.button._position.y, 
                                                self.button._position.x + self.button._size.w, self.button._position.y + self.button._size.h))
             

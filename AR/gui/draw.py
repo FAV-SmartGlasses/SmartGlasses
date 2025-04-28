@@ -3,10 +3,11 @@ import cv2
 import numpy as np
 
 from .color_manager import *
+from other_utilities import Position
 
 
 def draw_cursor(image, cursor_position):
-    if cursor_position != (None, None):
+    if cursor_position.get_array() != (None, None):
         cv2.circle(image, (cursor_position.x, cursor_position.y), 10, (0, 0, 255), -1)
 
 def draw_gui_objects(self, image, objects, cursor_position, click_gesture_detected):
@@ -16,12 +17,12 @@ def draw_gui_objects(self, image, objects, cursor_position, click_gesture_detect
                 is_hovered = self.is_cursor_in_rect(cursor_position, obj.rect)
                 obj.draw(image, is_hovered)
 
-def is_cursor_in_rect(position, rect):
-    if position  == (None, None) or rect  == (None, None, None, None):
+def is_cursor_in_rect(position: Position, rect):
+    if position.get_array() == (None, None) or rect  == (None, None, None, None):
         return False
     
     x1, y1, x2, y2 = rect
-    if x1 <= position[0] <= x2 and y1 <= position[1] <= y2:
+    if x1 <= position.x <= x2 and y1 <= position.y <= y2:
         return True
     
     return False

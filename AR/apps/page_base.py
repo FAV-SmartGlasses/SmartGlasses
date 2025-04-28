@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 
 from other_utilities import Position, Size
+from hand_detection_models import *
 
 class Page(ABC):
     @abstractmethod
@@ -10,9 +11,7 @@ class Page(ABC):
         self._size: Size
 
     @abstractmethod
-    def draw(self, image_overlay: np.ndarray,
-             left_click_gesture_detected: bool, right_click_gesture_detected: bool, 
-             left_cursor_position: tuple[int, int], right_cursor_position: tuple[int, int]):
+    def draw(self, image_overlay: np.ndarray, gestures: DetectionModel):
         raise NotImplementedError("This method should be overridden in subclasses") 
     
 

@@ -1,7 +1,9 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
+import numpy as np
 
 from menu_items import MenuItem
 from other_utilities import Position, Size
+from hand_detection_models import *
 
 class App(MenuItem):
     @abstractmethod
@@ -36,9 +38,7 @@ class App(MenuItem):
     def close(self):
         self.opened = False
 
-    def draw(self, image,
-             left_click_gesture_detected, right_click_gesture_detected, 
-             left_cursor_position, right_cursor_position):
+    def draw(self, image: np.ndarray, gestures: DetectionModel):
         return image
 #endregion
 

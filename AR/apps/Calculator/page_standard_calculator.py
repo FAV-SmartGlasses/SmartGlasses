@@ -1,7 +1,9 @@
 import numpy as np
+
 from apps.page_base import FixedAspectPage
 from gui.draw import *
 from gui.keyboard import Keyboard
+from hand_detection_models import *
 
 MAX_LENGTH = 10
 
@@ -40,9 +42,7 @@ class Standard(FixedAspectPage):
 
         return total_width / total_height
 
-    def draw(self, image_overlay: np.ndarray,
-             left_click_gesture_detected: bool, right_click_gesture_detected: bool, 
-             left_cursor_position: tuple[int, int], right_cursor_position: tuple[int, int]):
+    def draw(self, image_overlay: np.ndarray, gesture: DetectionModel):
         
         cv2.setUseOptimized(True)
         
@@ -74,9 +74,7 @@ class Standard(FixedAspectPage):
                     2)
 
         # Draw the keyboard with dynamically scaled keys
-        self.keyboard.draw(image_overlay, scaled_padding, textbox_height, 
-                           left_click_gesture_detected, right_click_gesture_detected, 
-                           left_cursor_position, right_cursor_position,
+        self.keyboard.draw(image_overlay, scaled_padding, textbox_height, gesture,
                            get_neutral_color_bgra(), get_neutral_color2_bgra(), get_font_color_bgra(), 
                            get_neutral_color2_bgra(), get_nice_color_bgra(), get_nice_color_bgra(), 
                            scaled_key_size, scaled_key_padding)

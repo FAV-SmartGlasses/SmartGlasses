@@ -8,6 +8,7 @@ from apps.app_base import FixedAspectApp
 from gui.draw import *
 from gui.elements.dropdown import Dropdown
 from other_utilities import Position, Size
+from hand_detection_models import *
 
 MAX_LENGTH = 10
 
@@ -25,9 +26,7 @@ class Calculator(FixedAspectApp):
     def compute_aspect_ratio(self):
         pass
 
-    def draw(self, image: np.ndarray,
-             left_click_gesture_detected: bool, right_click_gesture_detected: bool, 
-             left_cursor_position: tuple[int, int], right_cursor_position: tuple[int, int]):
+    def draw(self, image: np.ndarray, gestures: DetectionModel):
         
         cv2.setUseOptimized(True)
         
@@ -45,18 +44,14 @@ class Calculator(FixedAspectApp):
             page_w = w - 100
             self.pages[self.current_page].set_width(page_w)
             #overlay = 
-            self.pages[self.current_page].draw(overlay, 
-                                                        left_click_gesture_detected, right_click_gesture_detected, 
-                                                        left_cursor_position, right_cursor_position)
+            self.pages[self.current_page].draw(overlay, gestures)
             
             #overlay = self.alpha_blend(overlay, page_overlay)
             """page_overlay = self.insert_overlay(page_overlay, 50, 50, w, h)
             
             overlay = self.blend_overlays(overlay, page_overlay)"""
             
-            self.dropdown.draw(image, w, h,
-                            left_click_gesture_detected, right_click_gesture_detected,
-                            left_cursor_position, right_cursor_position)
+            self.dropdown.draw(image, gestures)
             
             # Ensure overlay is smaller than image
             overlay_h, overlay_w, _ = overlay.shape

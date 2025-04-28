@@ -18,8 +18,6 @@ class GUImanager:
         if PRINT_TIME_OF_DRAWING:
             start_time = time.time()
 
-        h, w, _ = image.shape
-
         (image, gestures) = self.hand_detection.process_image(image) # processing image and detecting gestures
         
         if PRINT_TIME_OF_DRAWING:
@@ -32,7 +30,7 @@ class GUImanager:
                     edited_gestures = copy.deepcopy(gestures)
                     edited_gestures.left_hand.click_gesture_detected = gestures.right_hand.click_gesture_detected = False
                     edited_gestures.left_hand.cursor = gestures.left_hand.cursor = Position()
-                    
+
                     item.draw(image, edited_gestures) # drawing app
                 else:
                     item.draw(image, gestures) # drawing app
@@ -49,8 +47,12 @@ class GUImanager:
        
         draw_time_bar(image, self.menu.get_visible())  # drawing time bar
 
-        draw_cursor(image, gestures.left_hand.cursor)  # drawing left cursor
-        draw_cursor(image, gestures.right_hand.cursor)  # drawing right cursor
+        if gestures.left_hand.cursor.get_array() == (None, None):
+            draw_cursor(image, gestures.left_hand.cursor)  # drawing left cursor
+        if gestures.right_hand.cursor.get_array() == (None, None):
+            draw_cursor(image, gestures.right_hand.cursor)  # drawing right cursor
+
+        print(f"{gestures.left_hand.cursor.get_array()}  {gestures.left_hand.click_gesture_detected}  {gestures.right_hand.cursor.get_array()}     {gestures.right_hand.click_gesture_detected}")
 
         if PRINT_TIME_OF_DRAWING:
             print(f"det: {hand_detection_diff*1000}    app: {app_diff*1000}    menu: {menu_diff*1000}        all: {(menu_time - start_time)*1000}")
