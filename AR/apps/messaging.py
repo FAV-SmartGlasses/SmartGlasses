@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 import settings_manager
 from apps.app_base import App
 from gui import keyboard, color_manager
+from hand_detection_models import DetectionModel
 
 load_dotenv(os.path.abspath("../resources/.env"))
 
@@ -59,16 +60,12 @@ class MessagingApp(App):
         self.opened = False
 
 
-    def draw(self, image,
-             left_click_gesture_detected, right_click_gesture_detected,
-             left_cursor_position, right_cursor_position):
+    def draw(self, image, gestures: DetectionModel):
         if self.opened:
             h, w, _ = image.shape
             overlay = np.zeros((h, w, 4), dtype=np.uint8)
 
-            self.keyboard.draw(overlay, w, h,
-                           left_click_gesture_detected, right_click_gesture_detected,
-                           left_cursor_position, right_cursor_position,
+            self.keyboard.draw(overlay, 0, 0, gestures,
                            color_manager.get_neutral_color_bgra(), color_manager.get_neutral_color2_bgra(), color_manager.get_font_color_bgra(),
                            color_manager.get_neutral_color2_bgra(), color_manager.get_nice_color_bgra(), color_manager.get_nice_color_bgra(), scaled_key_size, scaled_padding)
 
