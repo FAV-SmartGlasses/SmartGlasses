@@ -20,6 +20,81 @@ class HandDetection:
         self.last_left_wrist: Position = Position()
         self.last_right_wrist: Position = Position()
 
+
+
+
+#region FistDetection
+
+    def calculate_angle(self, a, b, c):
+        """Vypočítá úhel mezi body a, b, c (v bodě b)."""
+        ab = [a[0] - b[0], a[1] - b[1], a[2] - b[2]]
+        cb = [c[0] - b[0], c[1] - b[1], c[2] - b[2]]
+
+        dot_product = ab[0] * cb[0] + ab[1] * cb[1] + ab[2] * cb[2]
+        ab_magnitude = math.sqrt(ab[0]**2 + ab[1]**2 + ab[2]**2)
+        cb_magnitude = math.sqrt(cb[0]**2 + cb[1]**2 + cb[2]**2)
+
+        if ab_magnitude * cb_magnitude == 0:
+            return 0
+
+        cos_angle = dot_product / (ab_magnitude * cb_magnitude)
+        angle = math.acos(max(min(cos_angle, 1.0), -1.0))  # Ošetření chybiček
+        return math.degrees(angle)
+
+    def get_finger_angles(self, landmarks):
+        """
+        Vypočítá úhly v prstech ruky.
+        """
+        fingers = {
+            'thumb': [1, 2, 3],       # Body pro palec
+            'index': [5, 6, 7],       # Body pro ukazováček
+            'middle': [9, 10, 11],    # Body pro prostředníček
+            'ring': [13, 14, 15],     # Body pro prsteníček
+            'pinky': [17, 18, 19]     # Body pro malíček
+        }
+
+        angles = {}
+
+        for finger, points in fingers.items():
+            a = [landmarks[points[0]].x, landmarks[points[0]].y, landmarks[points[0]].z]
+            b = [landmarks[points[1]].x, landmarks[points[1]].y, landmarks[points[1]].z]
+            c = [landmarks[points[2]].x, landmarks[points[2]].y, landmarks[points[2]].z]
+
+            angles[finger] = self.calculate_angle(a, b, c)
+
+        return angles
+    
+    def is_fist_by_depth(self, landmarks, threshold=0.1):
+        """
+        Detekuje pěst na základě hloubky (z souřadnice).
+        Pokud jsou prsty blízko dlaně (málo výrazná hodnota z), pěst je uzavřená.
+        """
+        fingers_depth = []
+        for i in range(5, 21, 4):  # index, middle, ring, pinky tips
+            finger = landmarks[i]
+            fingers_depth.append(finger.z)
+
+        # Zkontroluj, jestli jsou prsty blízko k sobě (můžeme přidat více tolerance pro z)
+        min_depth = min(fingers_depth)
+        return min_depth > threshold
+
+    def is_fist(self, landmarks, angle_threshold=70):
+        """
+        Vrací True, pokud všechny prsty (kromě palce) mají malé úhly (jsou ohnuté = pěst).
+        """
+        angles = self.get_finger_angles(landmarks)
+        fingers_to_check = ['index', 'middle', 'ring', 'pinky']
+
+        for finger in fingers_to_check:
+            if angles[finger] > angle_threshold:
+                return False  # Pokud některý prst není dost ohnutý, není to pěst
+
+        return True  # Pokud všechny prsty jsou ohnuté, je to pěst
+#endregion
+
+
+
+
     def process_image(self, image: np.ndarray) -> tuple[np.ndarray, DetectionModel]:
         h, w, _ = image.shape
 
@@ -31,6 +106,11 @@ class HandDetection:
 
         if hands_results.multi_hand_landmarks:
             hand_landmarks_list = hands_results.multi_hand_landmarks
+            for hand_landmarks in hands_results.multi_hand_landmarks:
+                if self.is_fist(hand_landmarks.landmark):
+                    cv2.putText(image, "PEST!", (50, 50),
+                                cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+                    
             if len(hand_landmarks_list) == 2:
                 # TODO: add gesture for moving and resizing apps
 
@@ -39,8 +119,8 @@ class HandDetection:
                 left_swipe_gesture_detected = self.swipe_gesture_detected(left_hand, w, h, is_left = True)
                 right_swipe_gesture_detected = self.swipe_gesture_detected(right_hand, w, h, is_left = False)
 
-                result.left_hand.click_gesture_detected = self.is_click_gesture_detected(left_hand, w, h)
-                result.right_hand.click_gesture_detected = self.is_click_gesture_detected(right_hand, w, h)
+                result.left_hand.clicked = self.is_click_gesture_detected(left_hand, w, h)
+                result.right_hand.clicked = self.is_click_gesture_detected(right_hand, w, h)
 
                 result.left_hand.cursor = self.get_cursor_position(w, h, left_hand)
                 result.right_hand.cursor = self.get_cursor_position(w, h, right_hand)
@@ -50,17 +130,17 @@ class HandDetection:
             elif len(hand_landmarks_list) == 1:
                 hand_landmarks = hand_landmarks_list[0]
                 right_swipe_gesture_detected = self.swipe_gesture_detected(hand_landmarks, w, h, is_left=False)
-                result.right_hand.click_gesture_detected = self.is_click_gesture_detected(hand_landmarks, w, h)
+                result.right_hand.clicked = self.is_click_gesture_detected(hand_landmarks, w, h)
                 result.right_hand.cursor = self.get_cursor_position(w, h, hand_landmarks)
-                result.left_hand.cursor = Position(None, None)
+                result.left_hand.cursor = Position()
                 self.draw(image, hand_landmarks)
             elif len(hand_landmarks_list) == 0:
-                result.right_hand.cursor = Position(None, None)
-                result.left_hand.cursor = Position(None, None)
+                result.right_hand.cursor = Position()
+                result.left_hand.cursor = Position()
 
-        if result.left_hand.click_gesture_detected and result.right_hand.click_gesture_detected:
-            result.left_hand.click_gesture_detected = False
-            result.right_hand.click_gesture_detected = False
+        if result.left_hand.clicked and result.right_hand.clicked:
+            result.left_hand.clicked = False
+            result.right_hand.clicked = False
 
         result.swipe = self.combine_swipe_gestures(left_swipe_gesture_detected, right_swipe_gesture_detected)
 
@@ -68,9 +148,6 @@ class HandDetection:
             print(result.swipe.name)
 
         return image, result
-
-        return (image, left_click_gesture_detected, right_click_gesture_detected,
-                swipe_gesture_detected, left_cursor_position, right_cursor_position)
 
 #region swipe gest
     def swipe_gesture_detected(self, hand_landmarks, w, h, is_left):

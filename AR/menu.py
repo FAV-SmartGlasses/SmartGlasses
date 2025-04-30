@@ -48,7 +48,7 @@ class Menu:
         if self._visible:
             self.detect_menu_item_selection(h, gestures.right_hand.cursor)
             if self._current_selection is not None:
-                self.check_click_gesture(gestures.right_hand.click_gesture_detected)
+                self.check_click_gesture(gestures.right_hand.clicked)
 
             self._draw_menu(image)
 

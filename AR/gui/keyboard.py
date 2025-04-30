@@ -25,8 +25,8 @@ class Keyboard:
         left_detected_key = self.detect_key_press(*gesture.left_hand.cursor.get_array(), start_x, start_y)
         right_detected_key = self.detect_key_press(*gesture.right_hand.cursor.get_array(), start_x, start_y)
 
-        if gesture.left_hand.click_gesture_detected or gesture.right_hand.click_gesture_detected:
-            detected_key = left_detected_key if gesture.left_hand.click_gesture_detected else right_detected_key
+        if gesture.left_hand.clicked or gesture.right_hand.clicked:
+            detected_key = left_detected_key if gesture.left_hand.clicked else right_detected_key
 
             if detected_key is not None:
                 if len(self.click_history) != 0:

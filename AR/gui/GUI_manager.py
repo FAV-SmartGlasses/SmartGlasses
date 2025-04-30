@@ -20,9 +20,6 @@ class GUImanager:
 
         (image, gestures) = self.hand_detection.process_image(image) # processing image and detecting gestures
 
-        if gestures.left_hand.click_gesture_detected == True or gestures.right_hand.click_gesture_detected == True:
-            print("clicked")
-        
         if PRINT_TIME_OF_DRAWING:
             hand_detection_time = time.time()
             hand_detection_diff = hand_detection_time - start_time
@@ -30,10 +27,11 @@ class GUImanager:
         for item in self.menu.items:
             if isinstance(item, App) and item.opened: # if item is app and is opened
                 if(self.menu.get_visible()):
+                    # when is menu opened, any application can't get a cursor or click event
                     edited_gestures = copy.deepcopy(gestures)
-                    edited_gestures.left_hand.click_gesture_detected = False
+                    edited_gestures.left_hand.clicked = False
                     edited_gestures.left_hand.cursor = Position()
-                    edited_gestures.right_hand.click_gesture_detected = False
+                    edited_gestures.right_hand.clicked = False
                     edited_gestures.right_hand.cursor = Position()
 
                     item.draw(image, edited_gestures) # drawing app

@@ -9,6 +9,7 @@ from gui.draw import *
 from gui.elements.dropdown import Dropdown
 from other_utilities import Position, Size
 from hand_detection_models import *
+from settings_manager import get_app_transparency
 
 MAX_LENGTH = 10
 
@@ -22,6 +23,8 @@ class Calculator(FixedAspectApp):
         ]
         self.current_page = 0
         self.dropdown = Dropdown(Position(self._position.x + 200, self._position.y + 50), Size(200, 35), ["Standard", "Converter"], 0)
+        self._position = Position(0, 0)
+        #self._size = #500
 
     def compute_aspect_ratio(self):
         pass
@@ -32,7 +35,7 @@ class Calculator(FixedAspectApp):
         
         if self.opened:
             h, w, _ = image.shape
-            overlay = np.zeros((h, w, 4), dtype=np.uint8)
+            overlay = image.copy()
             """draw_rounded_rectangle(overlay,
                                 self.position, 
                                 (self.position[0] + self.size[0], self.position[1] + self.size[1]),
@@ -51,16 +54,20 @@ class Calculator(FixedAspectApp):
             
             overlay = self.blend_overlays(overlay, page_overlay)"""
             
-            self.dropdown.draw(image, gestures)
+            self.dropdown.draw(overlay, gestures)
+
+            # Kombinace původního obrázku a překryvného obrázku s průhledností
+            alpha = get_app_transparency()
+            cv2.addWeighted(overlay, alpha, image, 1 - alpha, 0, image)
             
-            # Ensure overlay is smaller than image
+            """# Ensure overlay is smaller than image
             overlay_h, overlay_w, _ = overlay.shape
             image_h, image_w, _ = image.shape
 
             if overlay_w > image_w or overlay_h > image_h:
-                raise ValueError("Overlay dimensions must be smaller than image dimensions.")
+                raise ValueError("Overlay dimensions must be smaller than image dimensions.")"""
 
-            # Calculate position to center overlay
+            """# Calculate position to center overlay
             x_offset = (image_w - overlay_w) // 2
             y_offset = (image_h - overlay_h) // 2
 
@@ -71,7 +78,7 @@ class Calculator(FixedAspectApp):
                 image[y_offset:y_offset + overlay_h, x_offset:x_offset + overlay_w, c] = (
                     alpha_channel * overlay[:, :, c] +
                     (1 - alpha_channel) * image[y_offset:y_offset + overlay_h, x_offset:x_offset + overlay_w, c]
-                )
+                )"""
 
 
     def blend_overlays(self, bottom: np.ndarray, top: np.ndarray) -> np.ndarray:

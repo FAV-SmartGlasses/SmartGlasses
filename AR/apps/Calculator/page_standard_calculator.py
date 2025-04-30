@@ -4,6 +4,7 @@ from apps.page_base import FixedAspectPage
 from gui.draw import *
 from gui.keyboard import Keyboard
 from hand_detection_models import *
+from other_utilities import *
 
 MAX_LENGTH = 10
 
@@ -27,7 +28,8 @@ class Standard(FixedAspectPage):
 
         self.aspect_ratio = self.compute_aspect_ratio()
 
-        self.size = (800, int(800 / self.aspect_ratio))
+        self._size = Size(800, int(800 / self.aspect_ratio))
+        self._position = Position(0, 0)
 
     def compute_aspect_ratio(self):
         cols = len(KEYS[0])
@@ -47,25 +49,25 @@ class Standard(FixedAspectPage):
         cv2.setUseOptimized(True)
         
         # Dynamic scaling factor based on screen dimensions
-        scale_factor = min(*self.size) / 800  # Base size is 800px (could be adjusted)
+        scale_factor = min(*self._size.get_array()) / 800  # Base size is 800px (could be adjusted)
         scaled_key_size = int(KEY_SIZE * scale_factor)  # Scale the key size
         scaled_padding = int(PADDING * scale_factor)  # Scale padding between keys
-        scaled_key_padding = int(scaled_padding/2)
+        scaled_key_padding = int(scaled_padding / 2)
 
         # Draw the textbox background
         textbox_height = int(60 * scale_factor)  # Scale textbox height
         draw_rounded_rectangle(image_overlay,
-                                (0, 0), 
-                                (len(KEYS[0]) * (scaled_key_size + scaled_key_padding) - scaled_key_padding + 2 * scaled_padding,
-                                 textbox_height + len(KEYS) * (scaled_key_size + scaled_key_padding) - scaled_key_padding + scaled_padding),
+                                (self._position.x, self._position.y), 
+                                (self._position.x + len(KEYS[0]) * (scaled_key_size + scaled_key_padding) - scaled_key_padding + 2 * scaled_padding,
+                                 self._position.y + textbox_height + len(KEYS) * (scaled_key_size + scaled_key_padding) - scaled_key_padding + scaled_padding),
                                 30, 
                                 get_nice_color_bgra(),  # Use BGRA color
                                 -1)
 
         # Draw the text inside the textbox with dynamic text size
         text_size = cv2.getTextSize(self.keyboard.text, cv2.FONT_HERSHEY_SIMPLEX, scale_factor, 2)[0]
-        text_x = scaled_padding + (len(KEYS[0]) * (scaled_key_size + scaled_key_padding) - scaled_key_padding - text_size[0]) // 2
-        text_y = (textbox_height - text_size[1]) // 2
+        text_x = self._position.x + scaled_padding + (len(KEYS[0]) * (scaled_key_size + scaled_key_padding) - scaled_key_padding - text_size[0]) // 2
+        text_y = self._position.y + (textbox_height - text_size[1]) // 2
         cv2.putText(image_overlay, self.keyboard.text, 
                     (text_x, text_y), 
                     cv2.FONT_HERSHEY_SIMPLEX, 
@@ -74,10 +76,13 @@ class Standard(FixedAspectPage):
                     2)
 
         # Draw the keyboard with dynamically scaled keys
-        self.keyboard.draw(image_overlay, scaled_padding, textbox_height, gesture,
+        self.keyboard.draw(image_overlay, 
+                           self._position.x + scaled_padding, 
+                           self._position.y + textbox_height, gesture,
                            get_neutral_color_bgra(), get_neutral_color2_bgra(), get_font_color_bgra(), 
                            get_neutral_color2_bgra(), get_nice_color_bgra(), get_nice_color_bgra(), 
-                           scaled_key_size, scaled_key_padding)
+                           scaled_key_size,
+                           scaled_key_padding)
 
 class CalculatorKeyboard(Keyboard):
     def __init__(self, layout: list[list[str]]):

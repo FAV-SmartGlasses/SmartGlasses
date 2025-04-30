@@ -67,7 +67,7 @@ def main():
         # Pokud uplynulo více než 1 sekunda, vypočteme FPS
         if elapsed_time > 1:
             cam_fps = frame_count / elapsed_time
-            print(f'FPS aplikace: {cam_fps}')
+            #print(f'FPS aplikace: {cam_fps}')
             
             # Resetujeme počítadla pro další sekundu
             frame_count = 0

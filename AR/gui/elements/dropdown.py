@@ -19,8 +19,8 @@ class Dropdown(Element):
         
         is_left_hovered = is_cursor_in_rect(gestures.left_hand.cursor, (self._position.x, self._position.y, self._position.x + self._size.w, self._position.y + self._size.h))
         is_right_hovered = is_cursor_in_rect(gestures.right_hand.cursor, (self._position.x, self._position.y, self._position.x + self._size.w, self._position.y + self._size.h))
-        is_left_clicked = is_left_hovered and gestures.left_hand.click_gesture_detected
-        is_right_clicked = is_right_hovered and gestures.right_hand.click_gesture_detected
+        is_left_clicked = is_left_hovered and gestures.left_hand.clicked
+        is_right_clicked = is_right_hovered and gestures.right_hand.clicked
         is_clicked = is_left_clicked or is_right_clicked
 
         if is_clicked:
@@ -49,8 +49,8 @@ class Dropdown(Element):
                 if option_left_hovered or option_right_hovered:
                     hovered = True
 
-                    if ((gestures.left_hand.click_gesture_detected and option_left_hovered) or 
-                        (gestures.right_hand.click_gesture_detected and option_right_hovered)):
+                    if ((gestures.left_hand.clicked and option_left_hovered) or 
+                        (gestures.right_hand.clicked and option_right_hovered)):
                         self.selected_option = option
                         self.open = False
 

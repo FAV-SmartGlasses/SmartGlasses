@@ -19,4 +19,4 @@ class Size:
         self.w = h
 
     def get_array(self) -> tuple[int, int]:
-        return self.x, self.y
+        return self.w, self.h
