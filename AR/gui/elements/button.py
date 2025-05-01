@@ -9,13 +9,13 @@ class Button(Element):
         
         super().__init__(position, size)
 
-        self.icon = icon  # This should be a small cv2 image (numpy array)
+        self.icon = icon
         self.text = text
 
         self.rect = (position.x, position.y, position.x + size.w, position.y + size.w)  # (x1, y1, x2, y2)
 
         self.is_hovered = False
-        self.color = color  # (B, G, R)
+        self.color = color
         self.border_color = border_color
         self.font_color = font_color
         self.hovering_color = hover_color
