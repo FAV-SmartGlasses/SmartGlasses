@@ -15,8 +15,8 @@ class Size:
     h: int
 
     def __init__(self, w: int = None, h: int = None):
-        self.h = w
-        self.w = h
+        self.h = h
+        self.w = w
 
     def get_array(self) -> tuple[int, int]:
         return self.w, self.h

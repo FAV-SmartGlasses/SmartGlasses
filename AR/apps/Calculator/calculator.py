@@ -10,6 +10,7 @@ from gui.elements.dropdown import Dropdown
 from other_utilities import Position, Size
 from hand_detection_models import *
 from settings_manager import get_app_transparency
+from other_utilities import Position, Size
 
 MAX_LENGTH = 10
 
@@ -34,15 +35,18 @@ class Calculator(FixedAspectApp):
         
         if self.opened:
             h, w, _ = image.shape
+            page_w = w - 100
+            #self._size.w = page_w
+            #self.aspect_ratio = self.pages[self.current_page].aspect_ratio
+            #self._size.h = int(self._size.w / self.aspect_ratio)
             overlay = image.copy()
             """draw_rounded_rectangle(overlay,
-                                self.position, 
-                                (self.position[0] + self.size[0], self.position[1] + self.size[1]),
+                                self._position.get_array(),
+                                (self._position.x + self._size.w, self._position.y + self._size.h),
                                 30, 
                                 get_nice_color_bgra(),  # Use BGRA color
                                 -1)"""
 
-            page_w = w - 100
             self.pages[self.current_page].set_width(page_w)
             #overlay = 
             self.pages[self.current_page].draw(overlay, gestures)
