@@ -48,7 +48,6 @@ class Calculator(FixedAspectApp):
                                 -1)"""
 
             self.pages[self.current_page].set_width(page_w)
-            #overlay = 
             self.pages[self.current_page].draw(overlay, gestures)
             
             self.dropdown.draw(overlay, gestures)
