@@ -35,7 +35,7 @@ class Calculator(FixedAspectApp):
         
         if self.opened:
             h, w, _ = image.shape
-            page_w = w - 100
+            page_w = w - 50
             #self._size.w = page_w
             #self.aspect_ratio = self.pages[self.current_page].aspect_ratio
             #self._size.h = int(self._size.w / self.aspect_ratio)
@@ -51,6 +51,7 @@ class Calculator(FixedAspectApp):
             self.pages[self.current_page].draw(overlay, gestures)
             
             self.dropdown.draw(overlay, gestures)
+            self.current_page = self.dropdown.selected_option_index
 
             # Kombinace původního obrázku a překryvného obrázku s průhledností
             alpha = get_app_transparency()

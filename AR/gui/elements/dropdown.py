@@ -7,16 +7,15 @@ from hand_detection_models import DetectionModel
 
 
 class Dropdown(Element):
-    def __init__(self, position: Position, size: Size, options: tuple[str], selected_option: int=None):
+    def __init__(self, position: Position, size: Size, options: tuple[str], selected_option_index: int = None):
         super().__init__(position, size)
-        self.open = False
-        self.options = options
-        self.selected_option = selected_option
+        self.open: bool = False
+        self.options: tuple[str] = options
+        self.selected_option_index: int = selected_option_index
         self.padding = 10
-        self.click_history = []
+        self.click_history: tuple[bool] = []
 
-    def draw(self, image: np.ndarray, gestures: DetectionModel): # TODO: teach Thomas how function overriding works
-        
+    def draw(self, image: np.ndarray, gestures: DetectionModel):
         is_left_hovered = is_cursor_in_rect(gestures.left_hand.cursor, (self._position.x, self._position.y, self._position.x + self._size.w, self._position.y + self._size.h))
         is_right_hovered = is_cursor_in_rect(gestures.right_hand.cursor, (self._position.x, self._position.y, self._position.x + self._size.w, self._position.y + self._size.h))
         is_left_clicked = is_left_hovered and gestures.left_hand.clicked
@@ -32,13 +31,13 @@ class Dropdown(Element):
                 self.click_history.append(False)
         
 
-        text = self.selected_option if self.selected_option else "Select an option"
+        text = self.options[self.selected_option_index] if self.selected_option_index is not None else "Select an option"
         self.draw_element(image, text)
 
         if self.open:
-            for idx, option in enumerate(self.options):
+            for index, option in enumerate(self.options):
                 option_x = self._position.x
-                option_y = self._position.y + (idx + 1) * (self._size.h + self.padding)
+                option_y = self._position.y + (index + 1) * (self._size.h + self.padding)
 
                 # Zkontrolujeme, jestli je kurzor nad možností
                 rect = (option_x, option_y, option_x + self._size.w, option_y + self._size.h)
@@ -51,7 +50,7 @@ class Dropdown(Element):
 
                     if ((gestures.left_hand.clicked and option_left_hovered) or 
                         (gestures.right_hand.clicked and option_right_hovered)):
-                        self.selected_option = option
+                        self.selected_option_index = index
                         self.open = False
 
                 self.draw_option(image, option_x, option_y, hovered, option)

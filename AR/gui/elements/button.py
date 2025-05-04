@@ -1,6 +1,7 @@
 from gui.draw import *
 from other_utilities import Position, Size
 from gui.elements.element_base import Element
+from hand_detection_models import DetectionModel
 
 class Button(Element):
     def __init__(self, icon, position: Position, size: Size, text: str,
@@ -22,6 +23,16 @@ class Button(Element):
         self.hovering_border_color = hover_border_color
         self.hovering_font_color = hover_font_color
 
+    def is_hovered_or_clicked(self, gestures: DetectionModel) -> tuple[bool, bool]:
+        rect = (*self._position.get_array(), self._position.x + self._size.w, self._position.y + self._size.h)
+        is_left_hovered = is_cursor_in_rect(gestures.left_hand.cursor, rect)
+        is_right_hovered = is_cursor_in_rect(gestures.right_hand.cursor, rect)
+        is_left_clicked = is_left_hovered and gestures.left_hand.clicked
+        is_right_clicked = is_right_hovered and gestures.right_hand.clicked
+        is_clicked = is_left_clicked or is_right_clicked
+        is_hovered = is_left_hovered or is_right_hovered
+
+        return is_hovered, is_clicked
 
     def draw(self, frame, is_hovered):
         self.is_hovered = is_hovered

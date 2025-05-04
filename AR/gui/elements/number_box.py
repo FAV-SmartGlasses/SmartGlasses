@@ -9,8 +9,8 @@ class NumberBox(Element):
         self.step = step
         self.value = min_value
 
-    def draw(self, image):
-        return super().draw(image)
+    def draw(self, overlay, gestures):
+        pass
 
     def set_value(self, value):
         if self.min_value <= value <= self.max_value:

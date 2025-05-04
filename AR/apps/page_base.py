@@ -20,13 +20,12 @@ class FixedAspectPage(Page):
     def __init__(self):
         super().__init__()
         
-        self.aspect_ratio: int
+        self.aspect_ratio: int = self.compute_aspect_ratio()
            
 #region computing and setting size
     @abstractmethod
     def compute_aspect_ratio(self):
-        if self.does_have_aspect_ratio:
-            raise NotImplementedError
+        raise NotImplementedError
 
     def set_width(self, w):
         h = int(w / self.aspect_ratio)

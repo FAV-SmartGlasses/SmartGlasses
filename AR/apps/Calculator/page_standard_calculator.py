@@ -36,7 +36,7 @@ class Standard(FixedAspectPage):
         rows = len(KEYS)
         sample_key_size = 10  # libovolná jednotka, důležité jsou proporce
         padding = sample_key_size // 5
-        key_padding = padding/2
+        key_padding = padding // 2
         textbox_height = sample_key_size
 
         total_width = cols * sample_key_size + (cols - 1) * key_padding + 2 * padding
@@ -45,14 +45,13 @@ class Standard(FixedAspectPage):
         return total_width / total_height
 
     def draw(self, image_overlay: np.ndarray, gesture: DetectionModel):
-        
         cv2.setUseOptimized(True)
         
         # Dynamic scaling factor based on screen dimensions
         scale_factor = min(*self._size.get_array()) / 800  # Base size is 800px (could be adjusted)
         scaled_key_size = int(KEY_SIZE * scale_factor)  # Scale the key size
         scaled_padding = int(PADDING * scale_factor)  # Scale padding between keys
-        scaled_key_padding = int(scaled_padding / 2)
+        scaled_key_padding = int(scaled_padding // 2)
 
         # Draw the textbox background
         textbox_height = int(60 * scale_factor)  # Scale textbox height
@@ -96,10 +95,16 @@ class CalculatorKeyboard(Keyboard):
             self.evaluated = False
 
         if detected_key == "X":
+            if self.evaluated:
+                self.text = ""
+                self.evaluated = False
             # Smazání posledního znaku
             if self.text:
                 self.text = self.text[:-1]
         elif detected_key in "0123456789":
+            if self.evaluated:
+                self.text = ""
+                self.evaluated = False
             # Přidání čísla
             if self.text == "0":
                 # Pokud text obsahuje pouze "0", nahradí se novým číslem
@@ -109,6 +114,8 @@ class CalculatorKeyboard(Keyboard):
         elif detected_key in "+-*/%^":
             # Přidání znaménka, pokud poslední znak není znaménko
             if self.text and self.text[-1] not in "+-*/%(^":
+                if self.evaluated:
+                    self.evaluated = False
                 if detected_key == "^":
                     self.text += "**"
                 else:
@@ -120,6 +127,8 @@ class CalculatorKeyboard(Keyboard):
                 last_number = self.text.split()[-1]
                 if "." not in last_number:
                     self.text += detected_key
+            if not self.text:
+                self.text = "0."
         elif detected_key == "()":
             # Přidání závorek s podporou vnořených závorek
             if not self.text or self.text[-1] in "+-*/%(":
@@ -134,7 +143,6 @@ class CalculatorKeyboard(Keyboard):
             else:
                 # Jinak přidá otevírací závorku
                 self.text += "("
-
         elif detected_key == "=" and len(self.text) > 0:
             try:
                 self.text = str(eval(self.text))

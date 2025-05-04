@@ -40,11 +40,6 @@ class Keyboard:
             if len(self.click_history) != 0 and self.click_history[-1]:
                 self.click_history.append(False)
 
-        # Výpočet počáteční pozice klávesnice
-        #start_x = w // 2 - (len(self.keys[0]) * (self.key_size + self.padding)) // 2
-        #start_y = h // 2 - (len(self.keys) * (self.key_size + self.padding)) // 2
-
-        # Vytvoření překryvného obrázku
         overlay = image.copy()
 
         # Procházení kláves a jejich vykreslení
@@ -58,10 +53,6 @@ class Keyboard:
                 new_color = hover_color if right_detected_key == key or left_detected_key == key else color
                 new_border_color = hover_border_color if right_detected_key == key or left_detected_key == key else border_color
                 new_font_color = hover_font_color if right_detected_key == key or left_detected_key == key else font_color
-
-                # Vykreslení klávesy (obdélník)
-                #cv2.rectangle(overlay, (x1, y1), (x2, y2), color, -1)
-                #cv2.rectangle(overlay, (x1, y1), (x2, y2), BLACK, 2)
 
                 draw_rounded_rectangle(overlay,
                                         (x1, y1), 
@@ -90,10 +81,6 @@ class Keyboard:
     def detect_key_press(self, x, y, start_x, start_y):
         if x is None or y is None:
             return None
-
-        # Výpočet počáteční pozice klávesnice
-        #start_x = w // 2 - (len(self.keys[0]) * (self.key_size + self.padding)) // 2
-        #start_y = h // 2 - (len(self.keys) * (self.key_size + self.padding)) // 2
 
         # Procházení kláves a kontrola, zda kliknutí spadá do jejich oblasti
         for row_idx, row in enumerate(self.keys):
