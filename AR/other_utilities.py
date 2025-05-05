@@ -20,3 +20,8 @@ class Size:
 
     def get_array(self) -> tuple[int, int]:
         return self.w, self.h
+    
+
+def get_right_bottom_pos(position: Position, size: Size)-> Position:
+    x1, x2 = position.x + size.w, position.y + size.h
+    return Position(x1, x2)

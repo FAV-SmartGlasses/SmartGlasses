@@ -1,5 +1,8 @@
 from .element_base import Element
-from other_utilities import Position, Size
+from other_utilities import *
+from hand_detection_models import DetectionModel
+from gui.draw import *
+from gui.color_manager import *
 
 class NumberBox(Element):
     def __init__(self, position: Position, size:Size, step: float=1, min_value: float=None, max_value: float=None):
@@ -9,11 +12,12 @@ class NumberBox(Element):
         self.step = step
         self.value = min_value
 
-    def draw(self, overlay, gestures):
-        pass
-
-    def set_value(self, value):
-        if self.min_value <= value <= self.max_value:
-            self.value = value
-        else:
-            raise ValueError(f"Value must be between {self.min_value} and {self.max_value}.")
+    def draw(self, overlay: np.ndarray, gestures: DetectionModel):
+        draw_rounded_rectangle(overlay, 
+                               self._position.get_array(), 
+                               get_right_bottom_pos(self._position, self._size).get_array(), 
+                               10, get_nice_color(), -1)
+        text_size = cv2.getTextSize(self.value, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)[0]
+        text_x = self._position.x + (self._size.w - text_size[0])//2
+        text_y = self._position.y + (self._size.h + text_size[1])//2
+        cv2.putText(overlay, self.value, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, 1, get_font_color_bgra(), 2)

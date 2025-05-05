@@ -66,7 +66,7 @@ class Standard(FixedAspectPage):
         # Draw the text inside the textbox with dynamic text size
         text_size = cv2.getTextSize(self.keyboard.text, cv2.FONT_HERSHEY_SIMPLEX, scale_factor, 2)[0]
         text_x = self._position.x + scaled_padding + (len(KEYS[0]) * (scaled_key_size + scaled_key_padding) - scaled_key_padding - text_size[0]) // 2
-        text_y = self._position.y + (textbox_height - text_size[1]) // 2
+        text_y = self._position.y + (textbox_height + text_size[1]) // 2
         cv2.putText(image_overlay, self.keyboard.text, 
                     (text_x, text_y), 
                     cv2.FONT_HERSHEY_SIMPLEX, 

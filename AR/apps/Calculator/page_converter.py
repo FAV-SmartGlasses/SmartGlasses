@@ -51,7 +51,7 @@ class Converter(FixedAspectPage):
         self.quantity_dropdown = Dropdown(Position(50, 50), Size(200, 40), self.quantities_options, None)
         self.unit_from_dropdown = Dropdown(Position(50, 200), Size(200, 40), [], None)
         self.unit_to_dropdown = Dropdown(Position(50, 400), Size(200, 40), [], None)
-        self.numberbox_in = NumberBox(Position(50, 200), Size(200, 40))
+        self.numberbox_in = NumberBox(Position(200, 200), Size(200, 40))
         self.numberbox_out = NumberBox(Position(50, 250), Size(200, 40))
         
     def compute_aspect_ratio(self):
@@ -67,12 +67,12 @@ class Converter(FixedAspectPage):
         scaled_padding = int(PADDING * scale_factor)  # Scale padding between keys
         scaled_key_padding = int(scaled_padding // 2)
 
-        draw_rounded_rectangle(overlay,
+        """draw_rounded_rectangle(overlay,
                            (self._position.x, self._position.y),
                            (self._position.x + self._size.w, self._position.y + self._size.h),
                            30,
                            get_nice_color(),
-                           -1)
+                           -1)"""
 
         self.convert_json()
 
@@ -89,10 +89,6 @@ class Converter(FixedAspectPage):
         
         self.unit_from_dropdown.draw(overlay, gestures)
         self.unit_to_dropdown.draw(overlay, gestures)
-
-        self.numberbox_in.draw(overlay, gestures)
-
-        #self.numberbox_out.draw(overlay, gestures)
         
         # Draw the keyboard with dynamically scaled keys
         self.keyboard.draw(overlay, 
@@ -102,6 +98,11 @@ class Converter(FixedAspectPage):
                            get_neutral_color2_bgra(), get_nice_color_bgra(), get_nice_color_bgra(), 
                            scaled_key_size,
                            scaled_key_padding)
+
+        self.numberbox_in.value = self.keyboard.text
+        self.numberbox_in.draw(overlay, gestures)
+
+        #self.numberbox_out.draw(overlay, gestures)
 
         return overlay
 
