@@ -35,19 +35,19 @@ class Calculator(FixedAspectApp):
         
         if self.opened:
             h, w, _ = image.shape
-            page_w = w - 50
+            page_w = int(w//3)
             #self._size.w = page_w
             #self.aspect_ratio = self.pages[self.current_page].aspect_ratio
             #self._size.h = int(self._size.w / self.aspect_ratio)
             overlay = image.copy()
-            """draw_rounded_rectangle(overlay,
-                                self._position.get_array(),
-                                (self._position.x + self._size.w, self._position.y + self._size.h),
-                                30, 
-                                get_nice_color_bgra(),  # Use BGRA color
-                                -1)"""
 
             self.pages[self.current_page].set_width(page_w)
+            draw_rounded_rectangle(overlay,
+                                self._position.get_array(),
+                                (self._position.x + self.pages[self.current_page]._size.w, self._position.y + self.pages[self.current_page]._size.h),
+                                30, 
+                                get_nice_color_bgra(),  # Use BGRA color
+                                -1)
             self.pages[self.current_page].draw(overlay, gestures)
             
             self.dropdown.draw(overlay, gestures)
