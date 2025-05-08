@@ -61,8 +61,32 @@ class Converter(FixedAspectPage):
     def draw(self, overlay: np.ndarray, gestures: DetectionModel):
         cv2.setUseOptimized(True)
         
+        # Výběr veličiny (Dropdownbox)
+        quantity_selection_position_percent = Position(5, 5)
+        quantity_selection_size_percent = Size(90, 10)
+
+        # Výběr vstupní jednotky (Dropdownbox)
+        input_unit_selection_position_percent = Position(5, 20)
+        input_unit_selection_size_percent = Size(40, 10)
+
+        # Vstupní číslo (Numberbox)
+        input_number_position_percent = Position(5, 35)
+        input_number_size_percent = Size(40, 15)
+
+        # Výběr výstupní jednotky (Dropdownbox)
+        output_unit_selection_position_percent = Position(55, 20)
+        output_unit_selection_size_percent = Size(40, 10)
+
+        # Výstupní číslo (Numberbox)
+        output_number_position_percent = Position(55, 35)
+        output_number_size_percent = Size(40, 15)
+
+        # Keyboard
+        keyboard_position_percent = Position(5, 50)
+        keyboard_size_percent = Size(45, 90)
+
         # Dynamic scaling factor based on screen dimensions
-        scale_factor = min(*self._size.get_array()) / 800  # Base size is 800px (could be adjusted)
+        scale_factor = min(*self._size.get_array()) / (800 / 3)  # Base size is 800px (could be adjusted)
         scaled_key_size = int(KEY_SIZE * scale_factor)  # Scale the key size
         scaled_padding = int(PADDING * scale_factor)  # Scale padding between keys
         scaled_key_padding = int(scaled_padding // 2)
@@ -93,11 +117,13 @@ class Converter(FixedAspectPage):
         # Draw the keyboard with dynamically scaled keys
         self.keyboard.draw(overlay, 
                            self._position.x + scaled_padding + 100, 
-                           self._position.y + 100, gestures,
+                           self._position.y + 100, 
+                           gestures,
                            get_neutral_color_bgra(), get_neutral_color2_bgra(), get_font_color_bgra(), 
                            get_neutral_color2_bgra(), get_nice_color_bgra(), get_nice_color_bgra(), 
                            scaled_key_size,
-                           scaled_key_padding)
+                           scaled_key_padding,
+                           False)
 
         self.numberbox_in.value = self.keyboard.text
         self.numberbox_in.draw(overlay, gestures)
