@@ -7,8 +7,7 @@ import cv2
 
 from gui.elements.dropdown import Dropdown
 from gui.elements.number_box import NumberBox
-from gui.elements.button import Button
-from apps.page_base import FixedAspectPage
+from apps.app_base import FixedAspectApp, FreeResizeApp
 from gui.color_manager import *
 from gui.draw import *
 from other_utilities import *
@@ -32,19 +31,19 @@ KEYES2 = [
             ["5", "6", "7", "8", "9"]
         ]
 
-class Converter(FixedAspectPage):
-    _file_path = Path(__file__).parent / "page_converter_data.json"  #  path to json file
+class UnitConverter(FixedAspectApp):
+    _file_path = Path(__file__).parent / "unit_converter_data.json"  #  path to json file
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, name: str, display_name: str, icon_path: str):
+        super().__init__(name, display_name, icon_path)
 
         self.keyboard = ConverterKeyboard(KEYS)
         self.keyboard.set_colors(get_neutral_color_bgra(), get_neutral_color2_bgra(), get_font_color_bgra(), 
                                 get_neutral_color2_bgra(), get_nice_color_bgra(), get_nice_color_bgra())
 
-        self.aspect_ratio = self.compute_aspect_ratio()
+        """self.aspect_ratio = self.compute_aspect_ratio()
 
-        self._size = Size(800, int(800 / self.aspect_ratio))
+        self._size = Size(800, int(800 / self.aspect_ratio))"""
         self._position = Position(0, 0)
 
         self.quantities_data_list = []  # list of UnitData objects
@@ -107,51 +106,57 @@ class Converter(FixedAspectPage):
 
         self.keyboard.set_position_and_size(keyboard_position, scaled_key_size, scaled_key_padding)
         
-    def compute_aspect_ratio(self):
+    """def compute_aspect_ratio(self):
         #TODO: compute_aspect_ratio in converter_page
-        return 1
+        return 1"""
 
-    def draw(self, overlay: np.ndarray, gestures: DetectionModel):
+    def draw(self, image: np.ndarray, gestures: DetectionModel):
         cv2.setUseOptimized(True)
 
-        """draw_rounded_rectangle(overlay,
-                           (self._position.x, self._position.y),
-                           (self._position.x + self._size.w, self._position.y + self._size.h),
-                           30,
-                           get_nice_color(),
-                           -1)"""
-        
-        self.set_sizes()
+        if self.opened:
+            overlay = image.copy()
 
-        self.convert_json()
+            draw_rounded_rectangle(overlay,
+                                    self._position.get_array(),
+                                    get_right_bottom_pos(self._position, self._size).get_array(),
+                                    30,
+                                    get_nice_color(),
+                                    -1)
+            
+            self.set_sizes()
 
-        self.quantity_dropdown.draw(overlay, gestures)
+            self.convert_json()
 
-        if self.quantity_dropdown.selected_option_index is not None:
-            selected_quantity = self.quantity_dropdown.options[self.quantity_dropdown.selected_option_index]
+            if self.quantity_dropdown.selected_option_index is not None:
+                selected_quantity = self.quantity_dropdown.options[self.quantity_dropdown.selected_option_index]
 
-            for quantity in self.quantities_data_list:
-                if quantity.name == selected_quantity:
-                    self.current_units_options = [quantity.basic] + [name for name, _ in quantity.other]
-                    self.unit_from_dropdown.options = self.current_units_options
-                    self.unit_to_dropdown.options = self.current_units_options
+                for quantity in self.quantities_data_list:
+                    if quantity.name == selected_quantity:
+                        self.current_units_options = [quantity.basic] + [name for name, _ in quantity.other]
+                        self.unit_from_dropdown.options = self.current_units_options
+                        self.unit_to_dropdown.options = self.current_units_options
 
-        if (self.quantity_dropdown.selected_option_index is not None and 
-            self.unit_from_dropdown.selected_option_index is not None and
-            self.unit_to_dropdown.selected_option_index is not None):
-            self.set_output_value()
-        
-        self.unit_from_dropdown.draw(overlay, gestures)
-        self.unit_to_dropdown.draw(overlay, gestures)
-        
-        # Draw the keyboard with dynamically scaled keys
-        self.keyboard.draw(overlay, gestures, False)
+            if (self.quantity_dropdown.selected_option_index is not None and 
+                self.unit_from_dropdown.selected_option_index is not None and
+                self.unit_to_dropdown.selected_option_index is not None):
+                self.set_output_value()
+            
+            
+            self.quantity_dropdown.draw(overlay, gestures)
+            
+            self.unit_from_dropdown.draw(overlay, gestures)
+            self.unit_to_dropdown.draw(overlay, gestures)
+            
+            # Draw the keyboard with dynamically scaled keys
+            self.keyboard.draw(overlay, gestures, False)
 
-        self.numberbox_in.value = self.keyboard.text
-        self.numberbox_in.draw(overlay, gestures)
-        self.numberbox_out.draw(overlay, gestures)
+            self.numberbox_in.value = self.keyboard.text
+            self.numberbox_in.draw(overlay, gestures)
+            self.numberbox_out.draw(overlay, gestures)
 
-        return overlay
+            # Kombinace původního obrázku a překryvného obrázku s průhledností
+            alpha = get_app_transparency()
+            cv2.addWeighted(overlay, alpha, image, 1 - alpha, 0, image)
 
     def set_output_value(self):
         if self.quantities_data_list is not None:
@@ -159,11 +164,11 @@ class Converter(FixedAspectPage):
             to_unit = self.unit_to_dropdown.options[self.unit_to_dropdown.selected_option_index]
             guantity = self.quantity_dropdown.options[self.quantity_dropdown.selected_option_index]
             in_number = self.numberbox_in.value
-            out_number = self.ConvertNumber(in_number, guantity, from_unit, to_unit)
+            out_number = self.convert_number(in_number, guantity, from_unit, to_unit)
             
             self.numberbox_out.value = out_number
 
-    def ConvertNumber(self, number: Union[int, float, str], quantity: str, unit_from: str, unit_to: str) -> float:
+    def convert_number(self, number: Union[int, float, str], quantity: str, unit_from: str, unit_to: str) -> float:
         self.convert_json()  # Load the conversion data from JSON
 
         try:

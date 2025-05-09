@@ -2,7 +2,8 @@ import math
 
 import numpy as np
 
-from apps.Calculator.calculator import Calculator
+from apps.Calculator.page_converter import UnitConverter
+from apps.Calculator.page_standard_calculator import Calculator
 from apps.messaging import MessagingApp
 from apps.settings import *
 from gui.draw import *
@@ -16,16 +17,12 @@ from hand_detection_models import *
 class Menu:
     items = [
         App("Home", "Home", "Home.png"),
-        #App("Settings", "Settings", "Settings.png"),
         Settings("Settings", "Settings", "Settings.png"),
         App("ToDo", "To DO", "Done.png"),
-        #App("Calculator", "Calculator", "Plus.png"),
         Calculator("Calculator", "Calculator", "Plus.png"),
+        UnitConverter("UnitConverter", "Unit Converter", "Refresh.png"),
         MessagingApp("MessagingApp", "Discord", "Discord.png"),
-        #App("Browser", "Browser", "Search.png"),
-        #App("Music", "Music", "Music.png"),
         App("Notes", "Notes", "Edit.png"),
-        LockMenu(("Lock.png", "Padlock.png")),
         CloseMenu("Close.png")
     ]
 
