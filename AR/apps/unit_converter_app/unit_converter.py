@@ -12,7 +12,8 @@ from gui.color_manager import *
 from gui.draw import *
 from other_utilities import *
 from hand_detection_models import *
-from apps.unit_converter_keyboard import ConverterKeyboard
+from apps.unit_converter_app.unit_converter_keyboard import *
+from apps.unit_converter_app.unit_converter_manager import UnitConverterManager, UnitData
 
 
 class UnitConverter(FixedAspectApp):
@@ -29,7 +30,8 @@ class UnitConverter(FixedAspectApp):
         self._position = Position(0, 0)
 
         self.quantities_data_list = []  # list of UnitData objects
-        self.convert_json()  # Load the conversion data from JSON   
+        self.manager = UnitConverterManager()
+        self.manager.convert_json()  # Load the conversion data from JSON   
         self.quantities_options = [unit_data.name for unit_data in self.quantities_data_list] 
         self.current_units_options = []  # list of current unit options for the dropdown menus
 
@@ -75,8 +77,8 @@ class UnitConverter(FixedAspectApp):
         key_padding_ratio_by_key_size = 0.2  # Ratio of padding to key size
         
         # Počet řádků a sloupců klávesnice
-        num_rows = len(self.keyboard.KEYS)
-        num_cols = max(len(row) for row in self.keyboard.KEYS)
+        num_rows = len(KEYS)
+        num_cols = max(len(row) for row in KEYS)
 
         # Výpočet velikosti klávesy na základě šířky a výšky klávesnice
         scaled_key_size_w = keyboard_size.w / (num_cols + (num_cols - 1) * key_padding_ratio_by_key_size)
@@ -107,7 +109,7 @@ class UnitConverter(FixedAspectApp):
             
             self.set_sizes()
 
-            self.convert_json()
+            self.manager.convert_json()
 
             if self.quantity_dropdown.selected_option_index is not None:
                 selected_quantity = self.quantity_dropdown.options[self.quantity_dropdown.selected_option_index]

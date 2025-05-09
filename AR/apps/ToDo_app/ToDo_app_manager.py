@@ -12,7 +12,7 @@ class ToDoManager:
     def __init__(self):
         self.tasks: List[Task] = []
         self._file_path = Path(__file__).parent / "ToDo_app_data.json"
-        self.load_tasks()
+        #self.load_tasks()
 
     def add_task(self, task: Task):
         self.tasks.append(task)

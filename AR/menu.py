@@ -2,8 +2,8 @@ import math
 
 import numpy as np
 
-from apps.unit_converter import UnitConverter
-from apps.ToDo_app import ToDoApp
+from apps.unit_converter_app.unit_converter import UnitConverter
+from apps.ToDo_app.ToDo_app import ToDoApp
 from apps.calculator import Calculator
 from apps.messaging import MessagingApp
 from apps.settings import *

@@ -6,8 +6,10 @@ import numpy as np
 import cv2
 
 class UnitConverterManager:
+    _file_path = Path(__file__).parent / "unit_converter_data.json"  #  path to json file
+    
     def __init__(self):
-        _file_path = Path(__file__).parent / "unit_converter_data.json"  #  path to json file
+        pass
         
     def convert_json(self):
         if self._file_path.exists():
