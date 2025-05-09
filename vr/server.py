@@ -30,7 +30,7 @@ try:
                 while True:
                     quat = sensor.quaternion
                     if quat is not None:
-                        quat = [quat[1], quat[0], quat[2], quat[3]]  # Reorder if needed
+                        quat = [quat[1], quat[0], quat[2], -quat[3]]  # Reorder if needed
                         packet = array.array('f', quat).tobytes()
                         client_socket.sendall(packet)
 
