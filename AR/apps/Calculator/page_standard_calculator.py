@@ -16,15 +16,13 @@ KEYS = [
     ["0", ".", "X", "="]
 ]
 
-"""PADDING_RATIO = 0.025  # Padding as a percentage of the smaller dimension
-KEY_SIZE_RATIO = 0.1  # Key size as a percentage of the smaller dimension
-TEXTBOX_HEIGHT_RATIO = 0.1  # Textbox height as a percentage of the height"""
-
 class Standard(FixedAspectPage):
     def __init__(self):
         super().__init__()
 
         self.keyboard = CalculatorKeyboard(KEYS)
+        self.keyboard.set_colors(get_neutral_color_bgra(), get_neutral_color2_bgra(), get_font_color_bgra(), 
+                                get_neutral_color2_bgra(), get_nice_color_bgra(), get_nice_color_bgra())
 
         self.aspect_ratio = self.compute_aspect_ratio()
 
@@ -44,19 +42,11 @@ class Standard(FixedAspectPage):
         total_width = cols * sample_key_size + (cols - 1) * sample_key_padding + 2 * sample_padding
         total_height = rows * sample_key_size + (rows - 1) * sample_key_padding + sample_textbox_height + 2 * sample_padding
 
-        """ratio = self._size.w / total_width
-
-        padding = sample_padding * ratio
-        key_size = sample_key_size * ratio
-        key_padding = sample_key_padding * ratio
-        textbox_height = sample_textbox_height * ratio"""
-
         return total_width / total_height
 
     def draw(self, image_overlay: np.ndarray, gesture: DetectionModel):
         """Draw the calculator UI dynamically based on the current size"""
         cv2.setUseOptimized(True)
-
 
         cols = len(KEYS[0])
         rows = len(KEYS)
@@ -74,18 +64,8 @@ class Standard(FixedAspectPage):
         scaled_key_padding = int(sample_key_padding * ratio)
         textbox_height = int(sample_textbox_height * ratio)
 
-
-        # Get the current size of the page
-        smaller_dimension = min(*self._size.get_array())
-
-        # Dynamically calculate sizes
-        """scaled_padding = int(PADDING_RATIO * smaller_dimension)
-        scaled_key_size = int(KEY_SIZE_RATIO * smaller_dimension)
-        scaled_key_padding = scaled_padding // 2
-        textbox_height = int(TEXTBOX_HEIGHT_RATIO * self._size.h)"""
-
         # Draw the textbox background
-        textbox_width = self._size.w #len(KEYS[0]) * (scaled_key_size + scaled_key_padding) - scaled_key_padding + 2 * scaled_padding
+        textbox_width = self._size.w
         """draw_rounded_rectangle(
             image_overlay,
             self._position.get_array(),
@@ -110,21 +90,12 @@ class Standard(FixedAspectPage):
             2
         )
 
-        # Draw the keyboard
-        self.keyboard.draw(
-            image_overlay,
-            self._position.x + scaled_padding,
-            self._position.y + textbox_height + scaled_padding,
-            gesture,
-            get_neutral_color_bgra(),
-            get_neutral_color2_bgra(),
-            get_font_color_bgra(),
-            get_neutral_color2_bgra(),
-            get_nice_color_bgra(),
-            get_nice_color_bgra(),
-            scaled_key_size,
-            scaled_key_padding
-        )
+        self.keyboard.set_position_and_size(
+                            Position(self._position.x + scaled_padding, self._position.y + textbox_height + scaled_padding),
+                            scaled_key_size,
+                            scaled_key_padding)
+        
+        self.keyboard.draw(image_overlay, gesture)
 
 class CalculatorKeyboard(Keyboard):
     def __init__(self, layout: list[list[str]]):

@@ -7,9 +7,10 @@ class Keyboard:
         self.text = text
         self.click_history = []
         self.keys: list[list[str]] = layout
-        self.key_size: int  # Velikost jedné klávesy (čtverec)
-        self.padding: int  # Mezera mezi klávesami
+        self.key_size: int
+        self.key_padding: int
         self.detected_key = None
+        self.position: Position = None
 
     def process_detected_key(self, detected_key):
         raise NotImplemented()
@@ -17,33 +18,19 @@ class Keyboard:
     def set_position_and_size(self, position: Position, key_size: int, padding: int):
         self.position = position
         self.key_size = key_size
-        self.padding = padding
+        self.key_padding = padding
 
-    
+    def set_colors(self, color, border_color, font_color, hover_color, hover_border_color, hover_font_color):
+        self.color = color
+        self.border_color = border_color
+        self.font_color = font_color
+        self.hover_color = hover_color
+        self.hover_border_color = hover_border_color
+        self.hover_font_color = hover_font_color
 
-    def draw(self, 
-             image: np.ndarray, 
-             start_x: int, start_y: int, 
-             gesture: DetectionModel, 
-             color, border_color, font_color, 
-             hover_color, hover_border_color, hover_font_color,
-             key_size, padding,
-             draw_blank_keys: bool = True):
-        
-        if start_x is None or start_y is None:
-            (start_x, start_y) = self.position.get_array()
-
-        if key_size is None :
-            key_size = self.key_size
-        
-        if padding is None:
-            padding = self.padding
-        
-        self.key_size = int(key_size)
-        self.padding = int(padding)
-
-        left_detected_key = self.detect_key_press(gesture.left_hand.cursor, start_x, start_y, draw_blank_keys)
-        right_detected_key = self.detect_key_press(gesture.right_hand.cursor, start_x, start_y, draw_blank_keys)
+    def draw(self, image: np.ndarray, gesture: DetectionModel, draw_blank_keys: bool = True):
+        left_detected_key = self.detect_key_press(gesture.left_hand.cursor, draw_blank_keys)
+        right_detected_key = self.detect_key_press(gesture.right_hand.cursor, draw_blank_keys)
 
         if gesture.left_hand.clicked or gesture.right_hand.clicked:
             detected_key = left_detected_key if gesture.left_hand.clicked else right_detected_key
@@ -69,14 +56,14 @@ class Keyboard:
                     if not draw_blank_keys:
                         continue
 
-                x1 = start_x + col_idx * (self.key_size + self.padding)
-                y1 = start_y + row_idx * (self.key_size + self.padding)
+                x1 = self.position.x + col_idx * (self.key_size + self.key_padding)
+                y1 = self.position.y + row_idx * (self.key_size + self.key_padding)
                 x2 = x1 + self.key_size
                 y2 = y1 + self.key_size
 
-                new_color = hover_color if right_detected_key == key or left_detected_key == key else color
-                new_border_color = hover_border_color if right_detected_key == key or left_detected_key == key else border_color
-                new_font_color = hover_font_color if right_detected_key == key or left_detected_key == key else font_color
+                new_color = self.hover_color if right_detected_key == key or left_detected_key == key else self.color
+                new_border_color = self.hover_border_color if right_detected_key == key or left_detected_key == key else self.border_color
+                new_font_color = self.hover_font_color if right_detected_key == key or left_detected_key == key else self.font_color
 
                 draw_rounded_rectangle(overlay,
                                         (x1, y1), 
@@ -102,21 +89,19 @@ class Keyboard:
         alpha = 0.5  # Nastavení průhlednosti (0.0 = zcela průhledné, 1.0 = zcela neprůhledné)
         cv2.addWeighted(overlay, alpha, image, 1 - alpha, 0, image)
 
-    def detect_key_press(self, cursor: Position, start_x: int, start_y: int, draw_blank_keys: bool):
-        x, y = cursor.get_array()
-
-        if x is None or y is None:
+    def detect_key_press(self, cursor: Position, draw_blank_keys: bool):
+        if cursor.x is None or cursor.y is None:
             return None
 
         # Procházení kláves a kontrola, zda kliknutí spadá do jejich oblasti
         for row_idx, row in enumerate(self.keys):
             for col_idx, key in enumerate(row):
-                x1 = start_x + col_idx * (self.key_size + self.padding)
-                y1 = start_y + row_idx * (self.key_size + self.padding)
+                x1 = self.position.x + col_idx * (self.key_size + self.key_padding)
+                y1 = self.position.y + row_idx * (self.key_size + self.key_padding)
                 x2 = x1 + self.key_size
                 y2 = y1 + self.key_size
 
-                if x1 <= x <= x2 and y1 <= y <= y2:
+                if x1 <= cursor.x <= x2 and y1 <= cursor.y <= y2:
                     if not draw_blank_keys and (key == "" or key == " "):
                         return None
                     return key  # Vrátí stisknutou klávesu
