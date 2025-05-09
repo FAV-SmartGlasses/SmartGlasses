@@ -1,7 +1,7 @@
 import json
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Tuple, Union
 import numpy as np
 import cv2
 
@@ -11,7 +11,7 @@ from gui.elements.button import Button
 from apps.page_base import FixedAspectPage
 from gui.color_manager import *
 from gui.draw import *
-from other_utilities import Position, Size
+from other_utilities import *
 from hand_detection_models import *
 from gui.keyboard import Keyboard
 
@@ -26,9 +26,11 @@ KEYS = [
             [" ", "0", "."]
         ]
 
-PADDING = 20
-KEY_PADDING = PADDING/2
-KEY_SIZE = 50
+KEYES2 = [
+            [" ", "C", "X", ".", ""],
+            ["0", "1", "2", "3", "4"],
+            ["5", "6", "7", "8", "9"]
+        ]
 
 class Converter(FixedAspectPage):
     _file_path = Path(__file__).parent / "page_converter_data.json"  #  path to json file
@@ -53,6 +55,62 @@ class Converter(FixedAspectPage):
         self.unit_to_dropdown = Dropdown(Position(50, 400), Size(200, 40), [], None)
         self.numberbox_in = NumberBox(Position(200, 200), Size(200, 40))
         self.numberbox_out = NumberBox(Position(50, 250), Size(200, 40))
+
+    def set_sizes(self):        
+        # Výběr veličiny (Dropdownbox)
+        quantity_selection_position_percent = Position(5, 5)
+        quantity_selection_size_percent = Size(40, 10)
+
+        # Výběr vstupní jednotky (Dropdownbox)
+        input_unit_selection_position_percent = Position(5, 20)
+        input_unit_selection_size_percent = Size(30, 10)
+
+        # Vstupní číslo (Numberbox)
+        input_number_position_percent = Position(5, 35)
+        input_number_size_percent = Size(30, 15)
+
+        # Výběr výstupní jednotky (Dropdownbox)
+        output_unit_selection_position_percent = Position(5, 55)
+        output_unit_selection_size_percent = Size(30, 10)
+
+        # Výstupní číslo (Numberbox)
+        output_number_position_percent = Position(5, 70)
+        output_number_size_percent = Size(30, 15)
+
+        # Keyboard
+        keyboard_position_percent = Position(50, 5)
+        keyboard_size_percent = Size(40, 90)
+
+        self.quantity_dropdown.set_position_and_size(*set_size_and_position_by_ratio(self._position, self._size, quantity_selection_position_percent, quantity_selection_size_percent))
+        self.unit_from_dropdown.set_position_and_size(*set_size_and_position_by_ratio(self._position, self._size, input_unit_selection_position_percent, input_unit_selection_size_percent))
+        self.unit_to_dropdown.set_position_and_size(*set_size_and_position_by_ratio(self._position, self._size, output_unit_selection_position_percent, output_unit_selection_size_percent))
+        self.numberbox_in.set_position_and_size(*set_size_and_position_by_ratio(self._position, self._size, input_number_position_percent, input_number_size_percent))
+        self.numberbox_out.set_position_and_size(*set_size_and_position_by_ratio(self._position, self._size, output_number_position_percent, output_number_size_percent))
+
+        (keyboard_position, keyboard_size) = set_size_and_position_by_ratio(self._position, self._size, keyboard_position_percent, keyboard_size_percent)
+        
+        key_padding_ratio_by_key_size = 0.2  # Ratio of padding to key size
+        
+        # Počet řádků a sloupců klávesnice
+        num_rows = len(KEYS)
+        num_cols = max(len(row) for row in KEYS)
+
+        # Výpočet velikosti klávesy na základě šířky a výšky klávesnice
+        scaled_key_size_w = keyboard_size.w / (num_cols + (num_cols - 1) * key_padding_ratio_by_key_size)
+        scaled_key_size_h = keyboard_size.h / (num_rows + (num_rows - 1) * key_padding_ratio_by_key_size)
+        scaled_key_size = int(min(scaled_key_size_w, scaled_key_size_h))  # Použijeme menší rozměr pro čtvercové klávesy
+
+        # Výpočet paddingu na základě velikosti klávesy
+        scaled_key_padding = int(scaled_key_size * key_padding_ratio_by_key_size)
+
+        self.keyboard.set_position_and_size(keyboard_position, scaled_key_size, scaled_key_padding)
+
+        """(keyboard_position, keyboard_size) = set_size_and_position_by_ratio(self._position, self._size, keyboard_position_percent, keyboard_size_percent)
+        key_padding_ratio_by_key_size = 0.2  # Ratio of padding to key size
+        scaled_key_size = int(keyboard_size.h / (len(KEYS[0]) * (1 + key_padding_ratio_by_key_size) - key_padding_ratio_by_key_size))  # Scale the key size
+        scaled_key_padding = int(scaled_key_size * key_padding_ratio_by_key_size)  # Scale padding between keys
+
+        self.keyboard.set_position_and_size(keyboard_position, scaled_key_size, scaled_key_padding)"""
         
     def compute_aspect_ratio(self):
         #TODO: compute_aspect_ratio in converter_page
@@ -60,36 +118,11 @@ class Converter(FixedAspectPage):
 
     def draw(self, overlay: np.ndarray, gestures: DetectionModel):
         cv2.setUseOptimized(True)
-        
-        # Výběr veličiny (Dropdownbox)
-        quantity_selection_position_percent = Position(5, 5)
-        quantity_selection_size_percent = Size(90, 10)
-
-        # Výběr vstupní jednotky (Dropdownbox)
-        input_unit_selection_position_percent = Position(5, 20)
-        input_unit_selection_size_percent = Size(40, 10)
-
-        # Vstupní číslo (Numberbox)
-        input_number_position_percent = Position(5, 35)
-        input_number_size_percent = Size(40, 15)
-
-        # Výběr výstupní jednotky (Dropdownbox)
-        output_unit_selection_position_percent = Position(55, 20)
-        output_unit_selection_size_percent = Size(40, 10)
-
-        # Výstupní číslo (Numberbox)
-        output_number_position_percent = Position(55, 35)
-        output_number_size_percent = Size(40, 15)
-
-        # Keyboard
-        keyboard_position_percent = Position(5, 50)
-        keyboard_size_percent = Size(45, 90)
 
         # Dynamic scaling factor based on screen dimensions
-        scale_factor = min(*self._size.get_array()) / (800 / 3)  # Base size is 800px (could be adjusted)
-        scaled_key_size = int(KEY_SIZE * scale_factor)  # Scale the key size
+        """scaled_key_size = int(KEY_SIZE * scale_factor)  # Scale the key size
         scaled_padding = int(PADDING * scale_factor)  # Scale padding between keys
-        scaled_key_padding = int(scaled_padding // 2)
+        scaled_key_padding = int(scaled_padding // 2)"""
 
         """draw_rounded_rectangle(overlay,
                            (self._position.x, self._position.y),
@@ -97,12 +130,14 @@ class Converter(FixedAspectPage):
                            30,
                            get_nice_color(),
                            -1)"""
+        
+        self.set_sizes()
 
         self.convert_json()
 
         self.quantity_dropdown.draw(overlay, gestures)
 
-        if(self.quantity_dropdown.selected_option_index is not None):
+        if self.quantity_dropdown.selected_option_index is not None:
             selected_quantity = self.quantity_dropdown.options[self.quantity_dropdown.selected_option_index]
 
             for quantity in self.quantities_data_list:
@@ -110,29 +145,35 @@ class Converter(FixedAspectPage):
                     self.current_units_options = [quantity.basic] + [name for name, _ in quantity.other]
                     self.unit_from_dropdown.options = self.current_units_options
                     self.unit_to_dropdown.options = self.current_units_options
+
+        if (self.quantity_dropdown.selected_option_index is not None and 
+            self.unit_from_dropdown.selected_option_index is not None and
+            self.unit_to_dropdown.selected_option_index is not None):
+            self.set_output_value()
         
         self.unit_from_dropdown.draw(overlay, gestures)
         self.unit_to_dropdown.draw(overlay, gestures)
         
         # Draw the keyboard with dynamically scaled keys
         self.keyboard.draw(overlay, 
-                           self._position.x + scaled_padding + 100, 
-                           self._position.y + 100, 
+                           #self._position.x + scaled_padding + 100, 
+                           #self._position.y + 100, 
+                           None, None,
                            gestures,
                            get_neutral_color_bgra(), get_neutral_color2_bgra(), get_font_color_bgra(), 
                            get_neutral_color2_bgra(), get_nice_color_bgra(), get_nice_color_bgra(), 
-                           scaled_key_size,
-                           scaled_key_padding,
+                           None, None,
+                           #scaled_key_size,
+                           #scaled_key_padding,
                            False)
 
         self.numberbox_in.value = self.keyboard.text
         self.numberbox_in.draw(overlay, gestures)
-
-        #self.numberbox_out.draw(overlay, gestures)
+        self.numberbox_out.draw(overlay, gestures)
 
         return overlay
 
-    def btn_click(self):
+    def set_output_value(self):
         if self.quantities_data_list is not None:
             from_unit = self.unit_from_dropdown.options[self.unit_from_dropdown.selected_option_index]
             to_unit = self.unit_to_dropdown.options[self.unit_to_dropdown.selected_option_index]
@@ -142,8 +183,14 @@ class Converter(FixedAspectPage):
             
             self.numberbox_out.value = out_number
 
-    def ConvertNumber(self, number: float, quantity: str, unit_from: str, unit_to: str) -> float:
+    def ConvertNumber(self, number: Union[int, float, str], quantity: str, unit_from: str, unit_to: str) -> float:
         self.convert_json()  # Load the conversion data from JSON
+
+        try:
+            number = float(number)  # Převod na float
+        except ValueError:
+            print(f"Error: Cannot convert input '{number}' to a number.")
+            return None
 
         for unit_data in self.quantities_data_list:
             if unit_data.name == quantity:

@@ -3,16 +3,23 @@ from hand_detection_models import *
 
 
 class Keyboard:
-    def __init__(self, layout : list[list[str]], key_size = 50, padding = 10, text = ""):
+    def __init__(self, layout : list[list[str]], text = ""):
         self.text = text
         self.click_history = []
-        self.keys = layout
-        self.key_size = key_size  # Velikost jedné klávesy (čtverec)
-        self.padding = padding  # Mezera mezi klávesami
+        self.keys: list[list[str]] = layout
+        self.key_size: int  # Velikost jedné klávesy (čtverec)
+        self.padding: int  # Mezera mezi klávesami
         self.detected_key = None
 
     def process_detected_key(self, detected_key):
         raise NotImplemented()
+    
+    def set_position_and_size(self, position: Position, key_size: int, padding: int):
+        self.position = position
+        self.key_size = key_size
+        self.padding = padding
+
+    
 
     def draw(self, 
              image: np.ndarray, 
@@ -22,6 +29,15 @@ class Keyboard:
              hover_color, hover_border_color, hover_font_color,
              key_size, padding,
              draw_blank_keys: bool = True):
+        
+        if start_x is None or start_y is None:
+            (start_x, start_y) = self.position.get_array()
+
+        if key_size is None :
+            key_size = self.key_size
+        
+        if padding is None:
+            padding = self.padding
         
         self.key_size = int(key_size)
         self.padding = int(padding)
@@ -52,7 +68,7 @@ class Keyboard:
                 if key == "" or key == " ":
                     if not draw_blank_keys:
                         continue
-                    
+
                 x1 = start_x + col_idx * (self.key_size + self.padding)
                 y1 = start_y + row_idx * (self.key_size + self.padding)
                 x2 = x1 + self.key_size

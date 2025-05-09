@@ -9,6 +9,10 @@ class Element(ABC):
         self._position = position
         self._size = size
 
+    def set_position_and_size(self, position: Position, size: Size):
+        self._position = position
+        self._size = size
+
     @abstractmethod
     def draw(self, image: np.ndarray):
         raise NotImplementedError("This method should be overridden in subclasses") 

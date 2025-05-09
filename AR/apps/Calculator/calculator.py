@@ -35,7 +35,7 @@ class Calculator(FixedAspectApp):
         
         if self.opened:
             h, w, _ = image.shape
-            page_w = int(w//3)
+            page_w = int(w // (1 if self.current_page == 1 else 2))
             #self._size.w = page_w
             #self.aspect_ratio = self.pages[self.current_page].aspect_ratio
             #self._size.h = int(self._size.w / self.aspect_ratio)
@@ -46,7 +46,7 @@ class Calculator(FixedAspectApp):
                                 self._position.get_array(),
                                 (self._position.x + self.pages[self.current_page]._size.w, self._position.y + self.pages[self.current_page]._size.h),
                                 30, 
-                                get_nice_color_bgra(),  # Use BGRA color
+                                (0,0,0),  # Use BGRA color
                                 -1)
             self.pages[self.current_page].draw(overlay, gestures)
             

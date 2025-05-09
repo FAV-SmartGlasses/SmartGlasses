@@ -16,9 +16,9 @@ KEYS = [
     ["0", ".", "X", "="]
 ]
 
-PADDING_RATIO = 0.025  # Padding as a percentage of the smaller dimension
+"""PADDING_RATIO = 0.025  # Padding as a percentage of the smaller dimension
 KEY_SIZE_RATIO = 0.1  # Key size as a percentage of the smaller dimension
-TEXTBOX_HEIGHT_RATIO = 0.1  # Textbox height as a percentage of the height
+TEXTBOX_HEIGHT_RATIO = 0.1  # Textbox height as a percentage of the height"""
 
 class Standard(FixedAspectPage):
     def __init__(self):
@@ -37,12 +37,12 @@ class Standard(FixedAspectPage):
         cols = len(KEYS[0])
         rows = len(KEYS)
         sample_key_size = 10  # libovolná jednotka, důležité jsou proporce
-        sample_padding = sample_key_size // 5
+        sample_padding = sample_key_size // 2
         sample_key_padding = sample_padding // 2
         sample_textbox_height = sample_key_size
 
         total_width = cols * sample_key_size + (cols - 1) * sample_key_padding + 2 * sample_padding
-        total_height = rows * sample_key_size + (rows - 1) * sample_key_padding + sample_textbox_height + sample_padding
+        total_height = rows * sample_key_size + (rows - 1) * sample_key_padding + sample_textbox_height + 2 * sample_padding
 
         """ratio = self._size.w / total_width
 
@@ -99,7 +99,7 @@ class Standard(FixedAspectPage):
         # Draw the text inside the textbox
         text_size = cv2.getTextSize(self.keyboard.text, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)[0]
         text_x = self._position.x + (textbox_width - text_size[0]) // 2
-        text_y = self._position.y + (textbox_height + text_size[1]) // 2
+        text_y = self._position.y + (textbox_height + text_size[1] + scaled_padding) // 2
         cv2.putText(
             image_overlay,
             self.keyboard.text,
