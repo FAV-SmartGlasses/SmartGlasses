@@ -3,6 +3,7 @@ import math
 import numpy as np
 
 from apps.unit_converter import UnitConverter
+from apps.ToDo_app import ToDoApp
 from apps.calculator import Calculator
 from apps.messaging import MessagingApp
 from apps.settings import *
@@ -18,7 +19,7 @@ class Menu:
     items = [
         App("Home", "Home", "Home.png"),
         Settings("Settings", "Settings", "Settings.png"),
-        App("ToDo", "To DO", "Done.png"),
+        ToDoApp("ToDo", "To Do", "Done.png"),
         Calculator("Calculator", "Calculator", "Plus.png"),
         UnitConverter("UnitConverter", "Unit Converter", "Refresh.png"),
         MessagingApp("MessagingApp", "Discord", "Discord.png"),

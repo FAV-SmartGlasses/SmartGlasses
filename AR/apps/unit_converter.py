@@ -12,32 +12,14 @@ from gui.color_manager import *
 from gui.draw import *
 from other_utilities import *
 from hand_detection_models import *
-from gui.keyboard import Keyboard
+from apps.unit_converter_keyboard import ConverterKeyboard
 
-
-MAX_LENGTH = 10
-
-KEYS = [
-            [" ", "C", "X"],
-            ["7", "8", "9"],
-            ["4", "5", "6"],
-            ["1", "2", "3"],
-            [" ", "0", "."]
-        ]
-
-KEYES2 = [
-            [" ", "C", "X", ".", ""],
-            ["0", "1", "2", "3", "4"],
-            ["5", "6", "7", "8", "9"]
-        ]
 
 class UnitConverter(FixedAspectApp):
-    _file_path = Path(__file__).parent / "unit_converter_data.json"  #  path to json file
-
     def __init__(self, name: str, display_name: str, icon_path: str):
         super().__init__(name, display_name, icon_path)
 
-        self.keyboard = ConverterKeyboard(KEYS)
+        self.keyboard = ConverterKeyboard()
         self.keyboard.set_colors(get_neutral_color_bgra(), get_neutral_color2_bgra(), get_font_color_bgra(), 
                                 get_neutral_color2_bgra(), get_nice_color_bgra(), get_nice_color_bgra())
 
@@ -93,8 +75,8 @@ class UnitConverter(FixedAspectApp):
         key_padding_ratio_by_key_size = 0.2  # Ratio of padding to key size
         
         # Počet řádků a sloupců klávesnice
-        num_rows = len(KEYS)
-        num_cols = max(len(row) for row in KEYS)
+        num_rows = len(self.keyboard.KEYS)
+        num_cols = max(len(row) for row in self.keyboard.KEYS)
 
         # Výpočet velikosti klávesy na základě šířky a výšky klávesnice
         scaled_key_size_w = keyboard_size.w / (num_cols + (num_cols - 1) * key_padding_ratio_by_key_size)
@@ -202,72 +184,3 @@ class UnitConverter(FixedAspectApp):
                 else:
                     print(f"Error: Unit '{unit_from}' or '{unit_to}' not found in '{quantity}'.")
                     return None
-
-    def convert_json(self):
-        if self._file_path.exists():
-            try:
-                with open(self._file_path, "r") as file:
-                    json_data = json.load(file)
-                    unit_data_list = [
-                        UnitData.from_dict(name, data)
-                        for name, data in json_data.items()
-                    ]
-                    self.quantities_data_list = unit_data_list
-                    self.quantities_options = [unit_data.name for unit_data in unit_data_list]
-                    #print("Loaded data:", unit_data_list)
-            except (json.JSONDecodeError, KeyError, TypeError) as e:
-                print(f"Error loading calculator converter: {e}.")
-                self.quantities_data_list = None
-        else:
-            print(f"File {self._file_path} does not exist.")
-            self.quantities_data_list = None
-
-@dataclass
-class UnitData:
-    name: str  # Name of the quantity (e.g., "length", "value")
-    basic: str  # Basic unit (e.g., "m")
-    other: List[Tuple[str, float]]  # List of other units with conversion factors
-
-    @staticmethod
-    def from_dict(name: str, data: dict) -> 'UnitData':
-        return UnitData(
-            name=name,
-            basic=data["basic"],
-            other=[(item[0], item[1]) for item in data["other"]]
-        )
-
-class ConverterKeyboard(Keyboard):
-    def __init__(self, layout: list[list[str]]):
-        super().__init__(layout)
-        self.equally_clicked = False
-        self.text = ""
-
-    def process_detected_key(self, detected_key):
-        self.equally_clicked = False
-        if detected_key == "X":
-            # Smazání posledního znaku
-            if self.text:
-                self.text = self.text[:-1]
-        if detected_key == "C":
-            # Smazání celého textu
-            self.text = ""
-        elif detected_key in "0123456789":
-            # Přidání čísla
-            if self.text == "0":
-                # Pokud text obsahuje pouze "0", nahradí se novým číslem
-                self.text = detected_key
-            else:
-                self.text += detected_key
-        elif detected_key == ".":
-            # Přidání čárky, pokud poslední znak je číslo a čárka již není v aktuálním čísle
-            if self.text and self.text[-1].isdigit():
-                # Zkontroluje, zda aktuální číslo již obsahuje čárku
-                last_number = self.text.split()[-1]
-                if "." not in last_number:
-                    self.text += detected_key
-            if not self.text:
-                self.text = "0."
-        elif detected_key == "=" and len(self.text) > 0:
-            self.equally_clicked = True
-
-        self.text = self.text[:MAX_LENGTH]
