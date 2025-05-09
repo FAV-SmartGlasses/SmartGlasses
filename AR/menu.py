@@ -2,8 +2,8 @@ import math
 
 import numpy as np
 
-from apps.Calculator.page_converter import UnitConverter
-from apps.Calculator.page_standard_calculator import Calculator
+from apps.unit_converter import UnitConverter
+from apps.calculator import Calculator
 from apps.messaging import MessagingApp
 from apps.settings import *
 from gui.draw import *
