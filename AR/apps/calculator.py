@@ -1,4 +1,5 @@
 import numpy as np
+import math
 
 from apps.app_base import FixedAspectApp
 from gui.draw import *
@@ -9,7 +10,8 @@ from other_utilities import *
 MAX_LENGTH = 10
 
 KEYS = [
-    ["^", "()", "%", "/"],
+    ["<-", "->", "^", "pi"],
+    ["C", "()", "%", "/"],
     ["7", "8", "9", "*"],
     ["4", "5", "6", "-"],
     ["1", "2", "3", "+"],
@@ -89,12 +91,12 @@ class Calculator(FixedAspectApp):
             cv2.addWeighted(overlay, alpha, image, 1 - alpha, 0, image)
 
             # Draw the text inside the textbox
-            text_size = cv2.getTextSize(self.keyboard.text, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)[0]
+            text_size = cv2.getTextSize(self.keyboard._text, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)[0]
             text_x = self._position.x + (textbox_width - text_size[0]) // 2
             text_y = self._position.y + (textbox_height + text_size[1] + scaled_padding) // 2
             cv2.putText(
                 image,
-                self.keyboard.text,
+                self.keyboard.get_text_with_cursor(),
                 (text_x, text_y),
                 cv2.FONT_HERSHEY_SIMPLEX,
                 1,
@@ -106,53 +108,92 @@ class CalculatorKeyboard(Keyboard):
     def __init__(self, layout: list[list[str]]):
         super().__init__(layout)
         self.evaluated = False
-        self.text = ""
+        self._text = "0"
 
     def process_detected_key(self, detected_key):
-        if detected_key == "X":
+        if detected_key == "<-":
+            if self._text and len(self._text) > self.cursor_in_text_position_from_back:
+                self.cursor_in_text_position_from_back += 1
+        elif detected_key == "->":
+            if self._text and self.cursor_in_text_position_from_back > 0:
+                self.cursor_in_text_position_from_back -= 1
+        elif detected_key == "X":
             if self.evaluated:
-                self.text = ""
+                self._text = "0"
                 self.evaluated = False
-            if self.text:
-                self.text = self.text[:-1]
+            if self._text:
+                if len(self._text) > 0 and self.cursor_in_text_position_from_back < len(self._text):
+                    cursor_position = len(self._text) - self.cursor_in_text_position_from_back
+                    self._text = self._text[:cursor_position - 1] + self._text[cursor_position:] # deletes character on the place before cursor
+                    #(cursor position from back stayes the same)
+        elif detected_key == "C":
+            self._text = "0"
+            self.cursor_in_text_position_from_back = 0
         elif detected_key in "0123456789":
             if self.evaluated:
-                self.text = ""
+                self._text = ""
+                self.cursor_in_text_position_from_back = 0
                 self.evaluated = False
-            # Přidání čísla
-            if self.text == "0":
-                self.text = detected_key
+            if self._text == "0" or self._text == "":
+                self._text = detected_key
             else:
-                self.text += detected_key
+                cursor_position = len(self._text) - self.cursor_in_text_position_from_back
+                self._text = self._text[:cursor_position] + detected_key + self._text[cursor_position:]
         elif detected_key in "+-*/%^":
+            cursor_position = len(self._text) - self.cursor_in_text_position_from_back
             # Add an operator if the last character is not an operator
-            if self.text and self.text[-1] not in "+-*/%^":
+            if self._text and self._text[cursor_position - 1] not in "+-*/%^":
                 if self.evaluated:
+                    self.cursor_in_text_position_from_back = 0
                     self.evaluated = False
-                self.text += "**" if detected_key == "^" else detected_key
+                self._text = self._text[:cursor_position] + detected_key + self._text[cursor_position:]
+        elif detected_key == "pi":
+            cursor_position = len(self._text) - self.cursor_in_text_position_from_back
+            if self.evaluated:
+                self._text = ""
+                self.cursor_in_text_position_from_back = 0
+                self.evaluated = False
+            self._text = self._text[:cursor_position] + detected_key + self._text[cursor_position:]
         elif detected_key == ".":
-            # Add a decimal point if valid
-            if self.text and self.text[-1].isdigit() and "." not in self.text.split()[-1]:
-                self.text += detected_key
-            elif not self.text:
-                self.text = "0."
+            cursor_position = len(self._text) - self.cursor_in_text_position_from_back
+
+            # Přidání desetinné tečky pouze pokud:
+            # 1. Před kurzorem je číslo (nebo text je prázdný a začínáme s "0.")
+            # 2. V aktuálním čísle (od posledního operátoru nebo závorky) ještě není desetinná tečka
+            if not self._text:
+                self._text = "0."
+            else:
+                # Najdeme poslední operátor nebo závorku před kurzorem
+                last_operator_pos = max(
+                    self._text.rfind(op, 0, cursor_position) for op in "+-*/%()"
+                )
+                # Extrahujeme aktuální číslo
+                current_number = self._text[last_operator_pos + 1:cursor_position]
+
+                # Přidáme tečku, pokud aktuální číslo neobsahuje tečku
+                if "." not in current_number:
+                    self._text = self._text[:cursor_position] + "." + self._text[cursor_position:]
         elif detected_key == "()":
+            cursor_position = len(self._text) - self.cursor_in_text_position_from_back
+
             # Add parentheses
-            if not self.text or self.text[-1] in "+-*/%(":
-                self.text += "("
-            elif self.text[-1].isdigit() or self.text[-1] == ")":
-                if self.text.count("(") > self.text.count(")"):
-                    self.text += ")"
+            if not self._text or self._text[cursor_position-1] in "+-*/%(":
+                self._text = self._text[:cursor_position] + "(" + self._text[cursor_position:]
+            elif self._text[cursor_position - 1].isdigit() or self._text[cursor_position - 1] == ")":
+                if self._text.count("(") > self._text.count(")"):
+                    self._text = self._text[:cursor_position] + ")" + self._text[cursor_position:]
                 else:
-                    self.text += "("
-        elif detected_key == "=" and self.text:
+                    self._text = self._text[:cursor_position] + "(" + self._text[cursor_position:]
+        elif detected_key == "=" and self._text:
             # Evaluate the expression
             try:
-                self.text = str(eval(self.text))
+                self._text = self._text.replace("pi", str(math.pi))
+                self._text = self._text.replace("^", "**")
+                self._text = str(eval(self._text))
             except (SyntaxError, ZeroDivisionError):
-                self.text = "Invalid"
+                self._text = "Invalid"
             self.evaluated = True
 
         # Limit the text length
-        self.text = self.text[:MAX_LENGTH]
-        print(f"Current text: {self.text}")
+        self._text = self._text[:MAX_LENGTH]
+        print(f"Current text: {self._text}")

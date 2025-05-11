@@ -7,7 +7,7 @@ import cv2
 
 class UnitConverterManager:
     _file_path = Path(__file__).parent / "unit_converter_data.json"  #  path to json file
-    
+
     def __init__(self):
         pass
         
@@ -20,15 +20,18 @@ class UnitConverterManager:
                         UnitData.from_dict(name, data)
                         for name, data in json_data.items()
                     ]
-                    self.quantities_data_list = unit_data_list
-                    self.quantities_options = [unit_data.name for unit_data in unit_data_list]
+                    return unit_data_list
+                    #self.quantities_data_list = unit_data_list
+                    #self.quantities_options = [unit_data.name for unit_data in unit_data_list]
                     #print("Loaded data:", unit_data_list)
             except (json.JSONDecodeError, KeyError, TypeError) as e:
                 print(f"Error loading calculator converter: {e}.")
-                self.quantities_data_list = None
+                return None
+                #self.quantities_data_list = None
         else:
             print(f"File {self._file_path} does not exist.")
-            self.quantities_data_list = None
+            return None
+            #self.quantities_data_list = None
 
 @dataclass
 class UnitData:

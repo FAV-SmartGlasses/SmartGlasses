@@ -29,9 +29,9 @@ class UnitConverter(FixedAspectApp):
         self._size = Size(800, int(800 / self.aspect_ratio))"""
         self._position = Position(0, 0)
 
-        self.quantities_data_list = []  # list of UnitData objects
+        self.quantities_data_list: List[UnitData] = []  # list of UnitData objects
         self.manager = UnitConverterManager()
-        self.manager.convert_json()  # Load the conversion data from JSON   
+        self.quantities_data_list = self.manager.convert_json()  # Load the conversion data from JSON
         self.quantities_options = [unit_data.name for unit_data in self.quantities_data_list] 
         self.current_units_options = []  # list of current unit options for the dropdown menus
 
@@ -97,6 +97,9 @@ class UnitConverter(FixedAspectApp):
     def draw(self, image: np.ndarray, gestures: DetectionModel):
         cv2.setUseOptimized(True)
 
+        if gestures.right_hand.clicked:
+            pass
+
         if self.opened:
             overlay = image.copy()
 
@@ -109,7 +112,7 @@ class UnitConverter(FixedAspectApp):
             
             self.set_sizes()
 
-            self.manager.convert_json()
+            self.quantities_data_list = self.manager.convert_json()
 
             if self.quantity_dropdown.selected_option_index is not None:
                 selected_quantity = self.quantity_dropdown.options[self.quantity_dropdown.selected_option_index]
@@ -134,7 +137,7 @@ class UnitConverter(FixedAspectApp):
             # Draw the keyboard with dynamically scaled keys
             self.keyboard.draw(overlay, gestures, False)
 
-            self.numberbox_in.value = self.keyboard.text
+            self.numberbox_in.value = self.keyboard.get_text_with_cursor()
             self.numberbox_in.draw(overlay, gestures)
             self.numberbox_out.draw(overlay, gestures)
 
@@ -147,13 +150,13 @@ class UnitConverter(FixedAspectApp):
             from_unit = self.unit_from_dropdown.options[self.unit_from_dropdown.selected_option_index]
             to_unit = self.unit_to_dropdown.options[self.unit_to_dropdown.selected_option_index]
             guantity = self.quantity_dropdown.options[self.quantity_dropdown.selected_option_index]
-            in_number = self.numberbox_in.value
+            in_number = str(self.numberbox_in.value).replace("|", "")
             out_number = self.convert_number(in_number, guantity, from_unit, to_unit)
             
             self.numberbox_out.value = out_number
 
     def convert_number(self, number: Union[int, float, str], quantity: str, unit_from: str, unit_to: str) -> float:
-        self.convert_json()  # Load the conversion data from JSON
+        self.quantities_data_list = self.manager.convert_json()  # Load the conversion data from JSON
 
         try:
             number = float(number)  # Převod na float

@@ -9,7 +9,7 @@ from gui.draw import *
 from other_utilities import *
 from hand_detection_models import *
 from gui.keyboard import Keyboard
-from apps.ToDo_app.ToDo_app_manager import ToDoManager, Task
+from apps.ToDo_app.ToDo_manager import ToDoManager, Task
 
 class ToDoApp(FreeResizeApp):
     def __init__(self, name: str, display_name: str, icon_path: str):
