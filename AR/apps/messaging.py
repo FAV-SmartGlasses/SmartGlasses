@@ -11,6 +11,7 @@ import settings_manager
 from apps.app_base import App
 from gui import keyboard, color_manager
 from hand_detection_models import DetectionModel
+from other_utilities import *
 
 load_dotenv(os.path.abspath("../resources/.env"))
 
@@ -34,6 +35,8 @@ class MessagingApp(App):
         super().__init__(name, display_name, icon_path)
         self.message_fetch = threading.Thread(target=self.fetch_messages)
         self.keyboard = keyboard.Keyboard(layout)
+        self.keyboard.set_colors(color_manager.get_neutral_color_bgra(), color_manager.get_neutral_color2_bgra(), color_manager.get_font_color_bgra(),
+                           color_manager.get_neutral_color2_bgra(), color_manager.get_nice_color_bgra(), color_manager.get_nice_color_bgra())
 
     def launch(self):
         #self.message_fetch.start()      #uncomment this when using discord messaging
@@ -65,9 +68,8 @@ class MessagingApp(App):
             h, w, _ = image.shape
             overlay = np.zeros((h, w, 4), dtype=np.uint8)
 
-            self.keyboard.draw(overlay, 0, 0, gestures,
-                           color_manager.get_neutral_color_bgra(), color_manager.get_neutral_color2_bgra(), color_manager.get_font_color_bgra(),
-                           color_manager.get_neutral_color2_bgra(), color_manager.get_nice_color_bgra(), color_manager.get_nice_color_bgra(), scaled_key_size, scaled_padding)
+            self.keyboard.set_position_and_size(Position(0,0), scaled_key_size, scaled_padding)
+            self.keyboard.draw(overlay, gestures)
 
 
 def send_message(message, server, channel):

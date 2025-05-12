@@ -20,7 +20,7 @@ class ConverterKeyboard(Keyboard):
     def __init__(self):
         super().__init__(KEYS)
         self.equally_clicked = False
-        self._text = ""
+        self._text = "0"
 
     def process_detected_key(self, detected_key):
         self.equally_clicked = False
@@ -34,7 +34,7 @@ class ConverterKeyboard(Keyboard):
             self.cursor_in_text_position_from_back = 0
         elif detected_key in "0123456789":
             # Přidání čísla
-            if self._text == "0" or self._text == "":
+            if self._text == "0" or self._text == "0":
                 self._text = detected_key
             else:
                 cursor_position = len(self._text) - self.cursor_in_text_position_from_back

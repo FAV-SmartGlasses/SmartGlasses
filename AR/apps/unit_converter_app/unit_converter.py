@@ -32,10 +32,9 @@ class UnitConverter(FixedAspectApp):
         self.quantities_data_list: List[UnitData] = []  # list of UnitData objects
         self.manager = UnitConverterManager()
         self.quantities_data_list = self.manager.convert_json()  # Load the conversion data from JSON
-        self.quantities_options = [unit_data.name for unit_data in self.quantities_data_list] 
         self.current_units_options = []  # list of current unit options for the dropdown menus
 
-        self.quantity_dropdown = Dropdown(Position(50, 50), Size(200, 40), self.quantities_options, None)
+        self.quantity_dropdown = Dropdown(Position(50, 50), Size(200, 40), self.manager.get_quantities_options(), None)
         self.unit_from_dropdown = Dropdown(Position(50, 200), Size(200, 40), [], None)
         self.unit_to_dropdown = Dropdown(Position(50, 400), Size(200, 40), [], None)
         self.numberbox_in = NumberBox(Position(200, 200), Size(200, 40))
@@ -112,7 +111,7 @@ class UnitConverter(FixedAspectApp):
             
             self.set_sizes()
 
-            self.quantities_data_list = self.manager.convert_json()
+            self.quantities_data_list = self.manager.get_quantities_datalist()
 
             if self.quantity_dropdown.selected_option_index is not None:
                 selected_quantity = self.quantity_dropdown.options[self.quantity_dropdown.selected_option_index]
@@ -150,42 +149,7 @@ class UnitConverter(FixedAspectApp):
             from_unit = self.unit_from_dropdown.options[self.unit_from_dropdown.selected_option_index]
             to_unit = self.unit_to_dropdown.options[self.unit_to_dropdown.selected_option_index]
             guantity = self.quantity_dropdown.options[self.quantity_dropdown.selected_option_index]
-            in_number = str(self.numberbox_in.value).replace("|", "")
-            out_number = self.convert_number(in_number, guantity, from_unit, to_unit)
+            in_number = str(self.numberbox_in.value).replace("|", "")  #self.keyboard._text 
+            out_number = self.manager.convert_number(in_number, guantity, from_unit, to_unit)
             
             self.numberbox_out.value = out_number
-
-    def convert_number(self, number: Union[int, float, str], quantity: str, unit_from: str, unit_to: str) -> float:
-        self.quantities_data_list = self.manager.convert_json()  # Load the conversion data from JSON
-
-        try:
-            number = float(number)  # Převod na float
-        except ValueError:
-            print(f"Error: Cannot convert input '{number}' to a number.")
-            return None
-
-        for unit_data in self.quantities_data_list:
-            if unit_data.name == quantity:
-                from_factor = None
-                to_factor = None
-
-                # base unit has factor 1
-                if unit_from == unit_data.basic:
-                    from_factor = 1
-                if unit_to == unit_data.basic:
-                    to_factor = 1
-
-                for name, factor in unit_data.other:
-                    if name == unit_from:
-                        from_factor = factor
-                    if name == unit_to:
-                        to_factor = factor
-
-                # Pokud jsme našli oba faktory, vypočti převod
-                if from_factor is not None and to_factor is not None:
-                    basic_value = number / from_factor  # převedeme na základní jednotku
-                    converted_value = basic_value * to_factor  # z ní převedeme do cílové jednotky
-                    return converted_value
-                else:
-                    print(f"Error: Unit '{unit_from}' or '{unit_to}' not found in '{quantity}'.")
-                    return None
