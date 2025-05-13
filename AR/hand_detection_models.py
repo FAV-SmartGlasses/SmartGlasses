@@ -16,11 +16,10 @@ class SwipeGesture(Enum):
 
 
 class HandModel:
-    def __init__(self, clicked: bool = False, 
-                        cursor: Position = Position()):
-        
+    def __init__(self, clicked: bool = False, cursor: Position = Position(), fist: bool = False):
         self.clicked: bool = clicked
         self.cursor: Position = cursor
+        self.fist: bool
 
 
 class DetectionModel:

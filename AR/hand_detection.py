@@ -20,80 +20,27 @@ class HandDetection:
         self.last_left_wrist: Position = Position()
         self.last_right_wrist: Position = Position()
 
+    def draw(self, image: np.ndarray, hand_landmarks):
+        h, w, _ = image.shape
 
+        thumb_tip = self.get_thumb_tip(hand_landmarks, w, h)  # Get thumb position
+        index_tip = self.get_index_tip(hand_landmarks, w, h)  # Get index finger position
 
+        cursor = self.get_cursor_position(w, h, hand_landmarks)
 
-#region FistDetection
+        # Draw the cursor - a point between thumb and index finger (red dot)
+        cv2.circle(image, cursor.get_array(), 10, (0, 0, 255), -1)
 
-    def calculate_angle(self, a, b, c):
-        """Vypočítá úhel mezi body a, b, c (v bodě b)."""
-        ab = [a[0] - b[0], a[1] - b[1], a[2] - b[2]]
-        cb = [c[0] - b[0], c[1] - b[1], c[2] - b[2]]
+        if DRAW_GREEN_LINE_FOR_MENU_SELECTION:
+            # Draw a horizontal line at the point between thumb and index finger (green line)
+            cv2.line(image, (0, cursor.y), (w, cursor.y), (0, 255, 0), 2)  # Green line
 
-        dot_product = ab[0] * cb[0] + ab[1] * cb[1] + ab[2] * cb[2]
-        ab_magnitude = math.sqrt(ab[0]**2 + ab[1]**2 + ab[2]**2)
-        cb_magnitude = math.sqrt(cb[0]**2 + cb[1]**2 + cb[2]**2)
-
-        if ab_magnitude * cb_magnitude == 0:
-            return 0
-
-        cos_angle = dot_product / (ab_magnitude * cb_magnitude)
-        angle = math.acos(max(min(cos_angle, 1.0), -1.0))  # Ošetření chybiček
-        return math.degrees(angle)
-
-    def get_finger_angles(self, landmarks):
-        """
-        Vypočítá úhly v prstech ruky.
-        """
-        fingers = {
-            'thumb': [1, 2, 3],       # Body pro palec
-            'index': [5, 6, 7],       # Body pro ukazováček
-            'middle': [9, 10, 11],    # Body pro prostředníček
-            'ring': [13, 14, 15],     # Body pro prsteníček
-            'pinky': [17, 18, 19]     # Body pro malíček
-        }
-
-        angles = {}
-
-        for finger, points in fingers.items():
-            a = [landmarks[points[0]].x, landmarks[points[0]].y, landmarks[points[0]].z]
-            b = [landmarks[points[1]].x, landmarks[points[1]].y, landmarks[points[1]].z]
-            c = [landmarks[points[2]].x, landmarks[points[2]].y, landmarks[points[2]].z]
-
-            angles[finger] = self.calculate_angle(a, b, c)
-
-        return angles
-    
-    def is_fist_by_depth(self, landmarks, threshold=0.1):
-        """
-        Detekuje pěst na základě hloubky (z souřadnice).
-        Pokud jsou prsty blízko dlaně (málo výrazná hodnota z), pěst je uzavřená.
-        """
-        fingers_depth = []
-        for i in range(5, 21, 4):  # index, middle, ring, pinky tips
-            finger = landmarks[i]
-            fingers_depth.append(finger.z)
-
-        # Zkontroluj, jestli jsou prsty blízko k sobě (můžeme přidat více tolerance pro z)
-        min_depth = min(fingers_depth)
-        return min_depth > threshold
-
-    def is_fist(self, landmarks, angle_threshold=70):
-        """
-        Vrací True, pokud všechny prsty (kromě palce) mají malé úhly (jsou ohnuté = pěst).
-        """
-        angles = self.get_finger_angles(landmarks)
-        fingers_to_check = ['index', 'middle', 'ring', 'pinky']
-
-        for finger in fingers_to_check:
-            if angles[finger] > angle_threshold:
-                return False  # Pokud některý prst není dost ohnutý, není to pěst
-
-        return True  # Pokud všechny prsty jsou ohnuté, je to pěst
-#endregion
-
-
-
+        if SHOW_FINGER_JOINTS:
+            # Draw the hand and positions
+            cv2.circle(image, thumb_tip.get_array(), 10, (0, 0, 255), -1)
+            cv2.circle(image, index_tip.get_array(), 10, (0, 0, 255), -1)
+            cv2.line(image, thumb_tip.get_array(), index_tip.get_array(), (255, 255, 0), 2)
+            self.mp_drawing.draw_landmarks(image, hand_landmarks, self.mp_hands.HAND_CONNECTIONS)
 
     def process_image(self, image: np.ndarray) -> tuple[np.ndarray, DetectionModel]:
         h, w, _ = image.shape
@@ -104,17 +51,22 @@ class HandDetection:
         left_swipe_gesture_detected = SwipeGesture.NO
         right_swipe_gesture_detected = SwipeGesture.NO
 
-        if hands_results.multi_hand_landmarks:
-            hand_landmarks_list = hands_results.multi_hand_landmarks
-            for hand_landmarks in hands_results.multi_hand_landmarks:
-                if self.is_fist(hand_landmarks.landmark):
-                    cv2.putText(image, "PEST!", (50, 50),
-                                cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-                    
+        hand_landmarks_list = hands_results.multi_hand_landmarks
+        if hand_landmarks_list:                    
             if len(hand_landmarks_list) == 2:
                 # TODO: add gesture for moving and resizing apps
 
                 left_hand, right_hand = self.get_left_and_right_hands(hand_landmarks_list, w, h)
+
+                result.left_hand.fist = self.is_fist_detected(left_hand)
+                result.right_hand.fist = self.is_fist_detected(right_hand)
+                print(f"left fist: {result.left_hand.fist}, right fist: {result.right_hand.fist}")
+                if result.right_hand.fist and result.left_hand.fist:
+                    cv2.putText(image, "both fists!", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+                elif result.left_hand.fist:
+                    cv2.putText(image, "left fist!", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+                elif result.right_hand.fist:
+                    cv2.putText(image, "right fist!", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
                 left_swipe_gesture_detected = self.swipe_gesture_detected(left_hand, w, h, is_left = True)
                 right_swipe_gesture_detected = self.swipe_gesture_detected(right_hand, w, h, is_left = False)
@@ -129,6 +81,12 @@ class HandDetection:
                 self.draw(image, right_hand)
             elif len(hand_landmarks_list) == 1:
                 hand_landmarks = hand_landmarks_list[0]
+
+                result.right_hand.fist = self.is_fist_detected(hand_landmarks)
+                print(f"fist: {result.right_hand.fist}")
+                if result.right_hand.fist:
+                    cv2.putText(image, "fist!", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+
                 right_swipe_gesture_detected = self.swipe_gesture_detected(hand_landmarks, w, h, is_left=False)
                 result.right_hand.clicked = self.is_click_gesture_detected(hand_landmarks, w, h)
                 result.right_hand.cursor = self.get_cursor_position(w, h, hand_landmarks)
@@ -149,7 +107,31 @@ class HandDetection:
 
         return image, result
 
-#region swipe gest
+#region fist detection
+    def calculate_distance_3d(self, point1, point2):
+        return math.sqrt((point1.x - point2.x) ** 2 + (point1.y - point2.y) ** 2 + (point1.z - point2.z) ** 2)
+    
+    def is_fist_detected(self, hand_landmarks) -> bool:
+        #getting positions of every finger
+        thumb_tip = hand_landmarks.landmark[self.mp_hands.HandLandmark.THUMB_TIP]
+        index_tip = hand_landmarks.landmark[self.mp_hands.HandLandmark.INDEX_FINGER_TIP]
+        middle_tip = hand_landmarks.landmark[self.mp_hands.HandLandmark.MIDDLE_FINGER_TIP]
+        ring_tip = hand_landmarks.landmark[self.mp_hands.HandLandmark.RING_FINGER_TIP]
+        pinky_tip = hand_landmarks.landmark[self.mp_hands.HandLandmark.PINKY_TIP]
+
+        # calculating distances between fingers with 3D coordinates
+        thumb_index_distance = self.calculate_distance_3d(thumb_tip, index_tip)
+        index_middle_distance = self.calculate_distance_3d(index_tip, middle_tip)
+        middle_ring_distance = self.calculate_distance_3d(middle_tip, ring_tip)
+        ring_pinky_distance = self.calculate_distance_3d(ring_tip, pinky_tip)
+
+        # if distances between fingers are smaller than DISTANCE_TREESHOLD, fist gesture is detected
+        DISTANCE_TREESHOLD = 0.05
+        return (thumb_index_distance < DISTANCE_TREESHOLD and index_middle_distance < DISTANCE_TREESHOLD and 
+                middle_ring_distance < DISTANCE_TREESHOLD and ring_pinky_distance < DISTANCE_TREESHOLD)
+#endregion
+
+#region swipe gesture
     def swipe_gesture_detected(self, hand_landmarks, w, h, is_left):
         wrist = self.get_wrist(hand_landmarks, w, h)  # Get wrist position
 
@@ -234,21 +216,19 @@ class HandDetection:
 
         return click_gesture_detected
 
+#region get points
     def get_point(self, id_, hand_landmarks, w, h) -> Position:
         lm = hand_landmarks.landmark[id_]
         return Position(int(lm.x * w), int(lm.y * h))
 
     def get_thumb_tip(self, hand_landmarks, w, h) -> Position:
-        mp_hands = mp.solutions.hands
-        return self.get_point(mp_hands.HandLandmark.THUMB_TIP, hand_landmarks, w, h)
+        return self.get_point(self.mp_hands.HandLandmark.THUMB_TIP, hand_landmarks, w, h)
     
     def get_index_tip(self, hand_landmarks, w, h) -> Position:
-        mp_hands = mp.solutions.hands
-        return self.get_point(mp_hands.HandLandmark.INDEX_FINGER_TIP, hand_landmarks, w, h)
-    
+        return self.get_point(self.mp_hands.HandLandmark.INDEX_FINGER_TIP, hand_landmarks, w, h)
+
     def get_wrist(self, hand_landmarks, w, h) -> Position:
-        mp_hands = mp.solutions.hands
-        return self.get_point(mp_hands.HandLandmark.WRIST, hand_landmarks, w, h)
+        return self.get_point(self.mp_hands.HandLandmark.WRIST, hand_landmarks, w, h)
     
     def get_cursor_position(self, w, h, hand_landmarks) -> Position:
         thumb_tip = self.get_thumb_tip(hand_landmarks, w, h)  # Get thumb position
@@ -258,25 +238,4 @@ class HandDetection:
         middle_point_y = (thumb_tip.y + index_tip.y) // 2
 
         return Position(middle_point_x, middle_point_y)
-
-    def draw(self, image, hand_landmarks):
-        h, w, _ = image.shape
-
-        thumb_tip = self.get_thumb_tip(hand_landmarks, w, h)  # Get thumb position
-        index_tip = self.get_index_tip(hand_landmarks, w, h)  # Get index finger position
-
-        cursor = self.get_cursor_position(w, h, hand_landmarks)
-
-        # Draw the cursor - a point between thumb and index finger (red dot)
-        cv2.circle(image, cursor.get_array(), 10, (0, 0, 255), -1)
-
-        if DRAW_GREEN_LINE_FOR_MENU_SELECTION:
-            # Draw a horizontal line at the point between thumb and index finger (green line)
-            cv2.line(image, (0, cursor.y), (w, cursor.y), (0, 255, 0), 2)  # Green line
-
-        if SHOW_FINGER_JOINTS:
-            # Draw the hand and positions
-            cv2.circle(image, thumb_tip.get_array(), 10, (0, 0, 255), -1)
-            cv2.circle(image, index_tip.get_array(), 10, (0, 0, 255), -1)
-            cv2.line(image, thumb_tip.get_array(), index_tip.get_array(), (255, 255, 0), 2)
-            self.mp_drawing.draw_landmarks(image, hand_landmarks, self.mp_hands.HAND_CONNECTIONS)
+#endregion
