@@ -19,6 +19,8 @@ class HandDetection:
         self.click_gesture_history = deque(maxlen=20)  # save the last states
         self.last_left_wrist: Position = Position()
         self.last_right_wrist: Position = Position()
+        self.last_left_fist_detected: bool = False
+        self.last_right_fist_detected: bool = False
 
     def draw(self, image: np.ndarray, hand_landmarks):
         h, w, _ = image.shape
@@ -51,8 +53,9 @@ class HandDetection:
         left_swipe_gesture_detected = SwipeGesture.NO
         right_swipe_gesture_detected = SwipeGesture.NO
 
+        left_hand, right_hand = None, None
         hand_landmarks_list = hands_results.multi_hand_landmarks
-        if hand_landmarks_list:                    
+        if hand_landmarks_list:
             if len(hand_landmarks_list) == 2:
                 # TODO: add gesture for moving and resizing apps
 
@@ -80,21 +83,37 @@ class HandDetection:
                 self.draw(image, left_hand)
                 self.draw(image, right_hand)
             elif len(hand_landmarks_list) == 1:
-                hand_landmarks = hand_landmarks_list[0]
+                right_hand = hand_landmarks_list[0]
 
-                result.right_hand.fist = self.is_fist_detected(hand_landmarks)
+                result.right_hand.fist = self.is_fist_detected(right_hand)
                 print(f"fist: {result.right_hand.fist}")
                 if result.right_hand.fist:
                     cv2.putText(image, "fist!", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
-                right_swipe_gesture_detected = self.swipe_gesture_detected(hand_landmarks, w, h, is_left=False)
-                result.right_hand.clicked = self.is_click_gesture_detected(hand_landmarks, w, h)
-                result.right_hand.cursor = self.get_cursor_position(w, h, hand_landmarks)
-                result.left_hand.cursor = Position()
-                self.draw(image, hand_landmarks)
+                right_swipe_gesture_detected = self.swipe_gesture_detected(right_hand, w, h, is_left=False)
+                result.right_hand.clicked = self.is_click_gesture_detected(right_hand, w, h)
+                result.right_hand.cursor = self.get_cursor_position(w, h, right_hand)
+                self.draw(image, right_hand)
             elif len(hand_landmarks_list) == 0:
                 result.right_hand.cursor = Position()
                 result.left_hand.cursor = Position()
+
+        result.left_hand.wrist_position = self.last_left_wrist
+        result.right_hand.wrist_position = self.last_right_wrist
+        result.left_hand.last_wrist_position = self.last_left_wrist
+        result.right_hand.last_wrist_position = self.last_right_wrist
+        self.last_left_fist_detected = result.left_hand.fist
+        self.last_right_fist_detected = result.right_hand.fist
+
+        # Save the last wrist position
+        if left_hand is not None:
+            self.last_left_wrist = result.left_hand.wrist_position = self.get_wrist(left_hand, w, h)
+        else:
+            self.last_left_wrist = result.left_hand.wrist_position = Position()
+        if right_hand is not None:
+            self.last_right_wrist = result.right_hand.wrist_position = self.get_wrist(right_hand, w, h)
+        else:
+            self.last_right_wrist = result.right_hand.wrist_position = Position()
 
         if result.left_hand.clicked and result.right_hand.clicked:
             result.left_hand.clicked = False
@@ -167,12 +186,6 @@ class HandDetection:
                     gesture_detected = SwipeGesture.NO
         else:
             gesture_detected = SwipeGesture.NO
-
-        # Save the last wrist position
-        if is_left:
-            self.last_left_wrist = wrist
-        else:
-            self.last_right_wrist = wrist
 
         return gesture_detected
 

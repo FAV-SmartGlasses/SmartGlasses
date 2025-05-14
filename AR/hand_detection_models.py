@@ -19,7 +19,9 @@ class HandModel:
     def __init__(self, clicked: bool = False, cursor: Position = Position(), fist: bool = False):
         self.clicked: bool = clicked
         self.cursor: Position = cursor
-        self.fist: bool
+        self.fist: bool = fist
+        self.wrist_position: Position = Position()
+        self.last_wrist_position: Position = Position()
 
 
 class DetectionModel:

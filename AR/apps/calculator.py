@@ -29,8 +29,9 @@ class Calculator(FixedAspectApp):
         self.aspect_ratio = self.compute_aspect_ratio()
 
         # Default size, will be dynamically updated
-        self._size = Size(300, int(300 / self.aspect_ratio))
-        self._position = Position(0, 0)
+        self._size: Size = Size(300, int(300 / self.aspect_ratio))
+        self._position: Position = Position(0, 0)
+        self._last_position: Position = self._position
 
     def compute_aspect_ratio(self):
         """Compute the aspect ratio based on the layout"""
@@ -53,6 +54,14 @@ class Calculator(FixedAspectApp):
         overlay = image.copy()
 
         if self.opened:
+            self._last_position = self._position
+            if (gesture.right_hand.last_wrist_position != None and 
+                gesture.right_hand.fist == True and
+                gesture.right_hand.wrist_position.get_array() != (None,None)):
+
+                wrist_diff = get_difference_between_positions(gesture.right_hand.last_wrist_position, gesture.right_hand.wrist_position)
+                self._position = get_sum_of_positions(self._position, wrist_diff)
+
             cols = len(KEYS[0])
             rows = len(KEYS)
             sample_key_size = 10  # libovolná jednotka, důležité jsou proporce

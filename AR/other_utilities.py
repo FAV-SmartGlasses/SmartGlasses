@@ -39,3 +39,16 @@ def set_size_and_position_by_ratio(page_position: Position, page_size: Size,
     y = y_on_page + page_position.y
 
     return Position(x, y), Size(w, h)
+
+def get_difference_between_positions(pos1: Position, pos2: Position) -> Position:
+    #if pos1 is bigger than pos2, will be returned positive differences
+    diff_X = pos1.x - pos2.x
+    diff_y = pos1.y - pos2.y
+
+    return Position(diff_X, diff_y)
+
+def get_sum_of_positions(pos1: Position, pos2: Position) -> Position:
+    diff_X = pos1.x - pos2.x
+    diff_y = pos1.y - pos2.y
+
+    return Position(diff_X, diff_y)
