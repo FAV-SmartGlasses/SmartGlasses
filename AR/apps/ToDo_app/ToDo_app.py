@@ -18,15 +18,18 @@ class ToDoApp(FreeResizeApp):
         self.new_task_title = ""
 
     def draw(self, image: np.ndarray, gestures: DetectionModel):
-        # Draw tasks
-        y_offset = 50
-        for task in self.manager.get_tasks():
-            color = (0, 255, 0) if task.completed else (255, 0, 0)
-            cv2.putText(image, task.title, (50, y_offset), cv2.FONT_HERSHEY_SIMPLEX, 1, color, 2)
-            y_offset += 40
+        if self.opened:
+            self.check_fist_gesture(gestures)
 
-        # Draw input for new task
-        cv2.putText(image, f"New Task: {self.new_task_title}", (50, y_offset), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+            # Draw tasks
+            y_offset = 50
+            for task in self.manager.get_tasks():
+                color = (0, 255, 0) if task.completed else (255, 0, 0)
+                cv2.putText(image, task.title, (50, y_offset), cv2.FONT_HERSHEY_SIMPLEX, 1, color, 2)
+                y_offset += 40
+
+            # Draw input for new task
+            cv2.putText(image, f"New Task: {self.new_task_title}", (50, y_offset), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
 
     def handle_gesture(self, gesture: DetectionModel):
         # Example: Add a new task when a specific gesture is detected

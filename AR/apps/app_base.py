@@ -4,6 +4,7 @@ import numpy as np
 from menu_items import MenuItem
 from other_utilities import Position, Size
 from hand_detection_models import *
+from other_utilities import *
 
 class App(MenuItem):
     @abstractmethod
@@ -23,6 +24,15 @@ class App(MenuItem):
             self.current_page = page_index
         else:
             print(f"Invalid page index: {page_index}")
+
+    def check_fist_gesture(self, gestures: DetectionModel):
+        self._last_position = self._position
+        if (gestures.right_hand.last_wrist_position.get_array() != (None,None) and 
+            gestures.right_hand.fist == True and
+            gestures.right_hand.wrist_position.get_array() != (None,None)):
+
+            wrist_diff = get_difference_between_positions(gestures.right_hand.last_wrist_position, gestures.right_hand.wrist_position)
+            self._position = get_sum_of_positions(self._position, wrist_diff)
 
 #region Opening/closing app
     def clicked(self):

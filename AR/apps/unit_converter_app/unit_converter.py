@@ -100,6 +100,8 @@ class UnitConverter(FixedAspectApp):
             pass
 
         if self.opened:
+            self.check_fist_gesture(gestures)
+
             overlay = image.copy()
 
             draw_rounded_rectangle(overlay,

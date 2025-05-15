@@ -65,6 +65,8 @@ class MessagingApp(App):
 
     def draw(self, image, gestures: DetectionModel):
         if self.opened:
+            self.check_fist_gesture(gestures)
+
             h, w, _ = image.shape
             overlay = np.zeros((h, w, 4), dtype=np.uint8)
 

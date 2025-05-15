@@ -47,20 +47,14 @@ class Calculator(FixedAspectApp):
 
         return total_width / total_height
 
-    def draw(self, image: np.ndarray, gesture: DetectionModel):
+    def draw(self, image: np.ndarray, gestures: DetectionModel):
         """Draw the calculator UI dynamically based on the current size"""
         cv2.setUseOptimized(True)
 
         overlay = image.copy()
 
         if self.opened:
-            self._last_position = self._position
-            if (gesture.right_hand.last_wrist_position != None and 
-                gesture.right_hand.fist == True and
-                gesture.right_hand.wrist_position.get_array() != (None,None)):
-
-                wrist_diff = get_difference_between_positions(gesture.right_hand.last_wrist_position, gesture.right_hand.wrist_position)
-                self._position = get_sum_of_positions(self._position, wrist_diff)
+            self.check_fist_gesture(gestures)
 
             cols = len(KEYS[0])
             rows = len(KEYS)
@@ -93,7 +87,7 @@ class Calculator(FixedAspectApp):
                                 scaled_key_size,
                                 scaled_key_padding)
             
-            self.keyboard.draw(overlay, gesture)
+            self.keyboard.draw(overlay, gestures)
 
             # Kombinace původního obrázku a překryvného obrázku s průhledností
             alpha = get_app_transparency()

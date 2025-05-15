@@ -22,6 +22,8 @@ class Settings(FreeResizeApp):
     def draw(self, image: np.ndarray, gestures: DetectionModel):
         
         if self.opened:
+            self.check_fist_gesture(gestures)
+
             overlay = image.copy()
 
             draw_rounded_rectangle(overlay,
