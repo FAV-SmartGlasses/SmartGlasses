@@ -35,7 +35,7 @@ class Button(Element):
         return is_hovered, is_clicked
 
     def draw(self, frame, is_hovered):
-        self.rect = (self._position.x, self._position.y, self._position.x + self._size.w, self._position.y + self._size.w)  # (x1, y1, x2, y2)
+        self.rect = (self._position.x, self._position.y, self._position.x + self._size.w, self._position.y + self._size.h)  # (x1, y1, x2, y2)
         self.is_hovered = is_hovered
 
         # setting colors based on hover state
