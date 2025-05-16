@@ -1,78 +1,30 @@
 import asyncio
-import os.path
-import threading
 import time
 
-import numpy as np
 import requests
-from dotenv import load_dotenv
-
 import settings_manager
-from apps.app_base import App
-from gui import keyboard, color_manager
-from hand_detection_models import DetectionModel
-from other_utilities import *
-
-load_dotenv(os.path.abspath("../resources/.env"))
-
-layout = [
-    ['`', "1", "2", '3', '4', '5', '6', '7', '8', '9', '0', '-', '='],
-    ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "(", ")"],
-    ["A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'", "\\"],
-    ["\\", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/"],
-    [" ", "->", "-<"]
-]
+import os
 
 messages = {}
 ai_messages = {}
 models = []
+fetch = False
 
-scaled_key_size = 0
-scaled_padding = 0
+def fetch_messages():
+    global messages, ai_messages
 
-class MessagingApp(App):
-    def __init__(self, name, display_name, icon_path):
-        super().__init__(name, display_name, icon_path)
-        self.message_fetch = threading.Thread(target=self.fetch_messages)
-        self.keyboard = keyboard.Keyboard(layout)
-        self.keyboard.set_colors(color_manager.get_neutral_color_bgra(), color_manager.get_neutral_color2_bgra(), color_manager.get_font_color_bgra(),
-                           color_manager.get_neutral_color2_bgra(), color_manager.get_nice_color_bgra(), color_manager.get_nice_color_bgra())
+    url = get_endpoint_address("/messages/get")
 
-    def launch(self):
-        #self.message_fetch.start()      #uncomment this when using discord messaging
-        self.opened = True
+    while fetch:
+        response = requests.get(url)
+        if response.status_code == 200:
+            messages = response.json()[0]
+            ai_messages = response.json()[1]
+            print(f"Updated messages to {messages}")
+        else:
+            print(response.text)
 
-    def fetch_messages(self):
-        global messages, ai_messages
-
-        url = get_endpoint_address("/messages/get")
-
-        while self.opened:
-            response = requests.get(url)
-            if response.status_code == 200:
-                messages = response.json()[0]
-                ai_messages = response.json()[1]
-                print(f"Updated messages to {messages}")
-            else:
-                print(response.text)
-
-            time.sleep(10)
-
-    def close(self):
-        #self.message_fetch.join()    #uncomment this when using discord messaging
-        self.opened = False
-
-
-    def draw(self, image, gestures: DetectionModel):
-        if self.opened:
-            self.check_fist_gesture(gestures)
-
-            h, w, _ = image.shape
-            overlay = np.zeros((h, w, 4), dtype=np.uint8)
-
-            self.keyboard.set_position_and_size(Position(0,0), scaled_key_size, scaled_padding)
-            self.keyboard.draw(overlay, gestures)
-
+        time.sleep(10)
 
 def send_message(message, server, channel):
     if server == "DM" or server == "DMraw":
@@ -190,6 +142,3 @@ async def send_llm(model, message, temperature = .7):
         print(ai_messages)
     else:
         print(f"Error: {response.status_code} - {response.text}")
-
-if __name__ == "__main__":
-    send_message("user:Hello", "ai", "dolphin-2.8-mistral-7b-v02")
