@@ -16,11 +16,18 @@ class HandDetection:
         self.mp_hands = mp.solutions.hands
         self.mp_drawing = mp.solutions.drawing_utils
         self.hands = self.mp_hands.Hands(static_image_mode=False, max_num_hands=2, min_detection_confidence=0.7)
+        
         self.click_gesture_history = deque(maxlen=20)  # save the last states
+
         self.last_left_wrist: Position = Position()
         self.last_right_wrist: Position = Position()
+
         self.last_left_fist_detected: bool = False
         self.last_right_fist_detected: bool = False
+
+        self.last_left_cursor_position: Position = Position()
+        self.last_right_cursor_position: Position = Position()
+
 
     def draw(self, image: np.ndarray, hand_landmarks):
         h, w, _ = image.shape
@@ -102,8 +109,12 @@ class HandDetection:
         result.right_hand.wrist_position = self.last_right_wrist
         result.left_hand.last_wrist_position = self.last_left_wrist
         result.right_hand.last_wrist_position = self.last_right_wrist
+        result.left_hand.last_cursor_position = self.last_left_cursor_position
+        result.right_hand.last_cursor_position = self.last_right_cursor_position
         self.last_left_fist_detected = result.left_hand.fist
         self.last_right_fist_detected = result.right_hand.fist
+        self.last_left_cursor_position = result.left_hand.cursor
+        self.last_right_cursor_position = result.right_hand.cursor
 
         # Save the last wrist position
         if left_hand is not None:

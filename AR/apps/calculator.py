@@ -31,7 +31,6 @@ class Calculator(FixedAspectApp):
         # Default size, will be dynamically updated
         self._size: Size = Size(300, int(300 / self.aspect_ratio))
         self._position: Position = Position(0, 0)
-        self._last_position: Position = self._position
 
     def compute_aspect_ratio(self):
         """Compute the aspect ratio based on the layout"""
@@ -55,6 +54,7 @@ class Calculator(FixedAspectApp):
 
         if self.opened:
             self.check_fist_gesture(gestures)
+            self.check_resize_gesture(gestures)
 
             cols = len(KEYS[0])
             rows = len(KEYS)

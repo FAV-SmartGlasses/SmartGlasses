@@ -16,9 +16,15 @@ class SwipeGesture(Enum):
 
 
 class HandModel:
-    def __init__(self, clicked: bool = False, cursor: Position = Position(), fist: bool = False):
+    def __init__(self, 
+                 clicked: bool = False, 
+                 cursor: Position = Position(), 
+                 last_cursor_position: Position = Position(),
+                 fist: bool = False):
+        
         self.clicked: bool = clicked
         self.cursor: Position = cursor
+        self.last_cursor_position: Position = last_cursor_position
         self.fist: bool = fist
         self.wrist_position: Position = Position()
         self.last_wrist_position: Position = Position()

@@ -26,13 +26,21 @@ class App(MenuItem):
             print(f"Invalid page index: {page_index}")
 
     def check_fist_gesture(self, gestures: DetectionModel):
-        self._last_position = self._position
         if (gestures.right_hand.last_wrist_position.get_array() != (None,None) and 
             gestures.right_hand.fist == True and
             gestures.right_hand.wrist_position.get_array() != (None,None)):
 
             wrist_diff = get_difference_between_positions(gestures.right_hand.last_wrist_position, gestures.right_hand.wrist_position)
             self._position = get_sum_of_positions(self._position, wrist_diff)
+
+    def check_resize_gesture(self, gestures: DetectionModel):
+        if (gestures.right_hand.last_cursor_position.get_array() != (None,None) and 
+            gestures.right_hand.clicked == True and
+            gestures.right_hand.cursor.get_array() != (None,None) and 
+            gestures.right_hand.fist == False):
+
+            cursor_diff = get_difference_between_positions(gestures.right_hand.last_cursor_position, gestures.right_hand.cursor)
+            self._size = get_sum_of_size_and_position(self._size, cursor_diff)
 
 #region Opening/closing app
     def clicked(self):

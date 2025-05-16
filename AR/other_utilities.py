@@ -52,3 +52,9 @@ def get_sum_of_positions(pos1: Position, pos2: Position) -> Position:
     diff_y = pos1.y - pos2.y
 
     return Position(diff_X, diff_y)
+
+def get_sum_of_size_and_position(size: Size, position: Position) -> Size:
+    w = size.w - position.x
+    h = size.h - position.y
+
+    return Size(w, h)
