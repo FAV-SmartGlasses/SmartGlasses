@@ -2,10 +2,10 @@ import threading
 
 from dotenv import load_dotenv
 
-from gui.elements import dropdown, button
 from apps.app_base import FreeResizeApp
 from gui import color_manager
 from gui.draw import *
+from gui.elements import dropdown, button
 from hand_detection_models import DetectionModel
 from other_utilities import *
 from . import messaging_keyboard
@@ -32,9 +32,11 @@ class MessagingApp(FreeResizeApp):
         self.messaging_keyboard.set_colors(color_manager.get_neutral_color_bgra(), color_manager.get_neutral_color2_bgra(), color_manager.get_font_color_bgra(),
                            color_manager.get_neutral_color2_bgra(), color_manager.get_nice_color_bgra(), color_manager.get_nice_color_bgra())
 
-        self.server = dropdown.Dropdown(Position(x=100, y=100), Size(w=100, h=100), ["Hello"])
-        self.channel = dropdown.Dropdown(Position(x=50, y=50), Size(w=50, h=50), ["World"])
-        self.send = button.Button(None, Position(300, 400), Size(100, 50), "Send!",
+        self.initial_positions = [Position(x=25, y=150), Position(x=200, y=150), Position(90, 200)]
+
+        self.server = dropdown.Dropdown(Position(x=100, y=100), Size(w=100, h=50), ["DMs", "OptiForge - SmartGlasses"])
+        self.channel = dropdown.Dropdown(Position(x=50, y=50), Size(w=100, h=50), ["miky8745", "general"])
+        self.send = button.Button(None, Position(300, 400), Size(100, 25), "Send!",
                           get_neutral_color(), get_neutral_color(), get_font_color(),
                           get_nice_color(), get_neutral_color2(), get_font_color())
 
@@ -87,16 +89,16 @@ class MessagingApp(FreeResizeApp):
                 scaled_key_padding)
 
             self.server.set_position_and_size(
-                Position(self._position.x + scaled_padding, self._position.y + textbox_height + scaled_padding), self.server._size
+                Position(self._position.x + scaled_padding + self.initial_positions[0].x, self._position.y + textbox_height + scaled_padding + self.initial_positions[0].y), self.server._size
                 )
 
             self.channel.set_position_and_size(
-                Position(self._position.x + scaled_padding + 100, self._position.y + textbox_height + scaled_padding),
+                Position(self._position.x + scaled_padding + self.initial_positions[1].x, self._position.y + textbox_height + scaled_padding + self.initial_positions[1].y),
                 self.channel._size
             )
 
             self.send.set_position_and_size(
-                Position(self._position.x + scaled_padding, self._position.y + textbox_height + scaled_padding),
+                Position(self._position.x + scaled_padding + self.initial_positions[2].x, self._position.y + textbox_height + scaled_padding + self.initial_positions[2].y),
                 self.send._size
             )
 
@@ -121,6 +123,23 @@ class MessagingApp(FreeResizeApp):
                 1,
                 get_font_color_bgra(),  # Use BGRA color
                 2)
+
+
+            if self.server.selected_option_index is None or self.channel.selected_option_index is None:
+                return
+
+            display_messages = list(messages.get(self.server.options[self.server.selected_option_index]).get(self.channel.options[self.channel.selected_option_index]))
+            display_messages.reverse()
+
+            for index, i in enumerate(display_messages[max(-5, -len(display_messages)):]):
+                cv2.putText(image,
+                            i.get("author") + ": " + i.get("content"),
+                            (90, index * 25 + 275),
+                            cv2.FONT_HERSHEY_SIMPLEX,
+                            0.5,
+                            get_font_color_bgra(),
+                            2
+                            )
 
 if __name__ == "__main__":
     send_message("user:Hello", "ai", "dolphin-2.8-mistral-7b-v02")

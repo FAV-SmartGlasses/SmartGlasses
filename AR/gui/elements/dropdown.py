@@ -7,13 +7,13 @@ from hand_detection_models import DetectionModel
 
 
 class Dropdown(Element):
-    def __init__(self, position: Position, size: Size, options: tuple[str], selected_option_index: int = None):
+    def __init__(self, position: Position, size: Size, options: list[str], selected_option_index: int = None):
         super().__init__(position, size)
         self.open: bool = False
-        self.options: tuple[str] = options
+        self.options: list[str] = options
         self.selected_option_index: int = selected_option_index
         self.padding = 10
-        self.click_history: tuple[bool] = []
+        self.click_history: list[bool] = []
 
     def draw(self, image: np.ndarray, gestures: DetectionModel):
         is_left_hovered = is_cursor_in_rect(gestures.left_hand.cursor, (self._position.x, self._position.y, self._position.x + self._size.w, self._position.y + self._size.h))
