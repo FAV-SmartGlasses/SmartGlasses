@@ -1,13 +1,13 @@
-import mediapipe as mp
-import cv2
 import math
-import numpy as np
 from collections import deque
-from enum import Enum
+
+import cv2
+import mediapipe as mp
+import numpy as np
 
 from config import *
-from other_utilities import Position
 from hand_detection_models import *
+
 
 class HandDetection:
     DIST_THRESHOLD = 40  # finger touch threshold

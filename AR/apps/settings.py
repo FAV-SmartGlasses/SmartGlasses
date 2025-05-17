@@ -1,12 +1,10 @@
-import numpy as np
-
 from apps.app_base import FreeResizeApp
 from gui.draw import *
 from gui.elements.button import Button
 from gui.elements.toggle_buttons import ToggleButtons
+from hand_detection_models import DetectionModel
 from other_utilities import Position, Size
 from settings_manager import *
-from hand_detection_models import DetectionModel
 
 
 class Settings(FreeResizeApp):

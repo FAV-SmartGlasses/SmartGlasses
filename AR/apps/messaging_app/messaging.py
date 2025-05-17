@@ -83,7 +83,7 @@ class MessagingApp(FreeResizeApp):
             self.check_fist_gesture(gestures)
 
             cols = len(layout[0])
-            rows = len(layout)
+
             sample_key_size = 10  # libovolná jednotka, důležité jsou proporce
             sample_padding = sample_key_size // 2
             sample_key_padding = sample_padding // 2

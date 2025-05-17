@@ -1,10 +1,11 @@
 from abc import abstractmethod
+
 import numpy as np
 
-from menu_items import MenuItem
-from other_utilities import Position, Size
 from hand_detection_models import *
+from menu_items import MenuItem
 from other_utilities import *
+
 
 class App(MenuItem):
     @abstractmethod

@@ -1,7 +1,8 @@
 import json
 from dataclasses import dataclass, asdict
 from pathlib import Path
-from typing import List, Tuple, Union
+from typing import List
+
 
 @dataclass
 class Task:

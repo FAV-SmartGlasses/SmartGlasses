@@ -1,10 +1,9 @@
 import json
 from dataclasses import dataclass
+from fractions import Fraction
 from pathlib import Path
 from typing import List, Tuple, Union
-from fractions import Fraction
-import numpy as np
-import cv2
+
 
 class UnitConverterManager:
     _file_path = Path(__file__).parent / "unit_converter_data.json"  #  path to json file
@@ -42,7 +41,7 @@ class UnitConverterManager:
             #return None
             self._quantities_data_list = None
 
-    def convert_number(self, number: Union[int, float, str], quantity: str, unit_from: str, unit_to: str) -> float:
+    def convert_number(self, number: Union[int, float, str], quantity: str, unit_from: str, unit_to: str) -> float | None:
         self.convert_json()  # Load the conversion data from JSON
 
         try:

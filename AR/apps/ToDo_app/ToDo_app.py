@@ -1,15 +1,8 @@
-import numpy as np
-import cv2
-
-from gui.elements.dropdown import Dropdown
-from gui.elements.number_box import NumberBox
-from apps.app_base import FixedAspectApp, FreeResizeApp
-from gui.color_manager import *
-from gui.draw import *
-from other_utilities import *
-from hand_detection_models import *
-from gui.keyboard import Keyboard
 from apps.ToDo_app.ToDo_manager import ToDoManager, Task
+from apps.app_base import FreeResizeApp
+from gui.draw import *
+from hand_detection_models import *
+
 
 class ToDoApp(FreeResizeApp):
     def __init__(self, name: str, display_name: str, icon_path: str):

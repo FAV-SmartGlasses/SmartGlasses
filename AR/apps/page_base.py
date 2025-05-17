@@ -1,8 +1,10 @@
 from abc import ABC, abstractmethod
+
 import numpy as np
 
-from other_utilities import Position, Size
 from hand_detection_models import *
+from other_utilities import Size
+
 
 class Page(ABC):
     @abstractmethod
