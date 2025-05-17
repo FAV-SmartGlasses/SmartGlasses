@@ -65,13 +65,13 @@ class MessagingApp(FreeResizeApp):
         if self.new_server != self.old_server:
             self.channel.selected_option_index = None
 
-        if self.server.selected_option_index is not None:
+        if self.server.selected:
             self.channel.options = list(self.messages.get(self.server.selected_option).keys())
         else:
             self.channel.options = []
 
-        #if send:
-            #send_message(self.messaging_keyboard._text, self.server.selected_option)
+        if send and self.server.selected and self.channel.selected:
+            send_message(self.messaging_keyboard._text, self.server.selected_option, self.channel.selected_option)
 
     def draw(self, image: np.ndarray, gestures: DetectionModel):
         """Draw the calculator UI dynamically based on the current size"""
@@ -151,7 +151,7 @@ class MessagingApp(FreeResizeApp):
 
             self.update(self.send.is_hovered_or_clicked(gestures)[1])
 
-            if self.server.selected_option_index is None or self.channel.selected_option_index is None:
+            if not self.server.selected or not self.channel.selected:
                 return
 
             display_messages = list(self.messages.get(self.server.selected_option).get(self.channel.selected_option))

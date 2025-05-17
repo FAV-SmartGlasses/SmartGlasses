@@ -1,19 +1,13 @@
-import json
-from dataclasses import dataclass
-from pathlib import Path
-from typing import List, Tuple, Union
-import numpy as np
-import cv2
+from typing import List
 
-from gui.elements.dropdown import Dropdown
-from gui.elements.number_box import NumberBox
-from apps.app_base import FixedAspectApp, FreeResizeApp
-from gui.color_manager import *
-from gui.draw import *
-from other_utilities import *
-from hand_detection_models import *
+from apps.app_base import FixedAspectApp
 from apps.unit_converter_app.unit_converter_keyboard import *
 from apps.unit_converter_app.unit_converter_manager import UnitConverterManager, UnitData
+from gui.draw import *
+from gui.elements.dropdown import Dropdown
+from gui.elements.number_box import NumberBox
+from hand_detection_models import *
+from other_utilities import *
 
 
 class UnitConverter(FixedAspectApp):
@@ -115,7 +109,7 @@ class UnitConverter(FixedAspectApp):
 
             self.quantities_data_list = self.manager.get_quantities_datalist()
 
-            if self.quantity_dropdown.selected_option_index is not None:
+            if self.quantity_dropdown.selected:
                 selected_quantity = self.quantity_dropdown.selected_option
 
                 for quantity in self.quantities_data_list:
@@ -124,9 +118,9 @@ class UnitConverter(FixedAspectApp):
                         self.unit_from_dropdown.options = self.current_units_options
                         self.unit_to_dropdown.options = self.current_units_options
 
-            if (self.quantity_dropdown.selected_option_index is not None and 
-                self.unit_from_dropdown.selected_option_index is not None and
-                self.unit_to_dropdown.selected_option_index is not None):
+            if (self.quantity_dropdown.selected and
+                self.unit_from_dropdown.selected and
+                self.unit_to_dropdown.selected):
                 self.set_output_value()
             
             

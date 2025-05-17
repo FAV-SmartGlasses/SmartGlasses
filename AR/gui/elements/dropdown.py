@@ -13,6 +13,7 @@ class Dropdown(Element):
         self.padding = 10
         self.click_history: list[bool] = []
         self.selected_option : str = ""
+        self.selected : bool = selected_option_index is not None
 
     def draw(self, image: np.ndarray, gestures: DetectionModel):
         is_left_hovered = is_cursor_in_rect(gestures.left_hand.cursor, (self._position.x, self._position.y, self._position.x + self._size.w, self._position.y + self._size.h))
@@ -20,6 +21,13 @@ class Dropdown(Element):
         is_left_clicked = is_left_hovered and gestures.left_hand.clicked
         is_right_clicked = is_right_hovered and gestures.right_hand.clicked
         is_clicked = is_left_clicked or is_right_clicked
+
+        self.selected = self.selected_option_index is not None
+
+        if self.selected:
+            self.selected_option = self.options[self.selected_option_index]
+        else:
+            self.selected_option = ""
 
         if is_clicked:
             if len(self.click_history) == 0 or (len(self.click_history) != 0 and self.click_history[-1] == False):
@@ -30,7 +38,7 @@ class Dropdown(Element):
                 self.click_history.append(False)
         
 
-        text = self.selected_option if self.selected_option_index is not None else "Select an option"
+        text = self.selected_option if self.selected else "Select an option"
         self.draw_element(image, text)
 
         if self.open:
@@ -50,7 +58,6 @@ class Dropdown(Element):
                     if ((gestures.left_hand.clicked and option_left_hovered) or 
                         (gestures.right_hand.clicked and option_right_hovered)):
                         self.selected_option_index = index
-                        self.selected_option = self.options[self.selected_option_index]
                         self.open = False
 
                 self.draw_option(image, option_x, option_y, hovered, option)
