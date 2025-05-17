@@ -52,7 +52,7 @@ class MessageFetch:
             time.sleep(10)
 
 def send_message(message, server, channel, ai_messages = {}):
-    if server == "DM" or server == "DMraw":
+    if server == "DMs" or server == "DMraw":
         if server == "DMraw":
             tags = [channel]
         else:
