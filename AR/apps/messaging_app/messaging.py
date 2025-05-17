@@ -53,24 +53,25 @@ class MessagingApp(FreeResizeApp):
         self.message_fetch.stop()   #uncomment this when using discord messaging
         self.opened = False
 
-    def update(self):
+    def update(self, send : bool):
         lock = threading.Lock()
 
         with lock:
             self.server.options = list(self.messages.keys())
 
         self.old_server = self.new_server
-
         self.new_server = self.server.selected_option_index
 
         if self.new_server != self.old_server:
             self.channel.selected_option_index = None
 
         if self.server.selected_option_index is not None:
-            self.channel.options = list(self.messages.get(self.server.options[self.server.selected_option_index]).keys())
+            self.channel.options = list(self.messages.get(self.server.selected_option).keys())
         else:
             self.channel.options = []
 
+        #if send:
+            #send_message(self.messaging_keyboard._text, self.server.selected_option)
 
     def draw(self, image: np.ndarray, gestures: DetectionModel):
         """Draw the calculator UI dynamically based on the current size"""
@@ -148,12 +149,12 @@ class MessagingApp(FreeResizeApp):
                 get_font_color_bgra(),  # Use BGRA color
                 2)
 
-            self.update()
+            self.update(self.send.is_hovered_or_clicked(gestures)[1])
 
             if self.server.selected_option_index is None or self.channel.selected_option_index is None:
                 return
 
-            display_messages = list(self.messages.get(self.server.options[self.server.selected_option_index]).get(self.channel.options[self.channel.selected_option_index]))
+            display_messages = list(self.messages.get(self.server.selected_option).get(self.channel.selected_option))
 
             for index, i in enumerate(display_messages[max(-5, -len(display_messages)-1):]):
                 cv2.putText(image,

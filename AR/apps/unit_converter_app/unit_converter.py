@@ -116,7 +116,7 @@ class UnitConverter(FixedAspectApp):
             self.quantities_data_list = self.manager.get_quantities_datalist()
 
             if self.quantity_dropdown.selected_option_index is not None:
-                selected_quantity = self.quantity_dropdown.options[self.quantity_dropdown.selected_option_index]
+                selected_quantity = self.quantity_dropdown.selected_option
 
                 for quantity in self.quantities_data_list:
                     if quantity.name == selected_quantity:
@@ -148,9 +148,9 @@ class UnitConverter(FixedAspectApp):
 
     def set_output_value(self):
         if self.quantities_data_list is not None:
-            from_unit = self.unit_from_dropdown.options[self.unit_from_dropdown.selected_option_index]
-            to_unit = self.unit_to_dropdown.options[self.unit_to_dropdown.selected_option_index]
-            guantity = self.quantity_dropdown.options[self.quantity_dropdown.selected_option_index]
+            from_unit = self.unit_from_dropdown.selected_option
+            to_unit = self.unit_to_dropdown.selected_option
+            guantity = self.quantity_dropdown.selected_option
             in_number = str(self.numberbox_in.value).replace("|", "")  #self.keyboard._text 
             out_number = self.manager.convert_number(in_number, guantity, from_unit, to_unit)
             

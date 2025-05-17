@@ -1,9 +1,7 @@
-import numpy as np
-
 from gui.draw import *
-from .element_base import Element
-from other_utilities import Position, Size
 from hand_detection_models import DetectionModel
+from other_utilities import Position, Size
+from .element_base import Element
 
 
 class Dropdown(Element):
@@ -14,6 +12,7 @@ class Dropdown(Element):
         self.selected_option_index: int = selected_option_index
         self.padding = 10
         self.click_history: list[bool] = []
+        self.selected_option : str = ""
 
     def draw(self, image: np.ndarray, gestures: DetectionModel):
         is_left_hovered = is_cursor_in_rect(gestures.left_hand.cursor, (self._position.x, self._position.y, self._position.x + self._size.w, self._position.y + self._size.h))
@@ -31,7 +30,7 @@ class Dropdown(Element):
                 self.click_history.append(False)
         
 
-        text = self.options[self.selected_option_index] if self.selected_option_index is not None else "Select an option"
+        text = self.selected_option if self.selected_option_index is not None else "Select an option"
         self.draw_element(image, text)
 
         if self.open:
@@ -51,6 +50,7 @@ class Dropdown(Element):
                     if ((gestures.left_hand.clicked and option_left_hovered) or 
                         (gestures.right_hand.clicked and option_right_hovered)):
                         self.selected_option_index = index
+                        self.selected_option = self.options[self.selected_option_index]
                         self.open = False
 
                 self.draw_option(image, option_x, option_y, hovered, option)
