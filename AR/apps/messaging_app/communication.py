@@ -9,15 +9,15 @@ import os
 class MessageFetch:
     def __init__(self, messages, ai_messages):
         self.fetch = False
-        self.thread = threading.Thread(target=self.fetch_messages)
+        self.thread = None
         self.messages = messages
         self.ai_messages = ai_messages
 
     def stop(self):
-        self.thread.join()
         self.fetch = False
 
     def start(self):
+        self.thread = threading.Thread(target=self.fetch_messages)
         self.thread.start()
 
     def fetch_messages(self):

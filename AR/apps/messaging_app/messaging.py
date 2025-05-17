@@ -72,6 +72,7 @@ class MessagingApp(FreeResizeApp):
 
         if send and self.server.selected and self.channel.selected:
             send_message(self.messaging_keyboard._text, self.server.selected_option, self.channel.selected_option)
+            self.messaging_keyboard._text = ""
 
     def draw(self, image: np.ndarray, gestures: DetectionModel):
         """Draw the calculator UI dynamically based on the current size"""
