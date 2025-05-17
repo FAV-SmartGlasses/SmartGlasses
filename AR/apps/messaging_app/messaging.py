@@ -1,5 +1,3 @@
-import threading
-
 from dotenv import load_dotenv
 
 from apps.app_base import FreeResizeApp
@@ -27,7 +25,6 @@ scaled_padding = 0
 class MessagingApp(FreeResizeApp):
     def __init__(self, name, display_name, icon_path):
         super().__init__(name, display_name, icon_path)
-        self.message_fetch = threading.Thread(target=fetch_messages)
         self.messaging_keyboard = messaging_keyboard.MessagingKeyboard(layout)
         self.messaging_keyboard.set_colors(color_manager.get_neutral_color_bgra(), color_manager.get_neutral_color2_bgra(), color_manager.get_font_color_bgra(),
                            color_manager.get_neutral_color2_bgra(), color_manager.get_nice_color_bgra(), color_manager.get_nice_color_bgra())
@@ -35,18 +32,45 @@ class MessagingApp(FreeResizeApp):
         self.initial_positions = [Position(x=25, y=150), Position(x=200, y=150), Position(90, 200)]
 
         self.server = dropdown.Dropdown(Position(x=100, y=100), Size(w=100, h=50), ["DMs", "OptiForge - SmartGlasses"])
-        self.channel = dropdown.Dropdown(Position(x=50, y=50), Size(w=100, h=50), ["miky8745", "general"])
+        self.channel = dropdown.Dropdown(Position(x=50, y=50), Size(w=100, h=50), [])
         self.send = button.Button(None, Position(300, 400), Size(100, 25), "Send!",
                           get_neutral_color(), get_neutral_color(), get_font_color(),
                           get_nice_color(), get_neutral_color2(), get_font_color())
 
+        self.messages = {}
+        self.ai_messages = {}
+
+        self.message_fetch = MessageFetch(self.messages, self.ai_messages)
+
+        self.new_server = self.old_server = None
+
     def launch(self):
-        #self.message_fetch.start()      #uncomment this when using discord messaging
+            #uncomment this when using discord messaging
+        self.message_fetch.start()
         self.opened = True
 
     def close(self):
-        #self.message_fetch.join()    #uncomment this when using discord messaging
+        self.message_fetch.stop()   #uncomment this when using discord messaging
         self.opened = False
+
+    def update(self):
+        lock = threading.Lock()
+
+        with lock:
+            self.server.options = list(self.messages.keys())
+
+        self.old_server = self.new_server
+
+        self.new_server = self.server.selected_option_index
+
+        if self.new_server != self.old_server:
+            self.channel.selected_option_index = None
+
+        if self.server.selected_option_index is not None:
+            self.channel.options = list(self.messages.get(self.server.options[self.server.selected_option_index]).keys())
+        else:
+            self.channel.options = []
+
 
     def draw(self, image: np.ndarray, gestures: DetectionModel):
         """Draw the calculator UI dynamically based on the current size"""
@@ -124,17 +148,17 @@ class MessagingApp(FreeResizeApp):
                 get_font_color_bgra(),  # Use BGRA color
                 2)
 
+            self.update()
 
             if self.server.selected_option_index is None or self.channel.selected_option_index is None:
                 return
 
-            display_messages = list(messages.get(self.server.options[self.server.selected_option_index]).get(self.channel.options[self.channel.selected_option_index]))
-            display_messages.reverse()
+            display_messages = list(self.messages.get(self.server.options[self.server.selected_option_index]).get(self.channel.options[self.channel.selected_option_index]))
 
-            for index, i in enumerate(display_messages[max(-5, -len(display_messages)):]):
+            for index, i in enumerate(display_messages[max(-5, -len(display_messages)-1):]):
                 cv2.putText(image,
                             i.get("author") + ": " + i.get("content"),
-                            (90, index * 25 + 275),
+                            (self._position.x + 0, index * 25 + 275 + self._position.y),
                             cv2.FONT_HERSHEY_SIMPLEX,
                             0.5,
                             get_font_color_bgra(),
@@ -142,4 +166,4 @@ class MessagingApp(FreeResizeApp):
                             )
 
 if __name__ == "__main__":
-    send_message("user:Hello", "ai", "dolphin-2.8-mistral-7b-v02")
+    send_message("Ahoj!", "3.E", "general")

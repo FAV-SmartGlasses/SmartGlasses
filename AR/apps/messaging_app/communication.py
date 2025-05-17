@@ -1,32 +1,57 @@
 import asyncio
+import threading
 import time
 
 import requests
 import settings_manager
 import os
 
-messages = {"DMs": {"miky8745": [{"author": "miky8745", "content": ".", "channel": "miky8745", "timestamp": "2025-04-18 14:49:26.549000+00:00"}]}, "OptiForge - SmartGlasses": {"general": [{"author": "miky8745", "content": "jo, ale dej tam minimum", "channel": "general", "timestamp": "2025-04-18 15:35:32.981000+00:00"}, {"author": "tomaskruta", "content": "ale jak?", "channel": "general", "timestamp": "2025-04-18 15:36:09.348000+00:00"}, {"author": "miky8745", "content": "spo\u010d\u00edtej si m\u00edsto a vyn\u00e1sob m\u00edstem velikost", "channel": "general", "timestamp": "2025-04-18 15:36:39.741000+00:00"}, {"author": "miky8745", "content": "a dej tam n\u011bjakou konstantu, kterou to bude\u0161 zv\u011bt\u0161ovat/zmen\u0161ovat, proto\u017ee to ur\u010dit\u011b nebude spr\u00e1vn\u011b velk\u00fd", "channel": "general", "timestamp": "2025-04-18 15:37:16.907000+00:00"}, {"author": "Optiforge user", "content": "Hello from OptiForge gui", "channel": "general", "timestamp": "2025-04-18 16:59:15.765000+00:00"}, {"author": "miky8745", "content": "no way", "channel": "general", "timestamp": "2025-04-18 16:59:26.142000+00:00"}, {"author": "tomaskruta", "content": "hezky", "channel": "general", "timestamp": "2025-04-18 16:59:37.520000+00:00"}, {"author": "miky8745", "content": "send_message(\"Hello from OptiForge gui\", \"OptiForge - SmartGlasses\", \"general\")", "channel": "general", "timestamp": "2025-04-18 17:00:27.028000+00:00"}, {"author": "tomaskruta", "content": "jak to vypad\u00e1? zat\u00edm tam je tla\u010d\u00edtko send demo meessage?", "channel": "general", "timestamp": "2025-04-18 17:00:31.717000+00:00"}, {"author": "miky8745", "content": "je\u0161t\u011b nemam tla\u010d\u00edtko", "channel": "general", "timestamp": "2025-04-18 17:00:44.291000+00:00"}, {"author": "miky8745", "content": "ani to je\u0161t\u011b neni aplikace \ud83d\ude26", "channel": "general", "timestamp": "2025-04-18 17:00:59.585000+00:00"}, {"author": "tomaskruta", "content": "ok, jestli to je takhle jednoduch\u00fd, tak tu apku klidn\u011b ud\u011bl\u00e1m, ale a\u017e po ve\u010de\u0159i a dod\u011bl\u00e1n\u00ed D\u00da z \u010dj", "channel": "general", "timestamp": "2025-04-18 17:01:48.686000+00:00"}]}}
-ai_messages = {}
-models = []
-fetch = False
+class MessageFetch:
+    def __init__(self, messages, ai_messages):
+        self.fetch = False
+        self.thread = threading.Thread(target=self.fetch_messages)
+        self.messages = messages
+        self.ai_messages = ai_messages
 
-def fetch_messages():
-    global messages, ai_messages
+    def stop(self):
+        self.thread.join()
+        self.fetch = False
 
-    url = get_endpoint_address("/messages/get")
+    def start(self):
+        self.thread.start()
 
-    while fetch:
-        response = requests.get(url)
-        if response.status_code == 200:
-            messages = response.json()[0]
-            ai_messages = response.json()[1]
-            print(f"Updated messages to {messages}")
-        else:
-            print(response.text)
+    def fetch_messages(self):
+        self.fetch = True
 
-        time.sleep(10)
+        url = get_endpoint_address("/messages/get")
 
-def send_message(message, server, channel):
+        while self.fetch:
+            lock = threading.Lock()
+
+            with lock:
+                response = requests.get(url)
+                if response.status_code == 200:
+                    self.messages.clear()
+
+                    received_messages = response.json()[0]
+
+                    for i in received_messages.keys():
+                        self.messages[i] = received_messages.get(i)
+
+                    self.ai_messages.clear()
+
+                    received_ai_messages = response.json()[1]
+
+                    for i in received_ai_messages.keys():
+                        self.ai_messages[i] = received_ai_messages.get(i)
+
+                    print(f"Updated messages to {self.messages}")
+                else:
+                    print(response.text)
+
+            time.sleep(10)
+
+def send_message(message, server, channel, ai_messages = {}):
     if server == "DM" or server == "DMraw":
         if server == "DMraw":
             tags = [channel]
@@ -39,7 +64,7 @@ def send_message(message, server, channel):
         return
 
     if server.lower() == "ai":
-        asyncio.run(send_llm(channel, message))
+        asyncio.run(send_llm(channel, message, ai_messages))
         return
 
     url = get_endpoint_address("/messages/send")
@@ -110,6 +135,8 @@ def get_models():
     url = get_endpoint_address("/models")
     response = requests.get(url)
 
+    models = []
+
     if response.ok:
         data = response.json()
 
@@ -120,7 +147,7 @@ def get_models():
     else:
         return None
 
-async def send_llm(model, message, temperature = .7):
+async def send_llm(model, message, ai_messages : dict, temperature = .7):
     url = get_endpoint_address("/llm")
 
     if ai_messages.get(model) is None:
