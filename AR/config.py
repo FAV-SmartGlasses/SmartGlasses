@@ -15,5 +15,5 @@ PRINT_TIME_OF_DRAWING = False
 PRINT_SWIPE_GESTURES = False
 
 
-r = 250              # inner radius = hole
+r = 500              # inner radius = hole
 alpha_value = 128
