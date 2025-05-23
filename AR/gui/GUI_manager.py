@@ -57,6 +57,8 @@ class GUImanager:
 
         #print(f"{gestures.left_hand.cursor.get_array()}  {gestures.left_hand.click_gesture_detected}  {gestures.right_hand.cursor.get_array()}     {gestures.right_hand.click_gesture_detected}")
 
+        image = add_transparent_ring(image)
+
         if PRINT_TIME_OF_DRAWING:
             print(f"det: {hand_detection_diff*1000}    app: {app_diff*1000}    menu: {menu_diff*1000}        all: {(menu_time - start_time)*1000}")
         return image
