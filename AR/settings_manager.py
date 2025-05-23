@@ -1,7 +1,6 @@
 import json
 from dataclasses import dataclass, asdict, field
 from enum import IntEnum
-from pathlib import Path
 
 
 class Theme(IntEnum):
@@ -44,14 +43,14 @@ class SettingsModel:
     brightness: int = 50  # (0-100)
     assistant_ON: bool = True
     GPS_ON: bool = True
-    aps_transparency: float = 0.5 # (0-1)
+    apps_transparency: float = 0.5 # (0-1)
     discord_api_ip: str = "127.0.0.1:8080"
     discord_name: str = "OptiForge user"
     discord_pfp_url: str = "https://avatars.githubusercontent.com/u/189787689?s=96&v=4"
     # TODO: implementation of other headset settings
 
 
-_settings_file = Path(__file__).parent / "settings.json"  # saves JSON into folder AR
+_settings_file = "../resources/settings.json"  # saves JSON into folder AR
 _settings = SettingsModel()
 
 # region Settings saving/loading methods
@@ -124,4 +123,4 @@ def get_custom_theme_neutral_color2():
 
 def get_app_transparency():
     load_settings()
-    return _settings.aps_transparency
+    return _settings.apps_transparency
