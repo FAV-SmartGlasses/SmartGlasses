@@ -1,7 +1,7 @@
 import json
 from dataclasses import dataclass, asdict, field
 from enum import IntEnum
-
+import os
 
 class Theme(IntEnum):
     LIGHT = 0
@@ -57,7 +57,7 @@ _settings = SettingsModel()
 def load_settings():
     global _settings
 
-    if _settings_file.exists():
+    if os.path.exists(_settings_file):
         try:
             with open(_settings_file, "r") as file:
                 data = json.load(file)
