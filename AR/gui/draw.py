@@ -4,7 +4,7 @@ import numpy as np
 
 from .color_manager import *
 from other_utilities import Position
-from config import r, alpha_value
+from config import r, r2, alpha_value
 
 
 def draw_cursor(image, cursor_position):
@@ -106,11 +106,11 @@ def add_transparent_ring(image):
     outer_radius = int(np.hypot(w, h))
 
     # Tloušťka bude rozdíl mezi vnějším a vnitřním poloměrem
-    thickness = outer_radius - r
+    thickness = outer_radius - r2
 
     # Vykreslit černý prstenec jako tlustou kružnici
     overlay = image.copy()
-    cv2.circle(overlay, center, r + thickness // 2, (0, 0, 0), thickness=thickness)
+    cv2.circle(overlay, center, r2 + thickness // 2, (0, 0, 0), thickness=thickness)
 
     result = cv2.addWeighted(overlay, alpha_value, image, 1 - alpha_value, 0)
 
