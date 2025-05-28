@@ -95,6 +95,7 @@ class UnitConverter(FixedAspectApp):
 
         if self.opened:
             self.check_fist_gesture(gestures)
+            self.draw_lines(image, gestures)
 
             overlay = image.copy()
 

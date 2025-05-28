@@ -13,6 +13,7 @@ class ToDoApp(FreeResizeApp):
     def draw(self, image: np.ndarray, gestures: DetectionModel):
         if self.opened:
             self.check_fist_gesture(gestures)
+            self.draw_lines(image, gestures)
 
             # Draw tasks
             y_offset = 50

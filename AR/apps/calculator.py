@@ -53,7 +53,8 @@ class Calculator(FixedAspectApp):
 
         if self.opened:
             self.check_fist_gesture(gestures)
-            self.check_resize_gesture(gestures)
+            self.draw_lines(image, gestures)
+            #self.check_resize_gesture(gestures)
 
             cols = len(KEYS[0])
             rows = len(KEYS)

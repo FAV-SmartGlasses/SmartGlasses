@@ -82,6 +82,7 @@ class MessagingApp(FreeResizeApp):
 
         if self.opened:
             self.check_fist_gesture(gestures)
+            self.draw_lines(image, gestures)
 
             cols = len(layout[0])
 
