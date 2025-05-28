@@ -15,11 +15,12 @@ class Menu:
     items = [
         App("Home", "Home", "Home.png"),
         Settings("Settings", "Settings", "Settings.png"),
-        ToDoApp("ToDo", "To Do", "Done.png"),
-        Calculator("Calculator", "Calculator", "Plus.png"),
+        ToDoApp("ToDo", "To Do", "Checklist.png"),
+        Calculator("Calculator", "Calculator", "Calculator.png"),
         UnitConverter("UnitConverter", "Unit Converter", "Refresh.png"),
         MessagingApp("MessagingApp", "Discord", "Discord.png"),
         App("Notes", "Notes", "Edit.png"),
+        App("SteamVR", "SteamVR", "Steam.png"),
         CloseMenu("Close.png")
     ]
 
