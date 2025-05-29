@@ -36,12 +36,6 @@ class App(MenuItem):
             wrist_diff = get_difference_between_positions(gestures.right_hand.last_wrist_position, gestures.right_hand.wrist_position)
             self._position = get_sum_of_positions(self._position, wrist_diff)
 
-    class resize_mode(Enum):
-        NONE = 0
-        WIDTH = 1
-        HEIGHT = 2
-        BOTH = 3
-
     def resize(self, gestures: DetectionModel, resize_w: bool, resize_h: bool):
         cursor_diff = get_difference_between_positions(gestures.right_hand.last_cursor_position, gestures.right_hand.cursor)
         if resize_w:
@@ -50,9 +44,6 @@ class App(MenuItem):
             self.set_height(get_sum_of_size_and_position(self._size, cursor_diff).h)
 
     def is_hovered(self, cursor_x, cursor_y, x1, y1, x2, y2):
-        """
-        Check if the cursor is hovering over a rectangular area defined by (x1, y1) and (x2, y2).
-        """
         return x1 <= cursor_x <= x2 and y1 <= cursor_y <= y2
 
     def calculate_hover_region(self, center, length, offset, is_vertical=False):
