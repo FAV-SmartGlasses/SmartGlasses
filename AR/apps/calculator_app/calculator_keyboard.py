@@ -34,7 +34,6 @@ class CalculatorKeyboard(Keyboard):
                 if len(self._text) > 0 and self.cursor_in_text_position_from_back < len(self._text):
                     cursor_position = len(self._text) - self.cursor_in_text_position_from_back
                     self._text = self._text[:cursor_position - 1] + self._text[cursor_position:] # deletes character on the place before cursor
-                    #(cursor position from back stayes the same)
         elif detected_key == "C":
             self._text = "0"
             self.cursor_in_text_position_from_back = 0
@@ -66,26 +65,20 @@ class CalculatorKeyboard(Keyboard):
         elif detected_key == ".":
             cursor_position = len(self._text) - self.cursor_in_text_position_from_back
 
-            # Přidání desetinné tečky pouze pokud:
-            # 1. Před kurzorem je číslo (nebo text je prázdný a začínáme s "0.")
-            # 2. V aktuálním čísle (od posledního operátoru nebo závorky) ještě není desetinná tečka
             if not self._text:
                 self._text = "0."
             else:
-                # Najdeme poslední operátor nebo závorku před kurzorem
                 last_operator_pos = max(
                     self._text.rfind(op, 0, cursor_position) for op in "+-*/%()"
                 )
-                # Extrahujeme aktuální číslo
+
                 current_number = self._text[last_operator_pos + 1:cursor_position]
 
-                # Přidáme tečku, pokud aktuální číslo neobsahuje tečku
                 if "." not in current_number:
                     self._text = self._text[:cursor_position] + "." + self._text[cursor_position:]
         elif detected_key == "()":
             cursor_position = len(self._text) - self.cursor_in_text_position_from_back
 
-            # Add parentheses
             if not self._text or self._text[cursor_position-1] in "+-*/%(":
                 self._text = self._text[:cursor_position] + "(" + self._text[cursor_position:]
             elif self._text[cursor_position - 1].isdigit() or self._text[cursor_position - 1] == ")":

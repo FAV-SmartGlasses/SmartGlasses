@@ -45,7 +45,7 @@ class UnitConverterManager:
         self.convert_json()  # Load the conversion data from JSON
 
         try:
-            number = Fraction(str(number))  # Přesný převod na zlomek
+            number = Fraction(str(number))
         except ValueError:
             print(f"Error: Cannot convert input '{number}' to a number.")
             return None
@@ -67,11 +67,10 @@ class UnitConverterManager:
                     if name == unit_to:
                         to_factor = factor
 
-                # Pokud jsme našli oba faktory, vypočti převod
                 if from_factor is not None and to_factor is not None:
                     basic_value = number / Fraction(str(from_factor))
                     converted_value = basic_value * Fraction(str(to_factor))
-                    return float(round(converted_value, 6))  # nebo vrátit přímo `converted_value` jako `Fraction` pokud nepotřebuješ float
+                    return float(round(converted_value, 6))
                 else:
                     print(f"Error: Unit '{unit_from}' or '{unit_to}' not found in '{quantity}'.")
                     return None

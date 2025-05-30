@@ -26,7 +26,6 @@ class ToDoKeyboard(Keyboard):
              if len(self._text) > 0 and self.cursor_in_text_position_from_back < len(self._text):
                 cursor_position = len(self._text) - self.cursor_in_text_position_from_back
                 self._text = self._text[:cursor_position - 1] + self._text[cursor_position:] # deletes character on the place before cursor
-                #(cursor position from back stayes the same)
         else:
             cursor_position = len(self._text) - self.cursor_in_text_position_from_back
             self._text = self._text[:cursor_position] + detected_key + self._text[cursor_position:]

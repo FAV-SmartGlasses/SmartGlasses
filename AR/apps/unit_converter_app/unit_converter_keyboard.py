@@ -28,21 +28,17 @@ class ConverterKeyboard(Keyboard):
             if len(self._text) > 0 and self.cursor_in_text_position_from_back < len(self._text):
                 cursor_position = len(self._text) - self.cursor_in_text_position_from_back
                 self._text = self._text[:cursor_position - 1] + self._text[cursor_position:] # deletes character on the place before cursor
-                #(cursor position from back stayes the same)
         elif detected_key == "C":
             self._text = "0"
             self.cursor_in_text_position_from_back = 0
         elif detected_key in "0123456789":
-            # Přidání čísla
             if self._text == "0" or self._text == "0":
                 self._text = detected_key
             else:
                 cursor_position = len(self._text) - self.cursor_in_text_position_from_back
                 self._text = self._text[:cursor_position] + detected_key + self._text[cursor_position:]
         elif detected_key == ".":
-            # Přidání čárky, pokud poslední znak je číslo a čárka již není v aktuálním čísle
             if self._text and self._text[-1].isdigit():
-                # Zkontroluje, zda aktuální číslo již obsahuje čárku
                 last_number = self._text.split()[-1]
                 if "." not in last_number:
                     self._text += detected_key

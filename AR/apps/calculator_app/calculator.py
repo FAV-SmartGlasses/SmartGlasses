@@ -23,7 +23,7 @@ class Calculator(FixedAspectApp):
         """Compute the aspect ratio based on the layout"""
         cols = len(self.keyboard.keys[0])
         rows = len(self.keyboard.keys)
-        sample_key_size = 10  # libovolná jednotka, důležité jsou proporce
+        sample_key_size = 10
         sample_padding = sample_key_size // 2
         sample_key_padding = sample_padding // 2
         sample_textbox_height = sample_key_size

@@ -35,6 +35,11 @@ def calculate_hover_region(center, length, offset, is_vertical=False):
         )
 
 
+def is_within_distance(point1: Position, point2: Position, max_distance: float) -> bool:
+    distance = math.sqrt((point1.x - point2.x) ** 2 + (point1.y - point2.y) ** 2)
+    return distance <= max_distance
+
+
 class App(MenuItem):
     @abstractmethod
     def __init__(self, name, display_name, icon_path):
@@ -52,11 +57,7 @@ class App(MenuItem):
         if 0 <= page_index < len(self.pages):
             self.current_page = page_index
         else:
-            print(f"Invalid page index: {page_index}")    
-
-    def is_within_distance(point1: Position, point2: Position, max_distance: float) -> bool:
-        distance = math.sqrt((point1.x - point2.x) ** 2 + (point1.y - point2.y) ** 2)
-        return distance <= max_distance
+            print(f"Invalid page index: {page_index}")
 
     def check_fist_gesture(self, gestures: DetectionModel):
         if (gestures.right_hand.last_wrist_position.get_array() != (None,None) and 
@@ -66,7 +67,7 @@ class App(MenuItem):
             wrist_diff = get_difference_between_positions(gestures.right_hand.last_wrist_position, gestures.right_hand.wrist_position)
             new_position = get_sum_of_positions(self._position, wrist_diff)
 
-            if(self.is_within_distance(new_position, self._position, r)):
+            if is_within_distance(new_position, self._position, r):
                 self._position = new_position
 
     def resize(self, gestures: DetectionModel, resize_w: bool, resize_h: bool):
