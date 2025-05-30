@@ -1,75 +1,35 @@
 import cv2
-import numpy as np
 from picamera2 import Picamera2
-import time
 
+from camera_manager import CameraManager
 from config import *
 from gui.GUI_manager import GUImanager
 
+
 def main():
     picam2 = Picamera2()
-    
-    window_name = 'AR Menu'
-    cv2.namedWindow(window_name, cv2.WND_PROP_FULLSCREEN)
-    cv2.setWindowProperty(window_name, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
-
     camera_config = picam2.create_still_configuration(main={"size": (W, H)})
     picam2.configure(camera_config)
     picam2.start()
 
+    window_name = 'AR Menu'
+    cv2.namedWindow(window_name, cv2.WND_PROP_FULLSCREEN)
+    cv2.setWindowProperty(window_name, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
     ui_manager = GUImanager()
-
-    prev_time = time.time()
-    frame_count = 0
-    cam_fps = None
-    
+    camera_manager = CameraManager(scale_down=SCALE_DOWN, show_fps=SHOW_FPS, two_eyes=TWO_EYES)
 
     while True:
         image = picam2.capture_array()
-
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-        original_h, original_w = image.shape[:2]
-
-        resized_image = cv2.resize(image, (original_w - original_w//SCALE_DOWN, original_h - original_h//SCALE_DOWN))
-        resized_h, resized_w = resized_image.shape[:2]
-
-        pad_top = (original_h - resized_h) // 2
-        pad_bottom = original_h - resized_h - pad_top
-        pad_left = (original_w - resized_w) // 2
-        pad_right = original_w - resized_w - pad_left
-
-        image = cv2.copyMakeBorder(resized_image, 0, 0, pad_left, pad_right, cv2.BORDER_CONSTANT,
-                                   value=[0, 0, 0])
-
-        target_width = image.shape[1] // 2
-
-        image = image[:, target_width // 2:target_width // 2 + target_width]
-
+        image, resized_w, resized_h = camera_manager.process_frame(image)
         image = ui_manager.display_GUI(image)
 
-        image = cv2.copyMakeBorder(image, pad_top, pad_bottom, 0, 0, cv2.BORDER_CONSTANT,
-                                   value=[0, 0, 0])
-        image = np.hstack((image, image))
+        image = camera_manager.make_two_eye_view(image, resized_w, resized_h)
 
-        frame_count += 1
-        
-        current_time = time.time()
-        elapsed_time = current_time - prev_time
-        
-        if elapsed_time > 1:
-            cam_fps = frame_count / elapsed_time
-            print(f'FPS: {cam_fps}')
-            
-            frame_count = 0
-            prev_time = current_time
-        if SHOW_FPS and cam_fps is not None:
-            text = "{:.2f}".format(cam_fps)
-            text_size = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 1)[0]
-            text_x = (resized_w - text_size[0]) // 2
-            text_y = (resized_h - text_size[1]) // 2
-            cv2.putText(image, text, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0,0,0), 1, cv2.LINE_AA)
+        camera_manager.calculate_fps()
+        camera_manager.display_fps(image, resized_w, resized_h)
 
         cv2.imshow('AR Menu', image)
 
