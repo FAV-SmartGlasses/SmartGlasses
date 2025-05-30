@@ -32,7 +32,7 @@ class CameraManager:
 
         return image, resized_w, resized_h
 
-    def make_two_eye_view(self, image, resized_w, resized_h):
+    def make_two_eye_view(self, image, resized_h):
         # Add padding to restore height and duplicate the image for two-eye view
         pad_top = (resized_h - resized_h // self.scale_down) // 2
         pad_bottom = resized_h - resized_h // self.scale_down - pad_top

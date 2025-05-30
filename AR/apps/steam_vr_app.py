@@ -1,6 +1,7 @@
-from apps.app_base import App, FreeResizeApp, FixedAspectApp
-from gui.keyboard import Keyboard
+from apps.app_base import FreeResizeApp
 from gui.draw import *
+from gui.keyboard import Keyboard
+
 
 class SteamVR(FreeResizeApp):
     def __init__(self, name: str, display_name: str, icon_path: str):
