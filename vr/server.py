@@ -2,38 +2,44 @@ import socket
 import time
 import board
 import busio
-import adafruit_bno055
+import adafruit_bno055  # pip install adafruit-circuitpython-bno055
 import array
 
+# Define IP and port
 IP = "0.0.0.0"
 PORT = 31000
 
-# Initialize I2C
+# Set up I2C outside the loop so it persists across reconnects
 i2c = busio.I2C(board.SCL, board.SDA)
 
 def try_connect_sensor(i2c, attempts=10, delay=0.5):
-    for _ in range(attempts):
+    """Try to connect to the BNO055 sensor with retries."""
+    for attempt in range(attempts):
         try:
             sensor = adafruit_bno055.BNO055_I2C(i2c)
             if sensor.quaternion is not None:
                 print("Sensor connected.")
                 return sensor
-        except:
-            pass
+        except Exception as e:
+            print(f"Sensor connect attempt {attempt+1} failed: {e}")
         time.sleep(delay)
     return None
 
+def reorder_bno(q):  # (w, x, y, z) → (x, y, z, -w)
+    return [q[1], q[0], q[2], -q[3]]
+
 def wait_for_valid_quat(sensor, timeout=3.0):
+    """Wait for a non-zero quaternion from the sensor."""
+    print("Waiting for valid quaternion...")
     start = time.time()
     while time.time() - start < timeout:
         q = sensor.quaternion
-        if q is not None:
+        if q is not None and any(abs(val) > 1e-3 for val in q):
+            print("Valid quaternion received.")
             return reorder_bno(q)
         time.sleep(0.1)
+    print("Timeout waiting for valid quaternion.")
     return None
-
-def reorder_bno(q):  # (w, x, y, z) › (x, y, z, -w)
-    return [q[1], q[0], q[2], -q[3]]
 
 def quat_inverse(q):
     x, y, z, w = q
@@ -52,14 +58,13 @@ def quat_multiply(q1, q2):
 def main():
     sensor = try_connect_sensor(i2c)
     if not sensor:
-        print("Could not connect to BNO055.")
+        print("Could not connect to BNO055 sensor. Exiting.")
         return
 
     zero_quat = wait_for_valid_quat(sensor)
     if not zero_quat:
-        print("Failed to get initial orientation.")
+        print("Failed to zero orientation. Exiting.")
         return
-    print("Initial orientation zeroed.")
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
         server_socket.bind((IP, PORT))
@@ -73,32 +78,34 @@ def main():
             with client_socket:
                 while True:
                     try:
-                        q = sensor.quaternion
-                        if q is None:
+                        quat = sensor.quaternion
+                        if quat is None:
                             continue
 
-                        q_now = reorder_bno(q)
+                        q_now = reorder_bno(quat)
                         q_rel = quat_multiply(quat_inverse(zero_quat), q_now)
 
                         packet = array.array('f', q_rel).tobytes()
                         client_socket.sendall(packet)
 
-                        time.sleep(0.01)  # ~100 Hz
+                        time.sleep(0.01)  # ~100Hz
                     except (ConnectionResetError, BrokenPipeError):
-                        print("Client disconnected.")
+                        print("Client disconnected unexpectedly.")
                         break
                     except OSError as e:
-                        print(f"Sensor error: {e}. Reconnecting...")
+                        print(f"Sensor error: {e}. Attempting to reconnect...")
                         sensor = try_connect_sensor(i2c)
                         if not sensor:
+                            print("Failed to reconnect to sensor. Closing client connection.")
                             break
                         zero_quat = wait_for_valid_quat(sensor)
                         if not zero_quat:
-                            print("Failed to re-zero sensor.")
+                            print("Failed to zero after reconnect.")
                             break
-                        print("Sensor reconnected and zeroed.")
+
+            print("Client disconnected.")
 
 try:
     main()
 except KeyboardInterrupt:
-    print("Exiting cleanly.")
+    print("\nShutting down gracefully.")
