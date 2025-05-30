@@ -2,10 +2,12 @@ from abc import abstractmethod
 
 import cv2
 import numpy as np
+import math
 
 from hand_detection_models import *
 from menu_items import MenuItem
 from other_utilities import *
+from config import r
 
 
 class App(MenuItem):
@@ -25,7 +27,11 @@ class App(MenuItem):
         if 0 <= page_index < len(self.pages):
             self.current_page = page_index
         else:
-            print(f"Invalid page index: {page_index}")
+            print(f"Invalid page index: {page_index}")    
+
+    def is_within_distance(point1: Position, point2: Position, max_distance: float) -> bool:
+        distance = math.sqrt((point1.x - point2.x) ** 2 + (point1.y - point2.y) ** 2)
+        return distance <= max_distance
 
     def check_fist_gesture(self, gestures: DetectionModel):
         if (gestures.right_hand.last_wrist_position.get_array() != (None,None) and 
@@ -33,7 +39,10 @@ class App(MenuItem):
             gestures.right_hand.wrist_position.get_array() != (None,None)):
 
             wrist_diff = get_difference_between_positions(gestures.right_hand.last_wrist_position, gestures.right_hand.wrist_position)
-            self._position = get_sum_of_positions(self._position, wrist_diff)
+            new_position = get_sum_of_positions(self._position, wrist_diff)
+
+            if(self.is_within_distance(new_position, self._position, r)):
+                self._position = new_position
 
     def resize(self, gestures: DetectionModel, resize_w: bool, resize_h: bool):
         cursor_diff = get_difference_between_positions(gestures.right_hand.last_cursor_position, gestures.right_hand.cursor)

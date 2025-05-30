@@ -26,6 +26,6 @@ class SteamVR(FreeResizeApp):
             overlay = image.copy()
 
             # Draw the keyboard
-            self.keyboard.draw(overlay, gestures, self._size, self._position)
+            self.keyboard.draw(overlay, gestures)
 
             cv2.addWeighted(overlay, 0.5, image, 0.5, 0, image)
