@@ -1,8 +1,7 @@
 from abc import abstractmethod
-from enum import Enum
 
-import numpy as np
 import cv2
+import numpy as np
 
 from hand_detection_models import *
 from menu_items import MenuItem
@@ -170,7 +169,6 @@ class App(MenuItem):
         if resize_w or resize_h:
             self.resize(gestures, resize_w, resize_h)
 
-#region Opening/closing app
     def clicked(self):
         super().clicked()
         if self.opened:
@@ -192,15 +190,13 @@ class App(MenuItem):
 
     def draw(self, image: np.ndarray, gestures: DetectionModel):
         self.draw_lines(image, gestures)
-#endregion
 
 class FixedAspectApp(App):
     def __init__(self, name, display_name, icon_path):
         super().__init__(name, display_name, icon_path)
         
         self.aspect_ratio: int
-           
-#region computing and setting size
+
     @abstractmethod
     def compute_aspect_ratio(self):
         if self.does_have_aspect_ratio:
@@ -214,7 +210,6 @@ class FixedAspectApp(App):
     def set_height(self, h):
         w = int(h * self.aspect_ratio)
         self._size = Size(w, h)
-#endregion    
 
 
 class FreeResizeApp(App):

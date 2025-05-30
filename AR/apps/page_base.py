@@ -23,8 +23,7 @@ class FixedAspectPage(Page):
         super().__init__()
         
         self.aspect_ratio: int = self.compute_aspect_ratio()
-           
-#region computing and setting size
+
     @abstractmethod
     def compute_aspect_ratio(self):
         raise NotImplementedError
@@ -36,7 +35,6 @@ class FixedAspectPage(Page):
     def set_height(self, h):
         w = int(h * self.aspect_ratio)
         self._size = Size(w, h)
-#endregion    
 
 
 class FreeResizePage(Page):

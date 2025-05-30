@@ -53,7 +53,7 @@ class SettingsModel:
 _settings_file = "../resources/settings.json"  # saves JSON into folder AR
 _settings = SettingsModel()
 
-# region Settings saving/loading methods
+
 def load_settings():
     global _settings
 
@@ -97,9 +97,7 @@ def set_settings(**kwargs):
         if hasattr(_settings, key):
             setattr(_settings, key, value)
     save_settings()
-#endregion
 
-# region Theme-related methods
 def get_theme():
     load_settings()
     return _settings.theme
@@ -119,7 +117,6 @@ def get_custom_theme_neutral_color():
 def get_custom_theme_neutral_color2():
     load_settings()
     return _settings.custom_theme_neutral_color2
-# endregion
 
 def get_app_transparency():
     load_settings()

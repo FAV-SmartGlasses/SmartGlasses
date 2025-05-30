@@ -164,7 +164,6 @@ class HandDetection:
 
         return image, result
 
-#region fist detection
 
     def is_fist_detected(self, hand_landmarks) -> bool:
         #getting positions of every finger
@@ -183,9 +182,7 @@ class HandDetection:
         # if distances between fingers are smaller than DISTANCE_THRESHOLD, fist gesture is detected
         return (thumb_index_distance < DISTANCE_THRESHOLD and index_middle_distance < DISTANCE_THRESHOLD and
                 middle_ring_distance < DISTANCE_THRESHOLD and ring_pinky_distance < DISTANCE_THRESHOLD)
-#endregion
 
-#region swipe gesture
     def swipe_gesture_detected(self, hand_landmarks, w, h, is_left):
         wrist = self.get_wrist(hand_landmarks, w, h)  # Get wrist position
 
@@ -224,7 +221,6 @@ class HandDetection:
 
         return gesture_detected
 
-    #endregion
 
     def get_left_and_right_hands(self, hand_landmarks_list, w, h):
         hand_1_wrist = self.get_wrist(hand_landmarks_list[0], w, h)
@@ -249,8 +245,6 @@ class HandDetection:
 
         return click_gesture_detected
 
-#region get points
-
     def get_thumb_tip(self, hand_landmarks, w, h) -> Position:
         return get_point(self.mp_hands.HandLandmark.THUMB_TIP, hand_landmarks, w, h)
     
@@ -268,4 +262,3 @@ class HandDetection:
         middle_point_y = (thumb_tip.y + index_tip.y) // 2
 
         return Position(middle_point_x, middle_point_y)
-#endregion
