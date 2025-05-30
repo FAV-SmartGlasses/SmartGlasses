@@ -46,7 +46,6 @@ class Dropdown(Element):
                 option_x = self._position.x
                 option_y = self._position.y + (index + 1) * (self._size.h + self.padding)
 
-                # Zkontrolujeme, jestli je kurzor nad možností
                 rect = (option_x, option_y, option_x + self._size.w, option_y + self._size.h)
                 hovered = False
 

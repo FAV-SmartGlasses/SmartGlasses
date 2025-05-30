@@ -103,85 +103,13 @@ def add_transparent_ring(image):
     h, w = image.shape[:2]
     center = (w // 2, h // 2)
 
-    # Spočítat poloměr tak, aby přetékal ven
     outer_radius = int(np.hypot(w, h))
 
-    # Tloušťka bude rozdíl mezi vnějším a vnitřním poloměrem
     thickness = outer_radius - r2
 
-    # Vykreslit černý prstenec jako tlustou kružnici
     overlay = image.copy()
     cv2.circle(overlay, center, r2 + thickness // 2, (0, 0, 0), thickness=thickness)
 
     result = cv2.addWeighted(overlay, alpha_value, image, 1 - alpha_value, 0)
 
     return result
-
-    """h, w = image.shape[:2]
-    center = (w // 2, h // 2)
-    outer_radius = int(np.hypot(w, h))  # přesahuje obraz
-
-    # Maska s prstencem: 1.0 = plná aplikace alpha
-    mask = np.zeros((h, w), dtype=np.float32)
-    cv2.circle(mask, center, outer_radius, 1.0, -1)
-    cv2.circle(mask, center, r, 0.0, -1)
-
-    # Reshape masky pro RGB
-    mask = mask.reshape(h, w, 1)
-
-    # Převod na float32 pro výpočty
-    image_f = image.astype(np.float32)
-    black_overlay = np.zeros_like(image_f)
-
-    # Alpha blending jen na místech masky
-    result = image_f * (1 - mask * alpha_value) + black_overlay * (mask * alpha_value)
-    result = np.clip(result, 0, 255).astype(np.uint8)
-    return result"""
-
-"""def add_transparent_ring(image):
-    h, w = image.shape[:2]
-    center = (w // 2, h // 2)
-    outer_radius = int(np.hypot(w, h))  # zajistí přetečení přes okraje
-
-    # maska: 255 tam, kde bude prstenec
-    mask = np.zeros((h, w), dtype=np.uint8)
-    cv2.circle(mask, center, outer_radius, 255, -1)
-    cv2.circle(mask, center, r, 0, -1)
-
-    # overlay (černý) a příprava blendingu
-    overlay = np.zeros_like(image, dtype=np.uint8)
-
-    # PŘEVOD NA FLOAT PRO BLENDING
-    image_f = image.astype(np.float32)
-    mask_f = (mask / 255.0).reshape(h, w, 1).astype(np.float32)
-
-    # blending
-    result = image_f * (1 - mask_f * alpha_value)
-
-    # ořízni hodnoty a zpět na uint8
-    result = np.clip(result, 0, 255).astype(np.uint8)
-    return result"""
-
-"""
-def add_transparent_ring(image):
-    h, w = image.shape[:2]
-    center = (w // 2, h // 2)
-    outer_radius = int(np.hypot(w, h))  # přetéká přes celý obrázek
-
-    # maska: 255 tam, kde bude prstenec, 0 jinde (včetně díry)
-    mask = np.zeros((h, w), dtype=np.uint8)
-    cv2.circle(mask, center, outer_radius, 255, thickness=-1)
-    cv2.circle(mask, center, r, 0, thickness=-1)
-
-    # vytvoř černý overlay (stejný rozměr jako image)
-    overlay = np.zeros_like(image, dtype=np.uint8)
-
-    # převeď masku na float v rozsahu 0–1 a roztáhni na 3 kanály
-    mask_float = (mask / 255.0).reshape(h, w, 1)  # shape (h, w, 1)
-    
-    # alpha blending
-    blended = image * (1 - mask_float * alpha_value) + overlay * (mask_float * alpha_value)
-    blended = blended.astype(np.uint8)
-
-    return blended
-"""
