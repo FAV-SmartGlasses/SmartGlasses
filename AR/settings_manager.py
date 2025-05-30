@@ -80,7 +80,7 @@ def load_settings():
                 )
         except (json.JSONDecodeError, KeyError, TypeError) as e:
             print(f"Error loading settings: {e}. Creating default settings.")
-            save_settings()  # Uloží výchozí nastavení
+            save_settings()
     else:
         save_settings()  # Save default settings if file doesn't exist
 
