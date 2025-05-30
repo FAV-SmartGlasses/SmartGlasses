@@ -8,6 +8,33 @@ import numpy as np
 from config import *
 from hand_detection_models import *
 
+DISTANCE_THRESHOLD = 0.05
+
+def calculate_distance_3d(point1, point2):
+    return math.sqrt((point1.x - point2.x) ** 2 + (point1.y - point2.y) ** 2 + (point1.z - point2.z) ** 2)
+
+
+def combine_swipe_gestures(left_gesture: SwipeGesture, right_gesture: SwipeGesture):
+    if left_gesture == SwipeGesture.RIGHT and right_gesture == SwipeGesture.RIGHT:
+        return SwipeGesture.BOTH_RIGHT
+    elif left_gesture == SwipeGesture.LEFT and right_gesture == SwipeGesture.LEFT:
+        return SwipeGesture.BOTH_LEFT
+    elif left_gesture == SwipeGesture.LEFT and right_gesture == SwipeGesture.RIGHT:
+        return SwipeGesture.BOTH_OUT
+    elif left_gesture == SwipeGesture.RIGHT and right_gesture == SwipeGesture.LEFT:
+        return SwipeGesture.BOTH_IN
+    elif left_gesture != SwipeGesture.NO and right_gesture == SwipeGesture.NO:
+        return left_gesture
+    elif left_gesture == SwipeGesture.NO and right_gesture != SwipeGesture.NO:
+        return right_gesture
+    else:
+        return SwipeGesture.NO
+
+
+def get_point(id_, hand_landmarks, w, h) -> Position:
+    lm = hand_landmarks.landmark[id_]
+    return Position(int(lm.x * w), int(lm.y * h))
+
 
 class HandDetection:
     DIST_THRESHOLD = 40  # finger touch threshold
@@ -130,7 +157,7 @@ class HandDetection:
             result.left_hand.clicked = False
             result.right_hand.clicked = False
 
-        result.swipe = self.combine_swipe_gestures(left_swipe_gesture_detected, right_swipe_gesture_detected)
+        result.swipe = combine_swipe_gestures(left_swipe_gesture_detected, right_swipe_gesture_detected)
 
         if PRINT_SWIPE_GESTURES and result.swipe is not SwipeGesture.NO:
             print(result.swipe.name)
@@ -138,9 +165,7 @@ class HandDetection:
         return image, result
 
 #region fist detection
-    def calculate_distance_3d(self, point1, point2):
-        return math.sqrt((point1.x - point2.x) ** 2 + (point1.y - point2.y) ** 2 + (point1.z - point2.z) ** 2)
-    
+
     def is_fist_detected(self, hand_landmarks) -> bool:
         #getting positions of every finger
         thumb_tip = hand_landmarks.landmark[self.mp_hands.HandLandmark.THUMB_TIP]
@@ -150,15 +175,14 @@ class HandDetection:
         pinky_tip = hand_landmarks.landmark[self.mp_hands.HandLandmark.PINKY_TIP]
 
         # calculating distances between fingers with 3D coordinates
-        thumb_index_distance = self.calculate_distance_3d(thumb_tip, index_tip)
-        index_middle_distance = self.calculate_distance_3d(index_tip, middle_tip)
-        middle_ring_distance = self.calculate_distance_3d(middle_tip, ring_tip)
-        ring_pinky_distance = self.calculate_distance_3d(ring_tip, pinky_tip)
+        thumb_index_distance = calculate_distance_3d(thumb_tip, index_tip)
+        index_middle_distance = calculate_distance_3d(index_tip, middle_tip)
+        middle_ring_distance = calculate_distance_3d(middle_tip, ring_tip)
+        ring_pinky_distance = calculate_distance_3d(ring_tip, pinky_tip)
 
-        # if distances between fingers are smaller than DISTANCE_TREESHOLD, fist gesture is detected
-        DISTANCE_TREESHOLD = 0.05
-        return (thumb_index_distance < DISTANCE_TREESHOLD and index_middle_distance < DISTANCE_TREESHOLD and 
-                middle_ring_distance < DISTANCE_TREESHOLD and ring_pinky_distance < DISTANCE_TREESHOLD)
+        # if distances between fingers are smaller than DISTANCE_THRESHOLD, fist gesture is detected
+        return (thumb_index_distance < DISTANCE_THRESHOLD and index_middle_distance < DISTANCE_THRESHOLD and
+                middle_ring_distance < DISTANCE_THRESHOLD and ring_pinky_distance < DISTANCE_THRESHOLD)
 #endregion
 
 #region swipe gesture
@@ -200,22 +224,7 @@ class HandDetection:
 
         return gesture_detected
 
-    def combine_swipe_gestures(self, left_gesture: SwipeGesture, right_gesture: SwipeGesture):
-        if left_gesture == SwipeGesture.RIGHT and right_gesture == SwipeGesture.RIGHT:
-            return SwipeGesture.BOTH_RIGHT
-        elif left_gesture == SwipeGesture.LEFT and right_gesture == SwipeGesture.LEFT:
-            return SwipeGesture.BOTH_LEFT
-        elif left_gesture == SwipeGesture.LEFT and right_gesture == SwipeGesture.RIGHT:
-            return SwipeGesture.BOTH_OUT
-        elif left_gesture == SwipeGesture.RIGHT and right_gesture == SwipeGesture.LEFT:
-            return SwipeGesture.BOTH_IN
-        elif left_gesture != SwipeGesture.NO and right_gesture == SwipeGesture.NO:
-            return left_gesture
-        elif left_gesture == SwipeGesture.NO and right_gesture != SwipeGesture.NO:
-            return right_gesture
-        else:
-            return SwipeGesture.NO
-#endregion
+    #endregion
 
     def get_left_and_right_hands(self, hand_landmarks_list, w, h):
         hand_1_wrist = self.get_wrist(hand_landmarks_list[0], w, h)
@@ -241,18 +250,15 @@ class HandDetection:
         return click_gesture_detected
 
 #region get points
-    def get_point(self, id_, hand_landmarks, w, h) -> Position:
-        lm = hand_landmarks.landmark[id_]
-        return Position(int(lm.x * w), int(lm.y * h))
 
     def get_thumb_tip(self, hand_landmarks, w, h) -> Position:
-        return self.get_point(self.mp_hands.HandLandmark.THUMB_TIP, hand_landmarks, w, h)
+        return get_point(self.mp_hands.HandLandmark.THUMB_TIP, hand_landmarks, w, h)
     
     def get_index_tip(self, hand_landmarks, w, h) -> Position:
-        return self.get_point(self.mp_hands.HandLandmark.INDEX_FINGER_TIP, hand_landmarks, w, h)
+        return get_point(self.mp_hands.HandLandmark.INDEX_FINGER_TIP, hand_landmarks, w, h)
 
     def get_wrist(self, hand_landmarks, w, h) -> Position:
-        return self.get_point(self.mp_hands.HandLandmark.WRIST, hand_landmarks, w, h)
+        return get_point(self.mp_hands.HandLandmark.WRIST, hand_landmarks, w, h)
     
     def get_cursor_position(self, w, h, hand_landmarks) -> Position:
         thumb_tip = self.get_thumb_tip(hand_landmarks, w, h)  # Get thumb position

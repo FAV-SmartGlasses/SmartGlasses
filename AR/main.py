@@ -1,10 +1,8 @@
 import cv2
-import numpy as np
-import time
 
+from camera_manager import CameraManager
 from config import *
 from gui.GUI_manager import GUImanager
-from camera_manager import CameraManager
 
 
 def main():
