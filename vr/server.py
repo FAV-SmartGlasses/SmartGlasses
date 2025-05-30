@@ -2,21 +2,18 @@ import socket
 import time
 import board
 import busio
-import adafruit_bno055  # pip install adafruit-circuitpython-bno055
+import adafruit_bno055
 import array
 
-# Define IP and port
 IP = "0.0.0.0"
 PORT = 31000
-
-# Set up I2C outside the loop so it persists across reconnects
 i2c = busio.I2C(board.SCL, board.SDA)
 
 def try_connect_sensor(i2c, attempts=10, delay=0.5):
-    """Try to connect to the BNO055 sensor with retries."""
     for attempt in range(attempts):
         try:
             sensor = adafruit_bno055.BNO055_I2C(i2c)
+            time.sleep(1.0)  # Let the sensor settle
             if sensor.quaternion is not None:
                 print("Sensor connected.")
                 return sensor
@@ -28,15 +25,15 @@ def try_connect_sensor(i2c, attempts=10, delay=0.5):
 def reorder_bno(q):  # (w, x, y, z) → (x, y, z, -w)
     return [q[1], q[0], q[2], -q[3]]
 
-def wait_for_valid_quat(sensor, timeout=3.0):
-    """Wait for a non-zero quaternion from the sensor."""
+def wait_for_valid_quat(sensor, timeout=5.0):
     print("Waiting for valid quaternion...")
     start = time.time()
     while time.time() - start < timeout:
         q = sensor.quaternion
         if q is not None and any(abs(val) > 1e-3 for val in q):
-            print("Valid quaternion received.")
-            return reorder_bno(q)
+            reordered = reorder_bno(q)
+            print(f"Zeroing with quaternion: {reordered}")
+            return reordered
         time.sleep(0.1)
     print("Timeout waiting for valid quaternion.")
     return None
@@ -66,6 +63,8 @@ def main():
         print("Failed to zero orientation. Exiting.")
         return
 
+    zero_inv = quat_inverse(zero_quat)
+
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
         server_socket.bind((IP, PORT))
         server_socket.listen(1)
@@ -83,12 +82,12 @@ def main():
                             continue
 
                         q_now = reorder_bno(quat)
-                        q_rel = quat_multiply(quat_inverse(zero_quat), q_now)
+                        q_rel = quat_multiply(zero_inv, q_now)
 
                         packet = array.array('f', q_rel).tobytes()
                         client_socket.sendall(packet)
 
-                        time.sleep(0.01)  # ~100Hz
+                        time.sleep(0.01)
                     except (ConnectionResetError, BrokenPipeError):
                         print("Client disconnected unexpectedly.")
                         break
@@ -102,6 +101,7 @@ def main():
                         if not zero_quat:
                             print("Failed to zero after reconnect.")
                             break
+                        zero_inv = quat_inverse(zero_quat)
 
             print("Client disconnected.")
 
