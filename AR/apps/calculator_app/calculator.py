@@ -45,7 +45,7 @@ class Calculator(FixedAspectApp):
 
             cols = len(self.keyboard.keys[0])
             rows = len(self.keyboard.keys)
-            sample_key_size = 10  # libovolná jednotka, důležité jsou proporce
+            sample_key_size = 10
             sample_padding = sample_key_size // 2
             sample_key_padding = sample_padding // 2
             sample_textbox_height = sample_key_size
@@ -76,7 +76,6 @@ class Calculator(FixedAspectApp):
             
             self.keyboard.draw(overlay, gestures)
 
-            # Kombinace původního obrázku a překryvného obrázku s průhledností
             alpha = get_app_transparency()
             cv2.addWeighted(overlay, alpha, image, 1 - alpha, 0, image)
 
