@@ -77,7 +77,6 @@ class Menu:
 
             if item_y <= cursor.y <= item_y + item_height:
                 self._current_selection = i
-                #print(f"Zelená čára ukazuje na: {self._items[i].get_name()}")
         
     def check_click_gesture(self, click_gesture_detected: bool):
         if click_gesture_detected:
@@ -93,29 +92,25 @@ class Menu:
         menu_x = 10
         menu_y = h // 2 - menu_height // 2
 
-        # Poloprůhledné pozadí menu
         overlay = image.copy()
 
-        if True: #konstanta zda vykrelit pozadí pro menu
-            draw_rounded_rectangle(overlay,
-                                        (menu_x, menu_y), 
-                                        (menu_x + menu_width, menu_y + menu_height), 
-                                        30, 
-                                        get_nice_color(), 
-                                        -1)
-            cv2.addWeighted(overlay, 0.4, image, 1 - 0.4, 0, image)
+        draw_rounded_rectangle(overlay,
+                                    (menu_x, menu_y),
+                                    (menu_x + menu_width, menu_y + menu_height),
+                                    30,
+                                    get_nice_color(),
+                                    -1)
+        cv2.addWeighted(overlay, 0.4, image, 1 - 0.4, 0, image)
 
-        # Zaoblené čtverce pro ikony
         for i, item in enumerate(self.items):
             if isinstance(item, App) and item.opened:
-                color = get_nice_color()  # Barva pro otevřenou aplikaci
+                color = get_nice_color()
             else:
-                color = get_neutral_color()  # Barva pro zavřenou aplikaci
+                color = get_neutral_color()
             
             item_x = menu_x + padding
-            item_y = menu_y + padding + i * (item_height + padding) #(menu_height // len(self._items))
+            item_y = menu_y + padding + i * (item_height + padding)
 
-            # Vyreslení bublin pro ikony
             radius = item_height // 2 if i != self._current_selection else math.ceil(item_height // 2 * 1.5)
             cv2.circle(image, 
                         (menu_x + (menu_width // 2 ), 
@@ -124,33 +119,29 @@ class Menu:
                         color, 
                         -1)
 
-            # Načtení a vykreslení ikony
             icon_path = item.get_icon_path()
             if icon_path:
                 icon = cv2.imread(icon_path, cv2.IMREAD_UNCHANGED)
                 if icon is not None:
                     icon_size = int(item_height / 5 * (3 if i != self._current_selection else 5))
-                    icon = cv2.resize(icon, (icon_size, icon_size))  # Přizpůsobení velikosti ikony
+                    icon = cv2.resize(icon, (icon_size, icon_size))
 
-                    padded_icon = np.zeros((item_height, item_height, 4), dtype=np.uint8)  # Vytvoření prázdného pozadí pro ikonu
+                    padded_icon = np.zeros((item_height, item_height, 4), dtype=np.uint8)
 
-                    # Výpočet pozice pro umístění ikony do středu
                     y_offset = (item_height - icon_size) // 2
                     x_offset = (item_height - icon_size) // 2
 
-                    # Vložení ikony do středu matice
                     padded_icon[y_offset:y_offset + icon_size, x_offset:x_offset + icon_size] = icon
 
                     icon_y = item_y
                     icon_x = item_x
-                    # Přidání ikony do menu
-                    if icon.shape[2] == 4:  # Pokud má ikona alfa kanál
+
+                    if icon.shape[2] == 4:
                         alpha_channel = icon[:, :, 3] / 255.0
-                        for c in range(3):  # Pro RGB kanály
+                        for c in range(3):
                             image[icon_y + y_offset:icon_y + y_offset + icon_size, icon_x + x_offset:icon_x + x_offset + icon_size, c] = (
                                 alpha_channel * icon[:, :, c] +
                                 (1 - alpha_channel) * image[icon_y + y_offset:icon_y + y_offset + icon_size, icon_x + x_offset:icon_x + x_offset + icon_size, c]
                             )
                     else:
                         image[icon_y + y_offset:icon_y + y_offset + icon_size, icon_x + x_offset:icon_x + x_offset + icon_size] = icon
-            #cv2.putText(image, item.get_display_name(), (item_x + 20, item_y + item_height // 2 + 10), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)

@@ -32,4 +32,4 @@ class CloseMenu(MenuItem):
         self.close()
 
     def close(self):
-        pass #jelikož se po vybrání nějaké položky v menu menu automaticky zavře, nění potřeba implementovat zavření menu
+        pass
