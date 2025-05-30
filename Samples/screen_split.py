@@ -5,7 +5,7 @@ SCALE_DOWN = 5
 
 # Kamera
 cap = cv2.VideoCapture(0)
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, 3840)  # Šířka obrazu
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 3840)
 
 while cap.isOpened():
     success, image = cap.read()
@@ -36,13 +36,12 @@ while cap.isOpened():
     image = image[:, target_width//2:target_width//2+target_width]
     image = np.hstack((image, image))
 
-    # Zobrazení obrazu
     cv2.imshow('AR Menu', image)
 
     key = cv2.waitKey(1) & 0xFF
-    if key == 27 or key == ord('q') or key == ord('Q'):  # ESC nebo 'q' pro ukončení
+    if key == 27 or key == ord('q') or key == ord('Q'):
         break
-    if cv2.getWindowProperty('AR Menu', cv2.WND_PROP_VISIBLE) < 1:  # Kontrola zavření okna
+    if cv2.getWindowProperty('AR Menu', cv2.WND_PROP_VISIBLE) < 1:
         break
 
 cap.release()
