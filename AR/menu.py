@@ -5,7 +5,6 @@ from apps.app_base import App
 from apps.calculator_app.calculator import Calculator
 from apps.messaging_app.messaging import MessagingApp
 from apps.settings import *
-from apps.steam_vr_app import SteamVR
 from apps.unit_converter_app.unit_converter import UnitConverter
 from gui.draw import *
 from hand_detection_models import *
@@ -21,7 +20,6 @@ class Menu:
         UnitConverter("UnitConverter", "Unit Converter", "Refresh.png"),
         MessagingApp("MessagingApp", "Discord", "Discord2.png"),
         App("Notes", "Notes", "Edit.png"),
-        SteamVR("SteamVR", "Steam VR", "Steam.png"),
         CloseMenu("Close.png")
     ]
 

@@ -25,7 +25,7 @@ class GUImanager:
 
         for item in self.menu.items:
             if isinstance(item, App) and item.opened: # if item is app and is opened
-                if(self.menu.get_visible()):
+                if self.menu.get_visible():
                     # when is menu opened, any application can't get a cursor or click event
                     edited_gestures = copy.deepcopy(gestures)
                     edited_gestures.left_hand.clicked = False

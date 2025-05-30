@@ -10,12 +10,12 @@ from settings_manager import *
 class Settings(FreeResizeApp):
     def __init__(self, name: str, display_name: str, icon_path: str):
         super().__init__(name, display_name, icon_path)
-        self._position: Position = Position(100, 100)  # Pozice aplikace na obrazovce
-        self._size: Size = Size(400, 400)  # Velikost aplikace
+        self._position: Position = Position(100, 100)
+        self._size: Size = Size(400, 400)
         self.button = Button(None, Position(300, 400), Size(100, 50), "Settings",
                           get_neutral_color(), get_neutral_color(), get_font_color(), 
                           get_nice_color(), get_neutral_color2(), get_font_color())
-        self.toggle = ToggleButtons("neco", Position(self._position.x + 10, self._position.y + 10), 20, ["Option 1", "Option 2", "Option 3"])
+        self.toggle = ToggleButtons("", Position(self._position.x + 10, self._position.y + 10), 20, ["Option 1", "Option 2", "Option 3"])
 
     def draw(self, image: np.ndarray, gestures: DetectionModel):
         
@@ -31,8 +31,7 @@ class Settings(FreeResizeApp):
                                     30, 
                                     get_nice_color(), 
                                     -1)
-            
-            # Kombinace původního obrázku a překryvného obrázku s průhledností
+
             alpha = get_app_transparency()
             cv2.addWeighted(overlay, alpha, image, 1 - alpha, 0, image)
 
@@ -48,5 +47,3 @@ class Settings(FreeResizeApp):
             self.button.draw(image, is_in_rect)
             
             self.toggle.draw(image)
-        
-            #TODO: implementace vykreslení aplikace nastavení

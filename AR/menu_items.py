@@ -20,7 +20,7 @@ class MenuItem:
         return self._name
 
     def get_icon_path(self) -> str:
-        base_path = os.path.dirname(__file__)  # Získá adresář aktuálního souboru
+        base_path = os.path.dirname(__file__)
         return os.path.join(base_path, "..", "resources", "icons", self._icon_path)
 
 class CloseMenu(MenuItem):

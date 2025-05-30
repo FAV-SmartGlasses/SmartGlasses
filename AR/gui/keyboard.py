@@ -49,7 +49,6 @@ class Keyboard:
                 if len(self.click_history) != 0:
                     if not self.click_history[-1]:
                         self.process_detected_key(detected_key)
-                        print(f"Stisknuta klávesa: {detected_key}")
                         self.click_history.append(True)
                 else:
                     self.click_history.append(True)
@@ -59,7 +58,6 @@ class Keyboard:
 
         overlay = image.copy()
 
-        # Procházení kláves a jejich vykreslení
         for row_idx, row in enumerate(self.keys):
             for col_idx, key in enumerate(row):
                 if key == "" or key == " ":
@@ -89,21 +87,18 @@ class Keyboard:
                                         new_border_color, 
                                         2)
 
-                # Vykreslení textu klávesy
                 text_size = cv2.getTextSize(key, cv2.FONT_HERSHEY_SIMPLEX, 0.8, 2)[0]
                 text_x = x1 + (self.key_size - text_size[0]) // 2
                 text_y = y1 + (self.key_size + text_size[1]) // 2
                 cv2.putText(overlay, key, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, 0.8, new_font_color, 2)
 
-        # Kombinace původního obrázku a překryvného obrázku s průhledností
-        alpha = 0.5  # Nastavení průhlednosti (0.0 = zcela průhledné, 1.0 = zcela neprůhledné)
+        alpha = 0.5
         cv2.addWeighted(overlay, alpha, image, 1 - alpha, 0, image)
 
     def detect_key_press(self, cursor: Position, draw_blank_keys: bool):
         if cursor.x is None or cursor.y is None:
             return None
 
-        # Procházení kláves a kontrola, zda kliknutí spadá do jejich oblasti
         for row_idx, row in enumerate(self.keys):
             for col_idx, key in enumerate(row):
                 x1 = self.position.x + col_idx * (self.key_size + self.key_padding)
@@ -114,5 +109,5 @@ class Keyboard:
                 if x1 <= cursor.x <= x2 and y1 <= cursor.y <= y2:
                     if not draw_blank_keys and (key == "" or key == " "):
                         return None
-                    return key  # Vrátí stisknutou klávesu
+                    return key
         return None
