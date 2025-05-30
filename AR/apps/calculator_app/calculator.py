@@ -1,6 +1,6 @@
 from apps.app_base import FixedAspectApp
-from gui.draw import *
 from apps.calculator_app.calculator_keyboard import CalculatorKeyboard
+from gui.draw import *
 from hand_detection_models import *
 from other_utilities import *
 

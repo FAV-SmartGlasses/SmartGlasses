@@ -1,10 +1,11 @@
+import array
 import socket
 import time
+
+import adafruit_bno055  # pip install adafruit-circuitpython-bno055
 import board
 import busio
-import adafruit_bno055  # pip install adafruit-circuitpython-bno055
-import array
-    
+
 # Define IP and port
 IP = "0.0.0.0"  # Listen on all interfaces
 PORT = 31000

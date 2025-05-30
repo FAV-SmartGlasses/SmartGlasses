@@ -1,7 +1,9 @@
 from abc import ABC, abstractmethod
+
 import numpy as np
 
 from other_utilities import Position, Size
+
 
 class Element(ABC):
     @abstractmethod

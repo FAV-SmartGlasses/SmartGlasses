@@ -1,7 +1,8 @@
 import json
+import os
 from dataclasses import dataclass, asdict, field
 from enum import IntEnum
-import os
+
 
 class Theme(IntEnum):
     LIGHT = 0

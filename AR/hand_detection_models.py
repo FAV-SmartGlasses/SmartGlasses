@@ -1,5 +1,7 @@
 from enum import Enum
+
 from other_utilities import Position
+
 
 class SwipeGesture(Enum):
     NO = 0

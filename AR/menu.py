@@ -1,18 +1,15 @@
 import math
 
-from apps.app_base import App
-
-from apps.unit_converter_app.unit_converter import UnitConverter
 from apps.ToDo_app.ToDo_app import ToDoApp
+from apps.app_base import App
 from apps.calculator_app.calculator import Calculator
 from apps.messaging_app.messaging import MessagingApp
 from apps.settings import *
 from apps.steam_vr_app import SteamVR
-
-from menu_items import CloseMenu
-
+from apps.unit_converter_app.unit_converter import UnitConverter
 from gui.draw import *
 from hand_detection_models import *
+from menu_items import CloseMenu
 
 
 class Menu:

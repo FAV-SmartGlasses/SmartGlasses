@@ -1,10 +1,12 @@
 import asyncio
+import os
 import threading
 import time
 
 import requests
+
 import settings_manager
-import os
+
 
 class MessageFetch:
     def __init__(self, messages, ai_messages):

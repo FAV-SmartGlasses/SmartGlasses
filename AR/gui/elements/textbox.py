@@ -1,5 +1,6 @@
-from .element_base import Element
 from other_utilities import Position, Size
+from .element_base import Element
+
 
 class TextBox(Element):
     def __init__(self, position: Position, size: Size, value: str, placeholder: str):

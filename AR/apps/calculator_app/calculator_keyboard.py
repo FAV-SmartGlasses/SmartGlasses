@@ -1,6 +1,6 @@
-from gui.keyboard import Keyboard
 import math
 
+from gui.keyboard import Keyboard
 
 MAX_LENGTH = 10
 

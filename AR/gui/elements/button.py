@@ -1,7 +1,8 @@
 from gui.draw import *
-from other_utilities import Position, Size
 from gui.elements.element_base import Element
 from hand_detection_models import DetectionModel
+from other_utilities import Position, Size
+
 
 class Button(Element):
     def __init__(self, icon, position: Position, size: Size, text: str,

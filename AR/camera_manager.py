@@ -1,6 +1,8 @@
+import time
+
 import cv2
 import numpy as np
-import time
+
 
 class CameraManager:
     def __init__(self, scale_down: int = 4, show_fps = False, two_eyes = False):

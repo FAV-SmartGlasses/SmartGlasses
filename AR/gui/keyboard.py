@@ -1,5 +1,5 @@
-from .draw import *
 from hand_detection_models import *
+from .draw import *
 
 
 class Keyboard:

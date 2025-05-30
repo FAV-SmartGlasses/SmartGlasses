@@ -1,10 +1,11 @@
 import datetime
+
 import cv2
 import numpy as np
 
-from .color_manager import *
+from config import r2, alpha_value
 from other_utilities import Position
-from config import r, r2, alpha_value
+from .color_manager import *
 
 
 def draw_cursor(image, cursor_position):

@@ -1,7 +1,7 @@
 from gui.draw import *
 from gui.elements.element_base import Element
-from gui.color_manager import *
 from other_utilities import Position, Size
+
 
 class ToggleButton(Element):
     def __init__(self, position: Position, height, text):

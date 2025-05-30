@@ -1,12 +1,11 @@
-import time
 import copy
+import time
 
-from .draw import *
-from hand_detection import HandDetection
-from menu import Menu
 from apps.app_base import App
 from config import PRINT_TIME_OF_DRAWING
-from other_utilities import *
+from hand_detection import HandDetection
+from menu import Menu
+from .draw import *
 
 
 class GUImanager:

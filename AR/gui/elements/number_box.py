@@ -1,8 +1,8 @@
-from .element_base import Element
-from other_utilities import *
-from hand_detection_models import DetectionModel
 from gui.draw import *
-from gui.color_manager import *
+from hand_detection_models import DetectionModel
+from other_utilities import *
+from .element_base import Element
+
 
 class NumberBox(Element):
     def __init__(self, position: Position, size: Size, step: float=1, min_value: float=None, max_value: float=None):
