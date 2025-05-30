@@ -78,7 +78,7 @@ def main():
                 while True:
                     try:
                         quat = sensor.quaternion
-                        if quat is None:
+                        if quat is None or len(quat) != 4 or "None" in str(quat):
                             continue
 
                         q_now = reorder_bno(quat)
