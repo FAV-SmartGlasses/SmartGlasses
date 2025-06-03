@@ -25,7 +25,7 @@ class Button(Element):
         self.hovering_font_color = hover_font_color
 
     def is_hovered_or_clicked(self, gestures: DetectionModel) -> tuple[bool, bool]:
-        rect = (*self._position.get_array(), self._position.x + self._size.w, self._position.y + self._size.h)
+        rect = (*self._position.get_array(), self._position.x + self.size.w, self._position.y + self.size.h)
         is_left_hovered = is_cursor_in_rect(gestures.left_hand.cursor, rect)
         is_right_hovered = is_cursor_in_rect(gestures.right_hand.cursor, rect)
         is_left_clicked = is_left_hovered and gestures.left_hand.clicked
@@ -36,7 +36,7 @@ class Button(Element):
         return is_hovered, is_clicked
 
     def draw(self, frame, is_hovered):
-        self.rect = (self._position.x, self._position.y, self._position.x + self._size.w, self._position.y + self._size.h)  # (x1, y1, x2, y2)
+        self.rect = (self._position.x, self._position.y, self._position.x + self.size.w, self._position.y + self.size.h)  # (x1, y1, x2, y2)
         self.is_hovered = is_hovered
 
         # setting colors based on hover state
@@ -60,6 +60,6 @@ class Button(Element):
             thickness = 1
             font = cv2.FONT_HERSHEY_SIMPLEX
             text_size = cv2.getTextSize(self.text, font, font_scale, thickness)[0]
-            text_x = x1 + (self._size.w - text_size[0]) // 2
-            text_y = y1 + (self._size.h + text_size[1]) // 2 - 5
+            text_x = x1 + (self.size.w - text_size[0]) // 2
+            text_y = y1 + (self.size.h + text_size[1]) // 2 - 5
             cv2.putText(frame, self.text, (text_x, text_y), font, font_scale, font_color, thickness)

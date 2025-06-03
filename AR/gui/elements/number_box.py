@@ -13,12 +13,12 @@ class NumberBox(Element):
         self.value = min_value
 
     def draw(self, overlay: np.ndarray, gestures: DetectionModel):
-        draw_rounded_rectangle(overlay, 
-                               self._position.get_array(), 
-                               get_right_bottom_pos(self._position, self._size).get_array(), 
+        draw_rounded_rectangle(overlay,
+                               self._position.get_array(),
+                               get_right_bottom_pos(self._position, self.size).get_array(),
                                10, get_nice_color(), -1)
         text = str(self.value) if self.value is not None else ""
         text_size = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)[0]
-        text_x = self._position.x + (self._size.w - text_size[0])//2
-        text_y = self._position.y + (self._size.h + text_size[1])//2
+        text_x = self._position.x + (self.size.w - text_size[0]) // 2
+        text_y = self._position.y + (self.size.h + text_size[1]) // 2
         cv2.putText(overlay, text, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, 1, get_font_color_bgra(), 2)

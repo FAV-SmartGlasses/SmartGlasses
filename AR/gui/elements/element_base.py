@@ -9,11 +9,11 @@ class Element(ABC):
     @abstractmethod
     def __init__(self, position: Position, size: Size):
         self._position = position
-        self._size = size
+        self.size = size
 
     def set_position_and_size(self, position: Position, size: Size):
         self._position = position
-        self._size = size
+        self.size = size
 
     @abstractmethod
     def draw(self, image: np.ndarray):

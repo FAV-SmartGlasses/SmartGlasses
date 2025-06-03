@@ -116,17 +116,17 @@ class MessagingApp(FreeResizeApp):
                 scaled_key_padding)
 
             self.server.set_position_and_size(
-                Position(self._position.x + scaled_padding + self.initial_positions[0].x, self._position.y + textbox_height + scaled_padding + self.initial_positions[0].y), self.server._size
+                Position(self._position.x + scaled_padding + self.initial_positions[0].x, self._position.y + textbox_height + scaled_padding + self.initial_positions[0].y), self.server.size
                 )
 
             self.channel.set_position_and_size(
                 Position(self._position.x + scaled_padding + self.initial_positions[1].x, self._position.y + textbox_height + scaled_padding + self.initial_positions[1].y),
-                self.channel._size
+                self.channel.size
             )
 
             self.send.set_position_and_size(
                 Position(self._position.x + scaled_padding + self.initial_positions[2].x, self._position.y + textbox_height + scaled_padding + self.initial_positions[2].y),
-                self.send._size
+                self.send.size
             )
 
             self.messaging_keyboard.draw(overlay, gestures)
@@ -138,7 +138,7 @@ class MessagingApp(FreeResizeApp):
             cv2.addWeighted(overlay, alpha, image, 1 - alpha, 0, image)
 
             # Draw the text inside the textbox
-            text_size = cv2.getTextSize(self.messaging_keyboard._text, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)[0]
+            text_size = cv2.getTextSize(self.messaging_keyboard.text, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)[0]
             text_x = self._position.x + (textbox_width - text_size[0]) // 2
             text_y = self._position.y + (textbox_height + text_size[1] + scaled_padding) // 2
             cv2.putText(

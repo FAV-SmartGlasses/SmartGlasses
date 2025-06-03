@@ -1,8 +1,6 @@
 import copy
-import time
 
 from apps.app_base import App
-from config import PRINT_TIME_OF_DRAWING
 from hand_detection import HandDetection
 from menu import Menu
 from .draw import *
@@ -14,14 +12,7 @@ class GUImanager:
         self.hand_detection = HandDetection()
 
     def display_GUI(self, image):
-        if PRINT_TIME_OF_DRAWING:
-            start_time = time.time()
-
         (image, gestures) = self.hand_detection.process_image(image) # processing image and detecting gestures
-
-        if PRINT_TIME_OF_DRAWING:
-            hand_detection_time = time.time()
-            hand_detection_diff = hand_detection_time - start_time
 
         for item in self.menu.items:
             if isinstance(item, App) and item.opened: # if item is app and is opened
@@ -36,16 +27,8 @@ class GUImanager:
                     item.draw(image, edited_gestures) # drawing app
                 else:
                     item.draw(image, gestures) # drawing app
-                    
-        if PRINT_TIME_OF_DRAWING:
-            app_time = time.time()
-            app_diff = app_time - hand_detection_time
 
         self.menu.display_menu(image, gestures)  # drawing menu
-        
-        if PRINT_TIME_OF_DRAWING:
-            menu_time = time.time()
-            menu_diff = menu_time - app_time
        
         draw_time_bar(image, self.menu.get_visible())  # drawing time bar
 
@@ -58,6 +41,4 @@ class GUImanager:
 
         image = add_transparent_ring(image)
 
-        if PRINT_TIME_OF_DRAWING:
-            print(f"det: {hand_detection_diff*1000}    app: {app_diff*1000}    menu: {menu_diff*1000}        all: {(menu_time - start_time)*1000}")
         return image

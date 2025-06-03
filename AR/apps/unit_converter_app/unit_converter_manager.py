@@ -9,7 +9,7 @@ class UnitConverterManager:
     _file_path = Path(__file__).parent / "unit_converter_data.json"  #  path to json file
 
     def __init__(self):
-        self._quantities_data_list: tuple[UnitData]
+        self._quantities_data_list: tuple[UnitData] | None = None
 
     def get_quantities_options(self):
         self.convert_json()

@@ -7,10 +7,9 @@ from other_utilities import Size
 
 
 class Page(ABC):
-    @abstractmethod
     def __init__(self):
-        self._position: Position
-        self._size: Size
+        self._position: Position | None = None
+        self._size: Size | None = None
 
     @abstractmethod
     def draw(self, image_overlay: np.ndarray, gestures: DetectionModel):
@@ -18,7 +17,6 @@ class Page(ABC):
     
 
 class FixedAspectPage(Page):
-    @abstractmethod
     def __init__(self):
         super().__init__()
         

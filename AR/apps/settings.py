@@ -35,12 +35,12 @@ class Settings(FreeResizeApp):
             alpha = get_app_transparency()
             cv2.addWeighted(overlay, alpha, image, 1 - alpha, 0, image)
 
-            left_in_rect = is_cursor_in_rect(gestures.left_hand.cursor, 
-                                             (self.button._position.x, self.button._position.y, 
-                                              self.button._position.x + self.button._size.w, self.button._position.y + self.button._size.h))
-            right_in_rect = is_cursor_in_rect(gestures.right_hand.cursor, 
-                                              (self.button._position.x, self.button._position.y, 
-                                               self.button._position.x + self.button._size.w, self.button._position.y + self.button._size.h))
+            left_in_rect = is_cursor_in_rect(gestures.left_hand.cursor,
+                                             (self.button._position.x, self.button._position.y,
+                                              self.button._position.x + self.button.size.w, self.button._position.y + self.button.size.h))
+            right_in_rect = is_cursor_in_rect(gestures.right_hand.cursor,
+                                              (self.button._position.x, self.button._position.y,
+                                               self.button._position.x + self.button.size.w, self.button._position.y + self.button.size.h))
             
             is_in_rect = left_in_rect or right_in_rect
 

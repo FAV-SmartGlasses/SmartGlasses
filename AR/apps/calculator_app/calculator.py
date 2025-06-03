@@ -80,7 +80,7 @@ class Calculator(FixedAspectApp):
             cv2.addWeighted(overlay, alpha, image, 1 - alpha, 0, image)
 
             # Draw the text inside the textbox
-            text_size = cv2.getTextSize(self.keyboard._text, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)[0]
+            text_size = cv2.getTextSize(self.keyboard.text, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)[0]
             text_x = self._position.x + (textbox_width - text_size[0]) // 2
             text_y = self._position.y + (textbox_height + text_size[1] + scaled_padding) // 2
             cv2.putText(

@@ -1,3 +1,4 @@
+from abc import ABC
 from typing import List
 
 from apps.app_base import FixedAspectApp
@@ -10,7 +11,7 @@ from hand_detection_models import *
 from other_utilities import *
 
 
-class UnitConverter(FixedAspectApp):
+class UnitConverter(FixedAspectApp, ABC):
     def __init__(self, name: str, display_name: str, icon_path: str):
         super().__init__(name, display_name, icon_path)
 
@@ -18,9 +19,6 @@ class UnitConverter(FixedAspectApp):
         self.keyboard.set_colors(get_neutral_color_bgra(), get_neutral_color2_bgra(), get_font_color_bgra(), 
                                 get_neutral_color2_bgra(), get_nice_color_bgra(), get_nice_color_bgra())
 
-        """self.aspect_ratio = self.compute_aspect_ratio()
-
-        self._size = Size(800, int(800 / self.aspect_ratio))"""
         self._position = Position(0, 0)
 
         self.quantities_data_list: List[UnitData] = []  # list of UnitData objects
@@ -137,7 +135,7 @@ class UnitConverter(FixedAspectApp):
             from_unit = self.unit_from_dropdown.selected_option
             to_unit = self.unit_to_dropdown.selected_option
             quantity = self.quantity_dropdown.selected_option
-            in_number = str(self.number_box_in.value).replace("|", "")  #self.keyboard._text
+            in_number = str(self.number_box_in.value).replace("|", "")  #self.keyboard.text
             out_number = self.manager.convert_number(in_number, quantity, from_unit, to_unit)
             
             self.number_box_out.value = out_number

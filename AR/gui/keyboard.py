@@ -4,14 +4,24 @@ from .draw import *
 
 class Keyboard:
     def __init__(self, layout : list[list[str]], text = ""):
-        self._text = text
+        self.text = text
         self.click_history = []
         self.keys: list[list[str]] = layout
         self.key_size: int
         self.key_padding: int
         self.detected_key = None
-        self.position: Position = None
+        self.position: Position | None = None
         self.cursor_in_text_position_from_back: int = 0 # 0 means cursor is at the end of the text
+
+        self.key_size = 0
+        self.key_padding = 0
+
+        self.color = None
+        self.border_color = None
+        self.font_color = None
+        self.hover_color = None
+        self.hover_border_color = None
+        self.hover_font_color = None
 
     def process_detected_key(self, detected_key):
         raise NotImplemented()
@@ -31,12 +41,12 @@ class Keyboard:
 
     def get_text_with_cursor(self):
         """returns text with cursor as char |  on right place"""
-        if self.cursor_in_text_position_from_back <= len(self._text):
-            cursor_position = len(self._text) - self.cursor_in_text_position_from_back
-            return self._text[:cursor_position] + "|" + self._text[cursor_position:]
+        if self.cursor_in_text_position_from_back <= len(self.text):
+            cursor_position = len(self.text) - self.cursor_in_text_position_from_back
+            return self.text[:cursor_position] + "|" + self.text[cursor_position:]
         else:
             self.cursor_in_text_position_from_back = 0
-            return self._text + "|"
+            return self.text + "|"
 
     def draw(self, image: np.ndarray, gesture: DetectionModel, draw_blank_keys: bool = True):
         left_detected_key = self.detect_key_press(gesture.left_hand.cursor, draw_blank_keys)

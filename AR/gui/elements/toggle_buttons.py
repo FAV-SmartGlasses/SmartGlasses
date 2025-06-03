@@ -16,10 +16,10 @@ class ToggleButton(Element):
 
         
         background_color = get_nice_color() if toggled else get_neutral_color()
-        draw_rounded_rectangle(image, 
-                                (self._position.x, self._position.y), 
-                                (self._position.x + self._size.w, self._position.y + self._size.h), 
-                                10, background_color, -1)
+        draw_rounded_rectangle(image,
+                               (self._position.x, self._position.y),
+                               (self._position.x + self.size.w, self._position.y + self.size.h),
+                               10, background_color, -1)
         cv2.putText(image, self.text, (self._position.x + 10, self._position.y + 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
 
         return image
@@ -43,8 +43,8 @@ class ToggleButtons(Element):
         # Draw the button with transparency (50%)
         overlay = image.copy()
 
-        draw_rounded_rectangle(overlay, (self._position.x, self._position.y), 
-                               (self._position.x + self._size.w, self._position.y + self._size.h), 
+        draw_rounded_rectangle(overlay, (self._position.x, self._position.y),
+                               (self._position.x + self.size.w, self._position.y + self.size.h),
                                10, get_nice_color(), -1)
 
         alpha = 0.5

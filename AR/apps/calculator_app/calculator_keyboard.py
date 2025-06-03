@@ -17,85 +17,85 @@ class CalculatorKeyboard(Keyboard):
     def __init__(self):
         super().__init__(KEYS)
         self.evaluated = False
-        self._text = "0"
+        self.text = "0"
 
     def process_detected_key(self, detected_key):
         if detected_key == "<-":
-            if self._text and len(self._text) > self.cursor_in_text_position_from_back:
+            if self.text and len(self.text) > self.cursor_in_text_position_from_back:
                 self.cursor_in_text_position_from_back += 1
         elif detected_key == "->":
-            if self._text and self.cursor_in_text_position_from_back > 0:
+            if self.text and self.cursor_in_text_position_from_back > 0:
                 self.cursor_in_text_position_from_back -= 1
         elif detected_key == "X":
             if self.evaluated:
-                self._text = "0"
+                self.text = "0"
                 self.evaluated = False
-            if self._text:
-                if len(self._text) > 0 and self.cursor_in_text_position_from_back < len(self._text):
-                    cursor_position = len(self._text) - self.cursor_in_text_position_from_back
-                    self._text = self._text[:cursor_position - 1] + self._text[cursor_position:] # deletes character on the place before cursor
+            if self.text:
+                if len(self.text) > 0 and self.cursor_in_text_position_from_back < len(self.text):
+                    cursor_position = len(self.text) - self.cursor_in_text_position_from_back
+                    self.text = self.text[:cursor_position - 1] + self.text[cursor_position:] # deletes character on the place before cursor
         elif detected_key == "C":
-            self._text = "0"
+            self.text = "0"
             self.cursor_in_text_position_from_back = 0
         elif detected_key in "0123456789":
             if self.evaluated:
-                self._text = ""
+                self.text = ""
                 self.cursor_in_text_position_from_back = 0
                 self.evaluated = False
-            if self._text == "0" or self._text == "":
-                self._text = detected_key
+            if self.text == "0" or self.text == "":
+                self.text = detected_key
             else:
-                cursor_position = len(self._text) - self.cursor_in_text_position_from_back
-                self._text = self._text[:cursor_position] + detected_key + self._text[cursor_position:]
+                cursor_position = len(self.text) - self.cursor_in_text_position_from_back
+                self.text = self.text[:cursor_position] + detected_key + self.text[cursor_position:]
         elif detected_key in "+-*/%^":
-            cursor_position = len(self._text) - self.cursor_in_text_position_from_back
+            cursor_position = len(self.text) - self.cursor_in_text_position_from_back
             # Add an operator if the last character is not an operator
-            if self._text and self._text[cursor_position - 1] not in "+-*/%^":
+            if self.text and self.text[cursor_position - 1] not in "+-*/%^":
                 if self.evaluated:
                     self.cursor_in_text_position_from_back = 0
                     self.evaluated = False
-                self._text = self._text[:cursor_position] + detected_key + self._text[cursor_position:]
+                self.text = self.text[:cursor_position] + detected_key + self.text[cursor_position:]
         elif detected_key == "pi":
-            cursor_position = len(self._text) - self.cursor_in_text_position_from_back
+            cursor_position = len(self.text) - self.cursor_in_text_position_from_back
             if self.evaluated:
-                self._text = ""
+                self.text = ""
                 self.cursor_in_text_position_from_back = 0
                 self.evaluated = False
-            self._text = self._text[:cursor_position] + detected_key + self._text[cursor_position:]
+            self.text = self.text[:cursor_position] + detected_key + self.text[cursor_position:]
         elif detected_key == ".":
-            cursor_position = len(self._text) - self.cursor_in_text_position_from_back
+            cursor_position = len(self.text) - self.cursor_in_text_position_from_back
 
-            if not self._text:
-                self._text = "0."
+            if not self.text:
+                self.text = "0."
             else:
                 last_operator_pos = max(
-                    self._text.rfind(op, 0, cursor_position) for op in "+-*/%()"
+                    self.text.rfind(op, 0, cursor_position) for op in "+-*/%()"
                 )
 
-                current_number = self._text[last_operator_pos + 1:cursor_position]
+                current_number = self.text[last_operator_pos + 1:cursor_position]
 
                 if "." not in current_number:
-                    self._text = self._text[:cursor_position] + "." + self._text[cursor_position:]
+                    self.text = self.text[:cursor_position] + "." + self.text[cursor_position:]
         elif detected_key == "()":
-            cursor_position = len(self._text) - self.cursor_in_text_position_from_back
+            cursor_position = len(self.text) - self.cursor_in_text_position_from_back
 
-            if not self._text or self._text[cursor_position-1] in "+-*/%(":
-                self._text = self._text[:cursor_position] + "(" + self._text[cursor_position:]
-            elif self._text[cursor_position - 1].isdigit() or self._text[cursor_position - 1] == ")":
-                if self._text.count("(") > self._text.count(")"):
-                    self._text = self._text[:cursor_position] + ")" + self._text[cursor_position:]
+            if not self.text or self.text[cursor_position - 1] in "+-*/%(":
+                self.text = self.text[:cursor_position] + "(" + self.text[cursor_position:]
+            elif self.text[cursor_position - 1].isdigit() or self.text[cursor_position - 1] == ")":
+                if self.text.count("(") > self.text.count(")"):
+                    self.text = self.text[:cursor_position] + ")" + self.text[cursor_position:]
                 else:
-                    self._text = self._text[:cursor_position] + "(" + self._text[cursor_position:]
-        elif detected_key == "=" and self._text:
+                    self.text = self.text[:cursor_position] + "(" + self.text[cursor_position:]
+        elif detected_key == "=" and self.text:
             # Evaluate the expression
             try:
-                self._text = self._text.replace("pi", str(math.pi))
-                self._text = self._text.replace("^", "**")
-                self._text = str(eval(self._text))
+                self.text = self.text.replace("pi", str(math.pi))
+                self.text = self.text.replace("^", "**")
+                self.text = str(eval(self.text))
             except (SyntaxError, ZeroDivisionError):
-                self._text = "Invalid"
+                self.text = "Invalid"
             self.evaluated = True
 
         # Limit the text length
-        self._text = self._text[:MAX_LENGTH]
-        print(f"Current text: {self._text}")
+        self.text = self.text[:MAX_LENGTH]
+        print(f"Current text: {self.text}")

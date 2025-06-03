@@ -207,13 +207,11 @@ class FixedAspectApp(App):
     def __init__(self, name, display_name, icon_path):
         super().__init__(name, display_name, icon_path)
         
-        self.aspect_ratio: int
+        self.aspect_ratio: int | None = None
 
     @abstractmethod
     def compute_aspect_ratio(self):
-        if self.does_have_aspect_ratio:
-            #implement
-            raise NotImplementedError
+        raise NotImplementedError
 
     def set_width(self, w):
         h = int(w / self.aspect_ratio)

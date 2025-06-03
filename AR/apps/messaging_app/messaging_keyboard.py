@@ -9,16 +9,16 @@ class MessagingKeyboard(keyboard.Keyboard):
     def process_detected_key(self, detected_key):
         match detected_key:
             case "<-":
-                if self._text and len(self._text) > self.cursor_in_text_position_from_back:
+                if self.text and len(self.text) > self.cursor_in_text_position_from_back:
                     self.cursor_in_text_position_from_back += 1
             case "->":
-                if self._text and self.cursor_in_text_position_from_back > 0:
+                if self.text and self.cursor_in_text_position_from_back > 0:
                     self.cursor_in_text_position_from_back -= 1
             case "X":
-                if self._text:
-                    if len(self._text) > 0 and self.cursor_in_text_position_from_back < len(self._text):
-                        cursor_position = len(self._text) - self.cursor_in_text_position_from_back
-                        self._text = self._text[:cursor_position - 1] + self._text[
+                if self.text:
+                    if len(self.text) > 0 and self.cursor_in_text_position_from_back < len(self.text):
+                        cursor_position = len(self.text) - self.cursor_in_text_position_from_back
+                        self.text = self.text[:cursor_position - 1] + self.text[
                                                                     cursor_position:]
             case _:
-                self._text += detected_key
+                self.text += detected_key

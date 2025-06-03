@@ -62,7 +62,6 @@ def load_settings():
         try:
             with open(_settings_file, "r") as file:
                 data = json.load(file)
-                #_settings = Settings(**data)
                 _settings = SettingsModel(
                     theme=Theme(data["theme"]),
                     custom_theme_font_color=tuple(data["custom_theme_font_color"]),
