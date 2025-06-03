@@ -13,13 +13,11 @@ from menu_items import CloseMenu
 
 class Menu:
     items = [
-        App("Home", "Home", "Home.png"),
         Settings("Settings", "Settings", "Settings.png"),
         ToDoApp("ToDo", "To Do", "Checklist.png"),
         Calculator("Calculator", "Calculator", "Calculator.png"),
         UnitConverter("UnitConverter", "Unit Converter", "Refresh.png"),
         MessagingApp("MessagingApp", "Discord", "Discord2.png"),
-        App("Notes", "Notes", "Edit.png"),
         CloseMenu("Close.png")
     ]
 

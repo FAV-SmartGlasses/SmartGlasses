@@ -39,6 +39,6 @@ class GUImanager:
 
         #print(f"{gestures.left_hand.cursor.get_array()}  {gestures.left_hand.click_gesture_detected}  {gestures.right_hand.cursor.get_array()}     {gestures.right_hand.click_gesture_detected}")
 
-        image = add_transparent_ring(image)
+        #image = add_transparent_ring(image)
 
         return image
