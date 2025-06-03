@@ -120,7 +120,7 @@ class HandDetection:
                 right_hand = hand_landmarks_list[0]
 
                 result.right_hand.fist = self.is_fist_detected(right_hand)
-                print(f"fist: {result.right_hand.fist}")
+
                 if result.right_hand.fist:
                     cv2.putText(image, "fist!", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
