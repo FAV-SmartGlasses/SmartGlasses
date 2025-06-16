@@ -8,6 +8,7 @@ from hand_detection_models import DetectionModel
 from other_utilities import *
 from . import messaging_keyboard
 from .communication import *
+from .messaging_utils import space_split
 
 load_dotenv(os.path.abspath("../resources/.env"))
 
@@ -21,6 +22,8 @@ layout = [
 
 scaled_key_size = 0
 scaled_padding = 0
+
+cutoff = 30
 
 class MessagingApp(FreeResizeApp):
     def __init__(self, name, display_name, icon_path):
@@ -58,6 +61,7 @@ class MessagingApp(FreeResizeApp):
 
         with lock:
             self.server.options = list(self.messages.keys())
+            self.server.options.append("AI")
 
         self.old_server = self.new_server
         self.new_server = self.server.selected_option_index
@@ -66,13 +70,17 @@ class MessagingApp(FreeResizeApp):
             self.channel.selected_option_index = None
 
         if self.server.selected:
-            self.channel.options = list(self.messages.get(self.server.selected_option).keys())
+            if self.server.selected_option == "AI":
+                self.channel.options = list(get_models())
+
+            else:
+                self.channel.options = list(self.messages.get(self.server.selected_option).keys())
         else:
             self.channel.options = []
 
         if send and self.server.selected and self.channel.selected:
-            send_message(self.messaging_keyboard._text, self.server.selected_option, self.channel.selected_option)
-            self.messaging_keyboard._text = ""
+            send_message(self.messaging_keyboard.text, self.server.selected_option, self.channel.selected_option)
+            self.messaging_keyboard.text = ""
 
     def draw(self, image: np.ndarray, gestures: DetectionModel):
         """Draw the calculator UI dynamically based on the current size"""
@@ -155,11 +163,20 @@ class MessagingApp(FreeResizeApp):
             if not self.server.selected or not self.channel.selected:
                 return
 
-            display_messages = list(self.messages.get(self.server.selected_option).get(self.channel.selected_option))
+            ai = self.server.selected_option == "AI"
+
+            if ai:
+                display_messages = self.ai_messages.get(self.channel.selected_option)
+                if display_messages is None:
+                    return
+
+                display_messages = space_split(list(display_messages)[-1].get("content"), cutoff)
+            else:
+                display_messages = list(self.messages.get(self.server.selected_option).get(self.channel.selected_option))
 
             for index, i in enumerate(display_messages[max(-5, -len(display_messages)-1):]):
                 cv2.putText(image,
-                            i.get("author") + ": " + i.get("content"),
+                            i.get("author") + ": " + i.get("content") if not ai else i,
                             (self._position.x + 0, index * 25 + 275 + self._position.y),
                             cv2.FONT_HERSHEY_SIMPLEX,
                             0.5,

@@ -157,13 +157,9 @@ async def send_llm(model, message, ai_messages : dict, temperature = .7):
     if ai_messages.get(model) is None:
         ai_messages[model] = []
 
-    ai_messages.get(model).append(create_ai_message_from_text(message))
-
-    chat = ai_messages
-
     payload = {
+        "message": create_ai_message("user", message),
         "model": model,
-        "messages": chat,
         "temperature": temperature
     }
     response = requests.post(url, json=payload)
