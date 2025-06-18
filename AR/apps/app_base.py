@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 import math
 
+from gui.color_manager import *
 from hand_detection_models import *
 from menu_items import MenuItem
 from other_utilities import *
@@ -105,8 +106,7 @@ class App(MenuItem):
         line_length = 60  # Shorter line length
         circle_radius = 20
         circle_thickness = 3
-        default_color = (0, 255, 0)  # Green color
-        hover_color = (255, 0, 0)  # Red color
+        default_color = get_nice_color()  # (0, 255, 0)  # Green color
 
         # Initialize hover states
         right_line_thickness = default_thickness
@@ -142,7 +142,6 @@ class App(MenuItem):
             # Check if cursor is hovering over the circle
             circle_center = (right_x - circle_radius - 10, bottom_line_bottom_y - circle_radius - 10)
             if (x - circle_center[0]) ** 2 + (y - circle_center[1]) ** 2 <= circle_radius ** 2:
-                circle_color = hover_color
                 circle_thickness = -1 # Make the circle filled
                 if gestures.right_hand.clicked:
                     resize_w = True
