@@ -82,6 +82,10 @@ class HandDetection:
         h, w, _ = image.shape
 
         hands_results = self.hands.process(image)
+        # MEMORY LEAK: creating new instance of MediaPipe Hands at every frame
+        #hands_instance = self.mp_hands.Hands(static_image_mode=False, max_num_hands=2, min_detection_confidence=0.7)
+        #hands_results = hands_instance.process(image)
+        # hands_instance.close()  # this code is avoiding memory leak if 2 previus lines are uncommented
 
         result = DetectionModel()
         left_swipe_gesture_detected = SwipeGesture.NO
@@ -97,13 +101,15 @@ class HandDetection:
 
                 result.left_hand.fist = self.is_fist_detected(left_hand)
                 result.right_hand.fist = self.is_fist_detected(right_hand)
-                print(f"left fist: {result.left_hand.fist}, right fist: {result.right_hand.fist}")
+                if result.left_hand.fist and result.right_hand.fist:
+                    result.left_hand.fist = result.right_hand.fist = False
+                """print(f"left fist: {result.left_hand.fist}, right fist: {result.right_hand.fist}")
                 if result.right_hand.fist and result.left_hand.fist:
                     cv2.putText(image, "both fists!", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
                 elif result.left_hand.fist:
                     cv2.putText(image, "left fist!", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
                 elif result.right_hand.fist:
-                    cv2.putText(image, "right fist!", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+                    cv2.putText(image, "right fist!", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)"""
 
                 left_swipe_gesture_detected = self.swipe_gesture_detected(left_hand, w, h, is_left = True)
                 right_swipe_gesture_detected = self.swipe_gesture_detected(right_hand, w, h, is_left = False)
@@ -121,10 +127,12 @@ class HandDetection:
 
                 result.right_hand.fist = self.is_fist_detected(right_hand)
 
-                if result.right_hand.fist:
-                    cv2.putText(image, "fist!", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+                """if result.right_hand.fist:
+                    cv2.putText(image, "fist!", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)"""
 
                 right_swipe_gesture_detected = self.swipe_gesture_detected(right_hand, w, h, is_left=False)
+                if right_swipe_gesture_detected is not SwipeGesture.NO:
+                    print("neco")
                 result.right_hand.clicked = self.is_click_gesture_detected(right_hand, w, h)
                 result.right_hand.cursor = self.get_cursor_position(w, h, right_hand)
                 self.draw(image, right_hand)
@@ -132,10 +140,9 @@ class HandDetection:
                 result.right_hand.cursor = Position()
                 result.left_hand.cursor = Position()
 
-        result.left_hand.wrist_position = self.last_left_wrist
-        result.right_hand.wrist_position = self.last_right_wrist
         result.left_hand.last_wrist_position = self.last_left_wrist
         result.right_hand.last_wrist_position = self.last_right_wrist
+
         result.left_hand.last_cursor_position = self.last_left_cursor_position
         result.right_hand.last_cursor_position = self.last_right_cursor_position
         self.last_left_fist_detected = result.left_hand.fist
@@ -152,6 +159,7 @@ class HandDetection:
             self.last_right_wrist = result.right_hand.wrist_position = self.get_wrist(right_hand, w, h)
         else:
             self.last_right_wrist = result.right_hand.wrist_position = Position()
+            print("No right hand detected")
 
         if result.left_hand.clicked and result.right_hand.clicked:
             result.left_hand.clicked = False
