@@ -31,11 +31,11 @@ def main():
         image = cv2.flip(image, 1)
         image = ui_manager.display_GUI(image)
 
-        if TWO_EYES:
-            image = camera_manager.make_two_eye_view(image, resized_w, resized_h)
+        #if TWO_EYES:
+            #image = camera_manager.make_two_eye_view(image, resized_w, resized_h)
 
-        camera_manager.calculate_fps()
-        camera_manager.display_fps(image, resized_w, resized_h)
+        #camera_manager.calculate_fps()
+        #camera_manager.display_fps(image, resized_w, resized_h)
 
         if recording:
             recorded_frames.append(image.copy())
