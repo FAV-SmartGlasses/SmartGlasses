@@ -26,9 +26,9 @@ class UnitConverter(FixedAspectApp, ABC):
         self.quantities_data_list = self.manager.convert_json()  # Load the conversion data from JSON
         self.current_units_options = []  # list of current unit options for the dropdown menus
 
-        self.quantity_dropdown = Dropdown(Position(50, 50), Size(200, 40), self.manager.get_quantities_options(), None)
-        self.unit_from_dropdown = Dropdown(Position(50, 200), Size(200, 40), [], None)
-        self.unit_to_dropdown = Dropdown(Position(50, 400), Size(200, 40), [], None)
+        self.quantity_dropdown = Dropdown(Position(50, 50), Size(200, 40), self.manager.get_quantities_options(), None, white_borders=True)
+        self.unit_from_dropdown = Dropdown(Position(50, 200), Size(200, 40), [], None, white_borders=True)
+        self.unit_to_dropdown = Dropdown(Position(50, 400), Size(200, 40), [], None, white_borders=True)
         self.number_box_in = NumberBox(Position(200, 200), Size(200, 40))
         self.number_box_out = NumberBox(Position(50, 250), Size(200, 40))
 
@@ -73,17 +73,16 @@ class UnitConverter(FixedAspectApp, ABC):
 
         self.keyboard.set_position_and_size(keyboard_position, scaled_key_size, scaled_key_padding)
         
-    """def compute_aspect_ratio(self):
+    def compute_aspect_ratio(self):
         #TODO: compute_aspect_ratio in converter_page
-        return 1"""
+        return 1
 
     def draw(self, image: np.ndarray, gestures: DetectionModel):
         cv2.setUseOptimized(True)
 
-        if gestures.right_hand.clicked:
-            pass
-
         if self.opened:
+            self. aspect_ratio = self.compute_aspect_ratio()
+
             self.check_fist_gesture(gestures)
             self.draw_lines(image, gestures)
 
@@ -100,6 +99,17 @@ class UnitConverter(FixedAspectApp, ABC):
 
             self.quantities_data_list = self.manager.get_quantities_datalist()
 
+            # Ensure only one dropdown is open at a time
+            if self.quantity_dropdown.open:
+                self.unit_from_dropdown.open = False
+                self.unit_to_dropdown.open = False
+            elif self.unit_from_dropdown.open:
+                self.quantity_dropdown.open = False
+                self.unit_to_dropdown.open = False
+            elif self.unit_to_dropdown.open:
+                self.quantity_dropdown.open = False
+                self.unit_from_dropdown.open = False
+
             if self.quantity_dropdown.selected:
                 selected_quantity = self.quantity_dropdown.selected_option
 
@@ -114,9 +124,8 @@ class UnitConverter(FixedAspectApp, ABC):
                 self.unit_to_dropdown.selected):
                 self.set_output_value()
             
-            
+            # Draw all dropdowns
             self.quantity_dropdown.draw(overlay, gestures)
-            
             self.unit_from_dropdown.draw(overlay, gestures)
             self.unit_to_dropdown.draw(overlay, gestures)
             
@@ -126,6 +135,14 @@ class UnitConverter(FixedAspectApp, ABC):
             self.number_box_in.value = self.keyboard.get_text_with_cursor()
             self.number_box_in.draw(overlay, gestures)
             self.number_box_out.draw(overlay, gestures)
+
+            # Draw the currently open dropdown
+            if self.quantity_dropdown.open:
+                self.quantity_dropdown.render(overlay, gestures)
+            elif self.unit_from_dropdown.open:
+                self.unit_from_dropdown.render(overlay, gestures)
+            elif self.unit_to_dropdown.open:
+                self.unit_to_dropdown.render(overlay, gestures)
 
             alpha = get_app_transparency()
             cv2.addWeighted(overlay, alpha, image, 1 - alpha, 0, image)
