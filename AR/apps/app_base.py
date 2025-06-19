@@ -15,24 +15,25 @@ def is_hovered(cursor_x, cursor_y, x1, y1, x2, y2):
     return x1 <= cursor_x <= x2 and y1 <= cursor_y <= y2
 
 
+# Define constants for sensitivity
+SIDE_SENSITIVITY = 10
+INSIDE_SENSITIVITY = 10
+OUTSIDE_SENSITIVITY = 20
+
 def calculate_hover_region(center, length, offset, is_vertical=False):
-    """
-    Calculate a rectangular hover region based on a center coordinate, length, and offset.
-    If is_vertical is True, the region is vertical; otherwise, it is horizontal.
-    """
     if is_vertical:
         return (
-            offset,
-            center - length // 2,
-            offset + 20,
-            center + length // 2
+            offset - INSIDE_SENSITIVITY,
+            center - length // 2 - SIDE_SENSITIVITY,
+            offset + 20 + SIDE_SENSITIVITY,
+            center + length // 2 + OUTSIDE_SENSITIVITY
         )
     else:
         return (
-            center - length // 2,
-            offset,
-            center + length // 2,
-            offset + 20
+            center - length // 2 - SIDE_SENSITIVITY,
+            offset - INSIDE_SENSITIVITY,
+            center + length // 2 + SIDE_SENSITIVITY,
+            offset + 20 + OUTSIDE_SENSITIVITY
         )
 
 
@@ -118,6 +119,7 @@ class App(MenuItem):
         resize_h = False
 
         # Define hover regions for right line and bottom line using the updated helper function
+        
         right_line_region = calculate_hover_region(app_y + app_height // 2, line_length, app_x + app_width, is_vertical=True)
         bottom_line_region = calculate_hover_region(app_x + app_width // 2, line_length, app_y + app_height, is_vertical=False)
 
