@@ -2,13 +2,13 @@ import math
 from collections import deque
 
 import cv2
+import time
 import mediapipe as mp
 import numpy as np
 
 from config import *
 from hand_detection_models import *
 
-DISTANCE_THRESHOLD = 0.05
 
 def calculate_distance_3d(point1, point2):
     return math.sqrt((point1.x - point2.x) ** 2 + (point1.y - point2.y) ** 2 + (point1.z - point2.z) ** 2)
@@ -37,7 +37,11 @@ def get_point(id_, hand_landmarks, w, h) -> Position:
 
 
 class HandDetection:
-    DIST_THRESHOLD = 40  # finger touch threshold
+    CLICK_DIST_THRESHOLD = 40  # finger touch threshold
+    FIST_FINGER_DISTANCE_THRESHOLD = 0.05
+    SWIPE_SPEED_THRESHOLD = 500  # px/s
+    SWIPE_DISTANCE_THRESHOLD = 50  # px – MIN distance to consider a swipe
+    SWIPE_COOLDOWN = 0.3  # 300 ms cooldown between 2 swipe gestures
 
     def __init__(self):
         self.mp_hands = mp.solutions.hands
@@ -51,6 +55,10 @@ class HandDetection:
 
         self.last_left_fist_detected: bool = False
         self.last_right_fist_detected: bool = False
+
+        self.last_left_wrist_time = 0
+        self.last_right_wrist_time = 0
+        self.last_swipe_time = 0
 
         self.last_left_cursor_position: Position = Position()
         self.last_right_cursor_position: Position = Position()
@@ -116,13 +124,6 @@ class HandDetection:
                 result.right_hand.fist = self.is_fist_detected(right_hand)
                 if result.left_hand.fist and result.right_hand.fist:
                     result.left_hand.fist = result.right_hand.fist = False
-                """print(f"left fist: {result.left_hand.fist}, right fist: {result.right_hand.fist}")
-                if result.right_hand.fist and result.left_hand.fist:
-                    cv2.putText(image, "both fists!", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-                elif result.left_hand.fist:
-                    cv2.putText(image, "left fist!", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-                elif result.right_hand.fist:
-                    cv2.putText(image, "right fist!", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)"""
 
                 left_swipe_gesture_detected = self.swipe_gesture_detected(left_hand, w, h, is_left = True)
                 right_swipe_gesture_detected = self.swipe_gesture_detected(right_hand, w, h, is_left = False)
@@ -140,12 +141,7 @@ class HandDetection:
 
                 result.right_hand.fist = self.is_fist_detected(right_hand)
 
-                """if result.right_hand.fist:
-                    cv2.putText(image, "fist!", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)"""
-
                 right_swipe_gesture_detected = self.swipe_gesture_detected(right_hand, w, h, is_left=False)
-                if right_swipe_gesture_detected is not SwipeGesture.NO:
-                    print("neco")
                 result.right_hand.clicked = self.is_click_gesture_detected(right_hand, w, h)
                 result.right_hand.cursor = self.get_cursor_position(w, h, right_hand)
                 self.draw(image, right_hand)
@@ -204,46 +200,79 @@ class HandDetection:
         ring_pinky_distance = calculate_distance_3d(ring_tip, pinky_tip)
 
         # if distances between fingers are smaller than DISTANCE_THRESHOLD, fist gesture is detected
-        return (thumb_index_distance < DISTANCE_THRESHOLD and index_middle_distance < DISTANCE_THRESHOLD and
-                middle_ring_distance < DISTANCE_THRESHOLD and ring_pinky_distance < DISTANCE_THRESHOLD)
+        return (thumb_index_distance < self.FIST_FINGER_DISTANCE_THRESHOLD and index_middle_distance < self.FIST_FINGER_DISTANCE_THRESHOLD and
+                middle_ring_distance < self.FIST_FINGER_DISTANCE_THRESHOLD and ring_pinky_distance < self.FIST_FINGER_DISTANCE_THRESHOLD)
 
     def swipe_gesture_detected(self, hand_landmarks, w, h, is_left):
-        wrist = self.get_wrist(hand_landmarks, w, h)  # Get wrist position
+        wrist = self.get_wrist(hand_landmarks, w, h)
+        current_time = time.time()
+
+        # Bezpečné čtení pozic
+        wrist_x = wrist.x if wrist.x is not None else 0
+        wrist_y = wrist.y if wrist.y is not None else 0
 
         if is_left:
-            last_wrist_x = self.last_left_wrist.x
-            last_wrist_y = self.last_left_wrist.y
+            last_pos = self.last_left_wrist
+            last_time = self.last_left_wrist_time
         else:
-            last_wrist_x = self.last_right_wrist.x
-            last_wrist_y = self.last_right_wrist.y
+            last_pos = self.last_right_wrist
+            last_time = self.last_right_wrist_time
 
-        if last_wrist_x is not None and last_wrist_y is not None:
-            delta_x = wrist.x - last_wrist_x
-            delta_y = wrist.y - last_wrist_y
-            threshold = 50
+        last_x = last_pos.x if last_pos.x is not None else 0
+        last_y = last_pos.y if last_pos.y is not None else 0
 
-            if abs(delta_x) > abs(delta_y):  # Horizontal movement
-                if delta_x > threshold:
-                    gesture_detected = SwipeGesture.RIGHT
-                    print(f"{'Left' if is_left else 'Right'} hand swipe right")
-                elif delta_x < -threshold:
-                    gesture_detected = SwipeGesture.LEFT
-                    print(f"{'Left' if is_left else 'Right'} hand swipe left")
-                else:
-                    gesture_detected = SwipeGesture.NO
-            else:  # Vertical movement
-                if delta_y > threshold:
-                    gesture_detected = SwipeGesture.DOWN
-                    print(f"{'Left' if is_left else 'Right'} hand swipe down")
-                elif delta_y < -threshold:
-                    gesture_detected = SwipeGesture.UP
-                    print(f"{'Left' if is_left else 'Right'} hand swipe up")
-                else:
-                    gesture_detected = SwipeGesture.NO
+        # První frame – nastav pouze poslední pozici a čas
+        if last_time == 0 or (last_pos.x is None or last_pos.y is None):
+            if is_left:
+                self.last_left_wrist = wrist
+                self.last_left_wrist_time = current_time
+            else:
+                self.last_right_wrist = wrist
+                self.last_right_wrist_time = current_time
+            return SwipeGesture.NO
+
+        delta_time = current_time - last_time
+        if delta_time == 0:
+            return SwipeGesture.NO
+
+        delta_x = wrist_x - last_x
+        delta_y = wrist_y - last_y
+
+        speed_x = delta_x / delta_time
+        speed_y = delta_y / delta_time
+
+        gesture = SwipeGesture.NO
+
+        # Vyhodnocení směru jen pokud překročena rychlost i vzdálenost
+        if abs(speed_x) > abs(speed_y) and abs(delta_x) > self.SWIPE_DISTANCE_THRESHOLD:
+            if speed_x > self.SWIPE_SPEED_THRESHOLD:
+                gesture = SwipeGesture.RIGHT
+            elif speed_x < -self.SWIPE_SPEED_THRESHOLD:
+                gesture = SwipeGesture.LEFT
+        elif abs(speed_y) > abs(speed_x) and abs(delta_y) > self.SWIPE_DISTANCE_THRESHOLD:
+            if speed_y > self.SWIPE_SPEED_THRESHOLD:
+                gesture = SwipeGesture.DOWN
+            elif speed_y < -self.SWIPE_SPEED_THRESHOLD:
+                gesture = SwipeGesture.UP
+
+        # Cooldown proti opakování
+        if current_time - self.last_swipe_time < self.SWIPE_COOLDOWN:
+            gesture = SwipeGesture.NO
+        elif gesture != SwipeGesture.NO:
+            self.last_swipe_time = current_time
+
+        # Ulož novou pozici
+        if is_left:
+            self.last_left_wrist = wrist
+            self.last_left_wrist_time = current_time
         else:
-            gesture_detected = SwipeGesture.NO
+            self.last_right_wrist = wrist
+            self.last_right_wrist_time = current_time
 
-        return gesture_detected
+        if gesture != SwipeGesture.NO:
+            print(f"{'Left' if is_left else 'Right'} hand swipe {gesture.name.lower()}")
+
+        return gesture
 
 
     def get_left_and_right_hands(self, hand_landmarks_list, w, h):
@@ -263,7 +292,7 @@ class HandDetection:
         distance = math.hypot(index_tip.x - thumb_tip.x, index_tip.y - thumb_tip.y)  # Distance between thumb and index finger
 
         # Detect the state of thumb and index finger touching
-        click_gesture_detected = True if distance < self.DIST_THRESHOLD else False
+        click_gesture_detected = True if distance < self.CLICK_DIST_THRESHOLD else False
         if not self.click_gesture_history or click_gesture_detected != self.click_gesture_history[-1]:
             self.click_gesture_history.append(click_gesture_detected)
 
