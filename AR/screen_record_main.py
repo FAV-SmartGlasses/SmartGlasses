@@ -28,13 +28,13 @@ def main():
             break
 
         image, resized_w, resized_h = camera_manager.process_frame(image)
-        image = cv2.flip(image, 1)
+        #image = cv2.flip(image, 1)
         image = ui_manager.display_GUI(image)
 
         #if TWO_EYES:
             #image = camera_manager.make_two_eye_view(image, resized_w, resized_h)
 
-        #camera_manager.calculate_fps()
+        camera_manager.calculate_fps()
         #camera_manager.display_fps(image, resized_w, resized_h)
 
         if recording:
@@ -65,9 +65,13 @@ def main():
                     out.release()
                     print(f"Saved to {filename}")
                 recorded_frames = []
-
         elif key != ord("f"):
             changed = True
+        
+        if key == ord("s"):
+            screenshot_filename = f"screenshot_{int(time.time())}.png"  # Změňte příponu na .jpg pro JPG
+            cv2.imwrite(screenshot_filename, image)
+            print(f"Screenshot saved as {screenshot_filename}")
 
         if key in [27, ord('q'), ord('Q')]:
             break

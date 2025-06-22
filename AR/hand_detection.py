@@ -95,8 +95,6 @@ class HandDetection:
         hand_landmarks_list = hands_results.multi_hand_landmarks
         if hand_landmarks_list:
             if len(hand_landmarks_list) == 2:
-                # TODO: add gesture for moving and resizing apps
-
                 left_hand, right_hand = self.get_left_and_right_hands(hand_landmarks_list, w, h)
 
                 result.left_hand.fist = self.is_fist_detected(left_hand)
@@ -159,11 +157,14 @@ class HandDetection:
             self.last_right_wrist = result.right_hand.wrist_position = self.get_wrist(right_hand, w, h)
         else:
             self.last_right_wrist = result.right_hand.wrist_position = Position()
-            print("No right hand detected")
+            #print("No right hand detected")
 
         if result.left_hand.clicked and result.right_hand.clicked:
             result.left_hand.clicked = False
             result.right_hand.clicked = False
+
+        """if right_swipe_gesture_detected == SwipeGesture.RIGHT:
+                print("neco")"""
 
         result.swipe = combine_swipe_gestures(left_swipe_gesture_detected, right_swipe_gesture_detected)
 

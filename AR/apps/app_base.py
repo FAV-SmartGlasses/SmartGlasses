@@ -3,12 +3,14 @@ from abc import abstractmethod
 import cv2
 import numpy as np
 import math
+from collections import deque
 
 from gui.color_manager import *
 from hand_detection_models import *
 from menu_items import MenuItem
 from other_utilities import *
 from config import r
+from gui.draw import draw_rounded_rectangle
 
 
 def is_hovered(cursor_x, cursor_y, x1, y1, x2, y2):
@@ -51,6 +53,8 @@ class App(MenuItem):
         self._size: Size = Size(400, 400)
         self.pages = []
         self.current_page = 0
+        self.is_resizing = False
+        self.fist_gesture_history = deque(maxlen=20)
 
     def add_page(self, page):
         self.pages.append(page)
@@ -64,13 +68,22 @@ class App(MenuItem):
     def check_fist_gesture(self, gestures: DetectionModel):
         if (gestures.right_hand.last_wrist_position.get_array() != (None,None) and 
             gestures.right_hand.fist == True and
-            gestures.right_hand.wrist_position.get_array() != (None,None)):
+            gestures.right_hand.wrist_position.get_array() != (None,None)): 
+            """or
+            (len(self.fist_gesture_history) > 0 and self.fist_gesture_history[-1] == True):"""
 
             wrist_diff = get_difference_between_positions(gestures.right_hand.last_wrist_position, gestures.right_hand.wrist_position)
             new_position = get_sum_of_positions(self._position, wrist_diff)
 
-            if is_within_distance(new_position, self._position, r):
-                self._position = new_position
+            #if is_within_distance(new_position, self._position, r):
+            self._position = new_position
+            self.is_resizing = True
+            self.fist_gesture_history.append(True)
+            #else:
+                #self.is_resizing = False
+        else:
+            self.is_resizing = False
+            self.fist_gesture_history.append(False)
 
     def resize(self, gestures: DetectionModel, resize_w: bool, resize_h: bool):
         cursor_diff = get_difference_between_positions(gestures.right_hand.last_cursor_position, gestures.right_hand.cursor)
@@ -86,6 +99,15 @@ class App(MenuItem):
         The circle is only drawn if the app type is FreeResizeApp.
         Additionally, handles resizing logic based on clicks.
         """
+        if self.is_resizing:
+            draw_rounded_rectangle(
+                image,
+                self._position.get_array(),
+                get_right_bottom_pos(self._position, self._size).get_array(),
+                30,
+                (0, 0, 0, 255),
+                2)
+
         # Get cursor positions for both hands
         cursors = [
             gestures.right_hand.cursor.get_array(),
@@ -95,7 +117,7 @@ class App(MenuItem):
         # Filter out invalid cursor positions
         cursors = [pos for pos in cursors if pos != (None, None)]
 
-        if not cursors:
+        if not cursors or self.is_resizing:
             return
 
         app_x, app_y = self._position.x, self._position.y

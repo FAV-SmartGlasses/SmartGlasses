@@ -39,8 +39,6 @@ class Calculator(FixedAspectApp):
         overlay = image.copy()
 
         if self.opened:
-            self.check_fist_gesture(gestures)
-            self.draw_lines(image, gestures)
             #self.check_resize_gesture(gestures)
 
             cols = len(self.keyboard.keys[0])
@@ -91,3 +89,7 @@ class Calculator(FixedAspectApp):
                 1,
                 get_font_color_bgra(),  # Use BGRA color
                 2)
+            
+            
+            self.check_fist_gesture(gestures)
+            self.draw_lines(image, gestures)
