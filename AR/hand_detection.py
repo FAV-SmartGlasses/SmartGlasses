@@ -82,7 +82,7 @@ class HandDetection:
         h, w, _ = image.shape
 
         hands_results = self.hands.process(image)
-        # MEMORY LEAK: creating new instance of MediaPipe Hands at every frame
+        # to create MEMORY LEAK: creating new instance of MediaPipe Hands at every frame
         #hands_instance = self.mp_hands.Hands(static_image_mode=False, max_num_hands=2, min_detection_confidence=0.7)
         #hands_results = hands_instance.process(image)
         # hands_instance.close()  # this code is avoiding memory leak if 2 previus lines are uncommented
@@ -93,9 +93,24 @@ class HandDetection:
 
         left_hand, right_hand = None, None
         hand_landmarks_list = hands_results.multi_hand_landmarks
+        handedness_list = getattr(hands_results, 'multi_handedness', None)
         if hand_landmarks_list:
             if len(hand_landmarks_list) == 2:
-                left_hand, right_hand = self.get_left_and_right_hands(hand_landmarks_list, w, h)
+                if USE_MEDIAPIPE_HANDEDNESS and handedness_list:
+                    # Určení podle MediaPipe
+                    hand_labels = [h.classification[0].label for h in handedness_list]
+                    # Najít indexy levé a pravé ruky
+                    try:
+                        left_idx = hand_labels.index("Left")
+                        right_idx = hand_labels.index("Right")
+                        left_hand = hand_landmarks_list[left_idx]
+                        right_hand = hand_landmarks_list[right_idx]
+                    except ValueError:
+                        # fallback na pozici pokud by MediaPipe nevrátil obě
+                        left_hand, right_hand = self.get_left_and_right_hands(hand_landmarks_list, w, h)
+                else:
+                    # Určení podle pozice (x-ové souřadnice)
+                    left_hand, right_hand = self.get_left_and_right_hands(hand_landmarks_list, w, h)
 
                 result.left_hand.fist = self.is_fist_detected(left_hand)
                 result.right_hand.fist = self.is_fist_detected(right_hand)
@@ -169,7 +184,7 @@ class HandDetection:
         result.swipe = combine_swipe_gestures(left_swipe_gesture_detected, right_swipe_gesture_detected)
 
         if PRINT_SWIPE_GESTURES and result.swipe is not SwipeGesture.NO:
-            print(result.swipe.name)
+            print(f"Swipe gesture detected: {result.swipe.name}")
 
         return image, result
 
