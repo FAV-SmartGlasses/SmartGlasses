@@ -20,37 +20,37 @@ class ConverterKeyboard(Keyboard):
     def __init__(self):
         super().__init__(KEYS)
         self.equally_clicked = False
-        self._text = "0"
+        self.text = "0"
 
     def process_detected_key(self, detected_key):
         self.equally_clicked = False
         if detected_key == "X":
-            if len(self._text) > 0 and self.cursor_in_text_position_from_back < len(self._text):
-                cursor_position = len(self._text) - self.cursor_in_text_position_from_back
-                self._text = self._text[:cursor_position - 1] + self._text[cursor_position:] # deletes character on the place before cursor
+            if len(self.text) > 0 and self.cursor_in_text_position_from_back < len(self.text):
+                cursor_position = len(self.text) - self.cursor_in_text_position_from_back
+                self.text = self.text[:cursor_position - 1] + self.text[cursor_position:] # deletes character on the place before cursor
         elif detected_key == "C":
-            self._text = "0"
+            self.text = "0"
             self.cursor_in_text_position_from_back = 0
         elif detected_key in "0123456789":
-            if self._text == "0" or self._text == "0":
-                self._text = detected_key
+            if self.text == "0" or self.text == "0":
+                self.text = detected_key
             else:
-                cursor_position = len(self._text) - self.cursor_in_text_position_from_back
-                self._text = self._text[:cursor_position] + detected_key + self._text[cursor_position:]
+                cursor_position = len(self.text) - self.cursor_in_text_position_from_back
+                self.text = self.text[:cursor_position] + detected_key + self.text[cursor_position:]
         elif detected_key == ".":
-            if self._text and self._text[-1].isdigit():
-                last_number = self._text.split()[-1]
+            if self.text and self.text[-1].isdigit():
+                last_number = self.text.split()[-1]
                 if "." not in last_number:
-                    self._text += detected_key
-            if not self._text:
-                self._text = "0."
-        elif detected_key == "=" and len(self._text) > 0:
+                    self.text += detected_key
+            if not self.text:
+                self.text = "0."
+        elif detected_key == "=" and len(self.text) > 0:
             self.equally_clicked = True
         elif detected_key == "<-":
-            if self._text and len(self._text) > self.cursor_in_text_position_from_back:
+            if self.text and len(self.text) > self.cursor_in_text_position_from_back:
                 self.cursor_in_text_position_from_back += 1
         elif detected_key == "->":
-            if self._text and self.cursor_in_text_position_from_back > 0:
+            if self.text and self.cursor_in_text_position_from_back > 0:
                 self.cursor_in_text_position_from_back -= 1
 
-        self._text = self._text[:MAX_LENGTH]
+        self.text = self.text[:MAX_LENGTH]

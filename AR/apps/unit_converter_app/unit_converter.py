@@ -153,6 +153,10 @@ class UnitConverter(FixedAspectApp, ABC):
             to_unit = self.unit_to_dropdown.selected_option
             quantity = self.quantity_dropdown.selected_option
             in_number = str(self.number_box_in.value).replace("|", "")  #self.keyboard.text
-            out_number = self.manager.convert_number(in_number, quantity, from_unit, to_unit)
+
+            if not in_number:
+                self.number_box_out.value = ""
+                return
             
+            out_number = self.manager.convert_number(in_number, quantity, from_unit, to_unit)
             self.number_box_out.value = out_number
